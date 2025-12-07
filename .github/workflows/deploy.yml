@@ -1,0 +1,147 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "env=production" >> $GITHUB_OUTPUT
+          else
+            echo "env=staging" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check required secrets
+        run: |
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "❌ DEPLOY_HOST secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+            echo "❌ DEPLOY_USER secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_PATH }}" ]; then
+            echo "❌ DEPLOY_PATH secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+            echo "❌ DEPLOY_SSH_KEY secret is missing"
+            exit 1
+          fi
+          echo "✅ All required secrets are present"
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      
+      - name: Add server to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Save current images as previous
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST << EOF
+            cd $DEPLOY_PATH
+            # Tag current images as previous for rollback
+            docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "(backend|frontend)" | while read image; do
+              if [[ ! "$image" =~ :previous$ ]]; then
+                docker tag "$image" "${image%:*}:previous" || true
+              fi
+            done
+          EOF
+      
+      - name: Deploy via SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          ENVIRONMENT: ${{ steps.env.outputs.env }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST << EOF
+            cd $DEPLOY_PATH
+            
+            # Pull latest code
+            git fetch origin
+            git checkout $GITHUB_REF_NAME
+            git pull origin $GITHUB_REF_NAME
+            
+            # Pull latest Docker images
+            docker compose pull backend frontend
+            
+            # Run migrations
+            docker compose exec -T backend alembic upgrade head || echo "Migration failed, continuing..."
+            
+            # Restart services
+            docker compose up -d backend frontend
+            
+            # Wait for services to be ready
+            sleep 10
+          EOF
+      
+      - name: Health check
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PROTOCOL: ${{ secrets.DEPLOY_PROTOCOL || 'http' }}
+        run: |
+          API_URL="$DEPLOY_PROTOCOL://$DEPLOY_HOST/"
+          for i in {1..30}; do
+            if curl -f -k "$API_URL" > /dev/null 2>&1; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Waiting for service to be ready... ($i/30)"
+            sleep 2
+          done
+          echo "Health check failed"
+          exit 1
+      
+      - name: Rollback on failure
+        if: failure()
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST << EOF
+            cd $DEPLOY_PATH
+            docker compose pull backend:previous frontend:previous || true
+            docker compose up -d backend frontend
+          EOF
+      
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful to ${{ steps.env.outputs.env }}"
+          else
+            echo "❌ Deployment failed to ${{ steps.env.outputs.env }}"
+          fi
+

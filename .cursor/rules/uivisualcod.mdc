@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+
+# Frontend Visualization & Media Rules
+
+- All visualizations must be implemented using the project's approved charting library 
+  (e.g., Recharts, Chart.js, ECharts, or another defined library). 
+  No placeholder pseudo-visualizations.
+
+- Every visualization component must:
+    - import the charting library directly
+    - use real data passed as props
+    - render a visible chart element on the page
+    - not rely on external images or screenshots from Figma
+
+- When the user requests "show a graph / chart / visualization":
+    - generate a React visualization component immediately
+    - include full working JSX + dataset
+    - include required imports
+    - insert the component into the correct page or layout
+
+- For images:
+    - place them in the project's /public or /assets folder
+    - reference them using static imports or absolute paths
+    - do not rely on external URLs unless explicitly provided
+
+- Figma designs must be interpreted verbally.
+  Cursor must never depend on Figma links or attempt to fetch design files.
+
+- When adding UI elements to the main menu:
+    - integrate components directly into the existing layout
+    - ensure the element is visible and styled with tokens
+    - ensure imports and file locations exist
+
+- If visualization data is missing, Cursor must generate a mock dataset.

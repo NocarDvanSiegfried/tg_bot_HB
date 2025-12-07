@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-coverage:
+    name: Backend Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run tests with coverage
+        working-directory: ./backend
+        run: |
+          pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v
+      
+      - name: Check coverage threshold
+        working-directory: ./backend
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            coverage report --fail-under=70
+          else
+            coverage report --fail-under=70 || echo "⚠️ Coverage below 70%, but continuing for non-main branch..."
+          fi
+      
+      - name: Upload coverage to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend/coverage.xml
+          retention-days: 30
+      
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERAGE_XML_PATH: backend/coverage.xml
+          MINIMUM_GREEN: 70
+          MINIMUM_ORANGE: 50
+

@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# General Caching Rules
+
+- Cache is a performance optimization layer, not a source of truth. 
+  All authoritative data must live in permanent storage.
+
+- Only cache data that:
+    - is read frequently,
+    - changes infrequently,
+    - is expensive or slow to compute or retrieve.
+
+- Every cached value must have a well-defined TTL (time-to-live).
+
+- The system must remain functional even if the cache is empty, lost, or unavailable.
+
+- Any change to the underlying data must trigger cache invalidation or refresh.
+
+- Sensitive data must never be cached (personal info, passwords, tokens, private keys).
+
+- Cache keys must follow a consistent and predictable naming pattern.
+
+- Cache must not mirror the entire database schema. 
+  Only cache results that improve performance meaningfully.
+
+- Avoid over-caching: excessive caching consumes memory and complicates invalidation.
+
+- Avoid too short TTLs: ineffective caching leads to little or no performance gain.
+
+- Cache logic must remain simple, transparent, and predictable.
+
+- When cache entries expire or are flushed, the system must automatically rebuild them on demand.
+
+- Business-critical decisions must never rely solely on cached values.
+
+- Caching must not change the behavior of the application — only speed it up.
+
+- The application must assume cached data may become stale, missing, or evicted at any time.

@@ -1,0 +1,157 @@
+---
+alwaysApply: true
+---
+
+# DevOps & CI/CD Standards
+
+## General Deployment Requirements
+- The project must support automated build, test, and deployment processes.
+- Manual deployment is allowed only for emergency patches.
+- All environments must be reproducible using scripts or configuration files.
+- No environment may rely on undocumented manual steps.
+
+---
+
+## Environment Separation
+The system must support separate environments:
+
+- local (developer environment)
+- staging (pre-production environment)
+- production (live environment)
+
+Each environment must have:
+- isolated configuration
+- isolated secrets
+- isolated API keys
+- isolated environment variables
+- isolated build artifacts
+
+---
+
+## Server Integration Rules
+When a new server or hosting is added:
+- Define environment variables for that server in a separate env file.
+- Add deployment steps for that server to the CI pipeline.
+- Do not mix server-specific configuration with application logic.
+- All server settings must live inside deployment-level config.
+
+Servers must be treated as:
+- independent deployment targets
+- swappable nodes without modifying code
+- configuration-driven
+
+---
+
+## Build Rules
+- Frontend must always build using:  
+    npm run build
+- Backend must always build using:  
+    docker compose build
+
+No warnings or errors are acceptable in production builds.
+
+---
+
+## Deployment via GitHub Actions
+GitHub Actions workflows must:
+
+- trigger on:
+    - push to main or production branch
+    - manual dispatch
+    - pull requests for testing
+
+- include required stages:
+    - checkout repository
+    - install dependencies (backend & frontend)
+    - run linting
+    - run type checks
+    - run builds
+    - build docker images when needed
+    - deploy artifacts to the target server
+
+Each stage must fail fast:
+- if linting fails → stop pipeline  
+- if type checks fail → stop pipeline  
+- if build fails → stop pipeline  
+- if deployment fails → notify  
+
+---
+
+## Deployment Artifacts
+- Frontend artifacts must be built once and uploaded/deployed directly.
+- Backend docker images must be tagged with:
+    - git commit hash
+    - date
+    - branch name
+
+Artifacts must never be built manually on servers.
+
+---
+
+## Secrets & Security
+- Secrets must be stored only in GitHub Actions secrets or server's secure vault.
+- No secrets in code or repo.
+- Secrets must never be output to logs.
+- Rotate secrets after major releases or security events.
+
+---
+
+## Deployment Steps for Servers
+When deploying to a server:
+
+- Pull the latest version or docker image.
+- Apply environment variables for that specific server.
+- Restart backend services safely.
+- Deploy frontend artifacts to the static server root.
+- Confirm health-check endpoint before marking deployment successful.
+
+No SSH manual editing of files allowed except for emergency.
+
+---
+
+## Monitoring & Logging
+- Each deployment must log:
+    - commit hash
+    - build number
+    - deployment time
+    - environment name
+- Logs must be structured and easy to parse.
+
+---
+
+## Rollback Strategy
+Every deployment must support rollback:
+
+- keep previous docker image
+- keep previous frontend build
+- keep last two environment configs
+
+Rollback must be:
+- script-driven
+- available immediately
+- not dependent on developer's laptop
+
+---
+
+## Scaling & Adding New Servers
+When adding new servers:
+- CI pipeline must be updated with new deployment jobs.
+- Environment files for the new server must be added.
+- Deployment must be parameterized by environment name.
+- No code duplication allowed between server configs.
+
+Servers must support:
+- horizontal scaling  
+- stateless backend nodes  
+- atomic deployments  
+
+---
+
+## Code Quality Gate for Deployment
+Deployment is allowed only if:
+- build passes
+- lint passes
+- type-check passes
+- TDD tests pass
+- no warnings in build logs
+- architecture checks pass

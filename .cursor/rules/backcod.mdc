@@ -1,0 +1,124 @@
+---
+alwaysApply: true
+---
+
+# Backend Architecture Standards (SOLID + Clean Architecture Only)
+
+## Architectural Layers
+The backend must strictly follow clean architecture principles using four logical layers:
+
+- domain: pure business rules, entities, value objects, domain services
+- application: use-cases, input/output ports, orchestrators
+- infrastructure: external implementations (adapters, network clients, drivers)
+- presentation/interfaces: controllers, routes, transport handlers
+
+No code may bypass these boundaries.
+
+### Allowed Dependencies (one direction only):
+domain  <-  application  <-  infrastructure  <-  presentation
+No reverse dependencies are allowed.
+
+---
+
+## SOLID Principles
+- Single Responsibility: every class/function handles exactly one responsibility.
+- Open/Closed: logic must be extendable without modifying core structures.
+- Liskov Substitution: abstractions must not break when replaced with implementations.
+- Interface Segregation: interfaces must be small and specific.
+- Dependency Inversion: domain and application depend only on abstractions, never concrete implementations.
+
+---
+
+## Domain Layer Rules
+- Contains only pure business rules.
+- No references to frameworks, platforms, network, or external modules.
+- No side-effects: deterministic logic only.
+- Entities must encapsulate invariants internally.
+- No DTOs or controller data formats inside this layer.
+
+---
+
+## Application Layer Rules
+- Contains use-cases that orchestrate operations.
+- Use-cases:
+    - validate input
+    - call domain logic
+    - call abstract ports (interfaces), not implementations
+    - return structured output
+- No business rules here; no infrastructure logic.
+- No global state.
+- Use-cases must not contain arbitrary computation not related to orchestration.
+
+---
+
+## Infrastructure Layer Rules
+- Contains only implementations of interfaces:
+    - API clients
+    - adapters
+    - storage drivers
+    - service wrappers
+- Must not contain business logic.
+- Must not expose its internal details to application layer.
+- All external interactions must be isolated here.
+
+---
+
+## Presentation Layer Rules
+- Controllers must:
+    - accept input
+    - map to DTO/input models
+    - call use-cases
+    - map results to responses
+- Controllers must not:
+    - contain business logic
+    - perform validation logic directly
+    - call infrastructure components directly
+- No inline logic, only mapping and delegation.
+
+---
+
+## Communication Between Layers
+- Domain never depends on application.
+- Application never depends on infrastructure.
+- Presentation never depends on domain directly; only through use-cases.
+- No circular dependencies.
+- No hidden cross-layer imports.
+
+---
+
+## DTO and Data Flow Rules
+- DTOs belong to the presentation/application border.
+- No DTOs in domain.
+- No domain objects in presentation responses.
+- Always map data in/out explicitly.
+
+---
+
+## Error Handling
+- Errors must be explicit and typed.
+- No throwing raw strings.
+- No framework-specific exceptions in domain/application layers.
+- Presentation layer is responsible for formatting user-facing error messages.
+
+---
+
+## Code Quality Rules
+- No magic constants.
+- No hardcoded configuration.
+- No duplicated logic.
+- No unused code or imports.
+- No premature abstractions that violate clarity.
+- No side-effects in constructors.
+- No non-existent imports or invented modules.
+- Naming must follow project conventions.
+
+---
+
+## Function & File Structure
+- One file = one responsibility.
+- Functions must be small and predictable.
+- Prefer pure functions where possible.
+- Never mix transport logic with business logic.
+- Never mix domain logic with formatting or transformation.
+
+---

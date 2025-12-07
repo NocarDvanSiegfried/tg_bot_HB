@@ -1,0 +1,72 @@
+---
+alwaysApply: true
+---
+
+# Testing Standards (TDD + Clean Architecture)
+
+## General Rules
+- All new logic must follow TDD:
+    1. Write tests first.
+    2. Implement the function/use-case.
+    3. Run the tests.
+    4. Fix until green.
+
+- Tests must be deterministic, isolated, and reproducible.
+- No external services, no database, no API calls inside tests.
+- No mocking business logic; mock only infrastructure interfaces.
+
+---
+
+## Unit Tests
+- Unit tests are the primary test type.
+- They must cover:
+    - domain entities
+    - value objects
+    - pure functions
+    - application use-cases (mocking infrastructure)
+- No I/O, no HTTP, no timers.
+- Unit tests must run extremely fast.
+
+---
+
+## Integration Tests
+- Integration tests must verify:
+    - interaction between application layer and infrastructure adapters
+    - correct mapping of data structures
+    - correct behavior of ports/interfaces
+
+- They must not touch external systems:
+    - no real DB
+    - no real cache
+    - no network
+
+- Focus only on module-to-module correctness.
+
+---
+
+## E2E Tests
+- E2E tests must cover real user flows only:
+    - page loads
+    - actions and UI behavior
+    - critical workflows
+
+- Must use the designated tool (Playwright).
+- Should be small in number but high value.
+- Do not test business logic in E2E — only behavior.
+
+---
+
+## Test Organization
+- One test file per module/use-case.
+- Keep tests short, readable, and structured.
+- Use consistent naming conventions for tests and helpers.
+
+---
+
+## Quality Gates
+- Code is not “done” until:
+    - all unit tests pass
+    - required integration tests pass
+    - essential E2E tests pass
+
+- Failing tests must block merges and deployments.

@@ -1,0 +1,136 @@
+---
+alwaysApply: true
+---
+
+# External API Integration Standards
+
+## General Principles
+- External APIs must only be accessed through dedicated infrastructure adapters.
+- No external API calls may appear in controllers, domain, or use-cases.
+- All integrations must be deterministic, stable, and fully isolated from business logic.
+- Never assume API behavior; always validate responses.
+
+---
+
+## API Client Rules
+- Each external service must have:
+    - a dedicated client file (one service = one adapter)
+    - explicit base URL
+    - explicit request/response types
+    - explicit timeouts
+    - explicit retry logic if required
+
+- No automatic generation of clients unless the service provides a schema (e.g., OpenAPI).
+
+---
+
+## Request Rules
+- All requests must:
+    - include required headers
+    - validate all input parameters
+    - avoid hardcoded URLs or tokens
+    - use environment variables for secrets and keys
+    - use typed DTOs for request bodies
+    - explicitly define HTTP method, path, query params
+
+- No dynamic, uncontrolled URLs.
+
+---
+
+## Response Handling Rules
+- External responses must be validated before use.
+- No reliance on undocumented fields.
+- The system must gracefully handle:
+    - missing fields
+    - unexpected types
+    - empty responses
+    - partial data
+    - timeouts
+    - non-200 status codes
+
+- All responses must be transformed into internal DTOs before reaching the application layer.
+
+---
+
+## Error Handling Rules
+- Every request must include:
+    - try/catch wrapper
+    - timeout handling
+    - network failure handling
+    - fallback behavior (return meaningful errors or defaults)
+    - structured error logs
+
+- No raw exceptions from external API clients may propagate into use-cases.
+
+---
+
+## Testing Requirements
+Before any API integration is accepted:
+
+- A manual test of the API endpoint must be performed using:
+    - cURL
+    - Postman
+    - or automated test calls
+
+- Cursor must check:
+    - that the endpoint exists
+    - that the API key is valid
+    - that the response format matches documentation
+    - that example input/output works
+
+- The integration must not be merged until:
+    - connectivity is confirmed
+    - authentication works
+    - rate limits are understood
+    - quotas are clear
+
+---
+
+## Supported API Types
+The system must handle:
+
+- REST APIs (OpenRouter, Yandex APIs, Google APIs, etc.)
+- OData endpoints
+- JSON-based services
+- GraphQL (if schema provided)
+- Geo services (routing, geocoding, transportation APIs)
+- Payment APIs
+- Any third-party HTTP interface
+
+All must follow the same adapter pattern.
+
+---
+
+## Clean Architecture Compliance
+- Domain layer must never know that external APIs exist.
+- Application layer may call only abstracted interfaces.
+- Infrastructure layer implements API calls.
+- No leaking external response structures into domain entities.
+
+---
+
+## Logging & Monitoring
+- All requests must include contextual logs:
+    - endpoint name
+    - request ID
+    - response time
+    - status code
+
+- Sensitive data must not appear in logs (API keys, tokens, PII).
+
+---
+
+## API Versioning Rules
+- Always specify API version explicitly if available.
+- Never rely on default or implicit versions.
+- Track API version changes and update client adapters accordingly.
+
+---
+
+## Reliability Rules
+- If an external API becomes unavailable:
+    - the system must degrade gracefully
+    - use fallback values or cached results when possible
+    - never block the entire application
+
+- No hard dependencies on non-critical external services.
