@@ -51,6 +51,7 @@ addopts = [
     "--strict-markers",
     "--tb=short",
     "--disable-warnings",
+    "--import-mode=importlib",
 ]
 
 [tool.coverage.run]
