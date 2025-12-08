@@ -1,5 +1,4 @@
 Run pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
-  
 ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
 cachedir: .pytest_cache
@@ -8,6 +7,7 @@ configfile: pytest.ini
 plugins: anyio-3.7.1, asyncio-0.21.1, mock-3.12.0, cov-4.1.0
 asyncio: mode=Mode.AUTO
 collecting ... collected 179 items / 8 errors
+
 ==================================== ERRORS ====================================
 ___________ ERROR collecting tests/presentation/telegram/test_bot.py ___________
 ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/test_bot.py'.
@@ -141,6 +141,7 @@ src/presentation/telegram/handlers/__init__.py:1: in <module>
 src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
     from aiogram.fsm.context import FSMContext
 E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
+
 ---------- coverage: platform linux, python 3.11.14-final-0 ----------
 Name                                                                       Stmts   Miss  Cover
 ----------------------------------------------------------------------------------------------
@@ -234,6 +235,7 @@ src/presentation/web/routes/api.py                                           248
 TOTAL                                                                       1548   1038    33%
 Coverage HTML written to dir htmlcov
 Coverage XML written to file coverage.xml
+
 =========================== short test summary info ============================
 ERROR tests/presentation/telegram/test_bot.py
 ERROR tests/presentation/telegram/test_keyboards.py
@@ -244,5 +246,5 @@ ERROR tests/presentation/telegram/handlers/test_panel_handler.py
 ERROR tests/presentation/telegram/handlers/test_responsible_handlers.py
 ERROR tests/presentation/telegram/handlers/test_start_handler.py
 !!!!!!!!!!!!!!!!!!! Interrupted: 8 errors during collection !!!!!!!!!!!!!!!!!!!!
-======================== 2 warnings, 8 errors in 3.59s =========================
+======================== 2 warnings, 8 errors in 3.57s =========================
 Error: Process completed with exit code 2.

@@ -6,8 +6,9 @@ from pathlib import Path
 def _setup_python_path_unified(project_root_str=None):
     """Unified function to setup Python path.
     
-    If PYTHONPATH is set (CI), don't modify sys.path.
-    If path needs to be added, append to end to ensure installed packages are found first.
+    Always adds project root to sys.path if not present (needed for importlib mode).
+    importlib mode may not properly use PYTHONPATH for resolving imports.
+    Adding to end ensures installed packages (like aiogram) are found first.
     """
     if project_root_str is None:
         project_root = Path(__file__).parent.parent
@@ -33,10 +34,10 @@ def _setup_python_path_unified(project_root_str=None):
         if p
     )
     
-    # If PYTHONPATH is set (CI), don't modify sys.path
-    # If not in sys.path and not in PYTHONPATH, append to end
-    # This ensures installed packages (like aiogram) are found first
-    if not in_sys_path and not in_pythonpath:
+    # Always add to sys.path if not present (needed for importlib mode)
+    # importlib mode may not properly use PYTHONPATH for resolving imports
+    # Adding to end ensures installed packages (like aiogram) are found first
+    if not in_sys_path:
         sys.path.append(project_root_str)
 
 
