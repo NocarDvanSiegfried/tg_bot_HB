@@ -11,6 +11,7 @@ from src.application.use_cases.calendar.get_calendar_data import GetCalendarData
 from src.application.use_cases.greeting.create_card import CreateCardUseCase
 from src.application.use_cases.greeting.generate_greeting import GenerateGreetingUseCase
 from src.application.use_cases.panel.check_panel_access import CheckPanelAccessUseCase
+from src.application.use_cases.panel.record_panel_access import RecordPanelAccessUseCase
 from src.application.use_cases.responsible.assign_responsible_to_date import (
     AssignResponsibleToDateUseCase,
 )
@@ -134,6 +135,10 @@ class UseCaseFactory:
     def create_panel_access_use_case(self):
         """Создать use-case для проверки доступа к панели."""
         return CheckPanelAccessUseCase(self.panel_access_repo)
+
+    def create_record_panel_access_use_case(self):
+        """Создать use-case для записи доступа к панели."""
+        return RecordPanelAccessUseCase(self.panel_access_repo)
 
     def create_auth_use_case(self):
         """Создать use-case для верификации Telegram auth."""

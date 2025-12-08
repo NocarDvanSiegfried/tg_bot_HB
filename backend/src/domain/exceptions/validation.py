@@ -13,4 +13,3 @@ class InvalidDateError(ValidationError):
     """Ошибка невалидной даты."""
 
     pass
-

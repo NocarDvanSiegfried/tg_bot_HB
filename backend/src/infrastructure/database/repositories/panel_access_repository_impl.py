@@ -14,3 +14,9 @@ class PanelAccessRepositoryImpl(PanelAccessRepository):
         stmt = select(PanelAccessModel).where(PanelAccessModel.user_id == user_id).limit(1)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    async def record_access(self, user_id: int) -> None:
+        """Записать факт доступа пользователя к панели."""
+        access = PanelAccessModel(user_id=user_id)
+        self.session.add(access)
+        await self.session.commit()
