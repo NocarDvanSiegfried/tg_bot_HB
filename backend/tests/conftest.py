@@ -42,17 +42,23 @@ def _setup_python_path_unified(project_root_str=None):
         sys.path.append(project_root_str)
 
 
+# Setup path IMMEDIATELY when conftest.py is imported, before any other imports
+# This ensures sys.path is configured before Python starts importing modules,
+# which is critical for importlib mode compatibility
+_setup_python_path_unified()
+
+
 def pytest_load_initial_conftests(early_config, parser, args):
-    """Load initial conftests - setup path before any imports.
+    """Load initial conftests - ensure path is set up (additional guarantee).
     
-    This hook is the ONLY place where sys.path is modified for importlib compatibility.
-    It runs before pytest_configure and before any test collection,
+    This hook runs before pytest_configure and before any test collection,
     ensuring sys.path is set up correctly even with --import-mode=importlib.
     
-    PYTHONPATH may be set in CI, but importlib mode requires explicit sys.path modification.
-    This hook always adds the project root to sys.path if not already present.
+    Note: Path setup already happens at module import time (see top of file),
+    but this hook provides an additional guarantee in case the module import
+    path setup didn't work correctly.
     """
-    # Setup path immediately, before any test collection
+    # Path should already be set up at module import time, but verify and add if needed
     # Try to get path from early_config.rootpath first, fallback to __file__
     try:
         if hasattr(early_config, 'rootpath') and early_config.rootpath:
@@ -66,19 +72,12 @@ def pytest_load_initial_conftests(early_config, parser, args):
         # This should work in CI where PYTHONPATH is set
         project_root_str = os.getcwd()
     
-    # Use unified function to setup path
+    # Use unified function to setup path (will check if already present)
     _setup_python_path_unified(project_root_str)
 
 
-def _setup_python_path():
-    """Setup Python path before any imports."""
-    # Use unified function to setup path
-    _setup_python_path_unified()
-
-# Path setup is handled exclusively by pytest_load_initial_conftests hook
-# This hook runs before any test collection and before any imports,
-# ensuring sys.path is set up correctly even with --import-mode=importlib.
-# PYTHONPATH may be set, but importlib mode requires explicit sys.path modification.
+# Path setup happens at module import time (see _setup_python_path_unified() call above)
+# pytest_load_initial_conftests hook provides additional guarantee if needed
 
 import pytest
 from datetime import date
