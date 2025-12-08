@@ -1,9 +1,10 @@
 import pytest
+import importlib
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock, patch
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from src.infrastructure.services.notifications_scheduler import setup_notifications
+from src.infrastructure.services import notifications_scheduler
 
 
 class TestNotificationsScheduler:
@@ -29,7 +30,9 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_initialization(self, mock_bot, mock_database):
         """Тест инициализации scheduler."""
-        scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler is not None
         assert isinstance(scheduler, AsyncIOScheduler)
@@ -38,7 +41,9 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_start(self, mock_bot, mock_database):
         """Тест запуска scheduler."""
-        scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler.running
         # Проверяем, что задачи добавлены
@@ -52,7 +57,9 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_stop(self, mock_bot, mock_database):
         """Тест остановки scheduler."""
-        scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler.running
         scheduler.shutdown(wait=True)
@@ -63,7 +70,9 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_jobs_configuration(self, mock_bot, mock_database):
         """Тест конфигурации задач scheduler."""
-        scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         jobs = scheduler.get_jobs()
         
@@ -82,6 +91,7 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_send_today_execution(self, mock_bot, mock_database):
         """Тест выполнения задачи send_today."""
+        # Патчим классы в исходных модулях - они будут использованы при импорте внутри функций
         with patch(
             "src.infrastructure.database.repositories.birthday_repository_impl.BirthdayRepositoryImpl"
         ) as mock_repo_class, patch(
@@ -119,7 +129,9 @@ class TestNotificationsScheduler:
             mock_service.get_active_users = AsyncMock(return_value=[123])
             mock_service_class.return_value = mock_service
             
-            scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
             
             # Получаем задачу и выполняем её
             jobs = scheduler.get_jobs()
@@ -173,7 +185,9 @@ class TestNotificationsScheduler:
             mock_service.get_active_users = AsyncMock(return_value=[123])
             mock_service_class.return_value = mock_service
             
-            scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
             
             # Получаем задачу и выполняем её
             jobs = scheduler.get_jobs()
@@ -227,7 +241,9 @@ class TestNotificationsScheduler:
             mock_service.get_active_users = AsyncMock(return_value=[123])
             mock_service_class.return_value = mock_service
             
-            scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
             
             # Получаем задачу и выполняем её
             jobs = scheduler.get_jobs()
@@ -281,7 +297,9 @@ class TestNotificationsScheduler:
             mock_service.get_active_users = AsyncMock(return_value=[123])
             mock_service_class.return_value = mock_service
             
-            scheduler = await setup_notifications(mock_bot, mock_database)
+            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
+            importlib.reload(notifications_scheduler)
+            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
             
             # Получаем задачу и выполняем её
             jobs = scheduler.get_jobs()

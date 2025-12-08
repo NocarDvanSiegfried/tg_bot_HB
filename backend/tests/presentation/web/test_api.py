@@ -14,7 +14,14 @@ from src.domain.entities.professional_holiday import ProfessionalHoliday
 @pytest.fixture
 def mock_session():
     """Мок сессии БД."""
-    return AsyncMock(spec=AsyncSession)
+    session = AsyncMock(spec=AsyncSession)
+    # Настраиваем мок для session.execute() -> result.scalars().all()
+    mock_result = MagicMock()
+    mock_scalars = MagicMock()
+    mock_scalars.all.return_value = []
+    mock_result.scalars.return_value = mock_scalars
+    session.execute = AsyncMock(return_value=mock_result)
+    return session
 
 
 @pytest.fixture

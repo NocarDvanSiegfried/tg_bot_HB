@@ -1,5 +1,10 @@
-Run pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
-  pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
+ Запускаем основные тесты
+  # Запускаем основные тесты
+  pytest tests/application tests/domain tests/infrastructure tests/presentation/web \
+    -v --tb=short --cov=src --cov-report=term-missing --cov-report=xml --cov-report=html
+  # Запускаем presentation/telegram тесты отдельно для изоляции
+  pytest tests/presentation/telegram \
+    -v --tb=short --cov=src --cov-append --cov-report=term-missing --cov-report=xml --cov-report=html
   shell: /usr/bin/bash -e {0}
   env:
     pythonLocation: /opt/hostedtoolcache/Python/3.11.14/x64
@@ -9,9 +14,6 @@ Run pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html
     Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
     LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib
     PYTHONPATH: /home/runner/work/tg_bot_HB/tg_bot_HB/backend
-    DATABASE_URL: sqlite+aiosqlite:///:memory:
-    TELEGRAM_BOT_TOKEN: test_token
-    OPENROUTER_API_KEY: test_key
 ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
 cachedir: .pytest_cache
@@ -19,149 +21,675 @@ rootdir: /home/runner/work/tg_bot_HB/tg_bot_HB/backend
 configfile: pytest.ini
 plugins: anyio-3.7.1, asyncio-0.21.1, mock-3.12.0, cov-4.1.0
 asyncio: mode=Mode.AUTO
-collecting ... collected 179 items / 8 errors
-
-==================================== ERRORS ====================================
-___________ ERROR collecting tests/presentation/telegram/test_bot.py ___________
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/test_bot.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/test_bot.py:5: in <module>
-    from src.presentation.telegram.bot import main
-src/presentation/telegram/bot.py:5: in <module>
-    from aiogram.fsm.storage.memory import MemoryStorage
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-________ ERROR collecting tests/presentation/telegram/test_keyboards.py ________
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/test_keyboards.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/test_keyboards.py:3: in <module>
-    from src.presentation.telegram.keyboards import (
-src/presentation/telegram/keyboards.py:1: in <module>
-    from aiogram.types import (
-E   ModuleNotFoundError: No module named 'aiogram.types'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_birthday_handlers.py _
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_birthday_handlers.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_birthday_handlers.py:5: in <module>
-    from src.presentation.telegram.handlers.birthday_handlers import (
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_calendar_handler.py _
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_calendar_handler.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_calendar_handler.py:5: in <module>
-    from src.presentation.telegram.handlers.calendar_handler import (
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_greeting_handlers.py _
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_greeting_handlers.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_greeting_handlers.py:4: in <module>
-    from src.presentation.telegram.handlers.greeting_handlers import (
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_panel_handler.py __
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_panel_handler.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_panel_handler.py:4: in <module>
-    from src.presentation.telegram.handlers.panel_handler import cmd_panel, panel_main_callback
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_responsible_handlers.py _
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_responsible_handlers.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_responsible_handlers.py:4: in <module>
-    from src.presentation.telegram.handlers.responsible_handlers import (
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-_ ERROR collecting tests/presentation/telegram/handlers/test_start_handler.py __
-ImportError while importing test module '/home/runner/work/tg_bot_HB/tg_bot_HB/backend/tests/presentation/telegram/handlers/test_start_handler.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/python.py:617: in _importtestmodule
-    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/pathlib.py:540: in import_path
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/presentation/telegram/handlers/test_start_handler.py:4: in <module>
-    from src.presentation.telegram.handlers.start_handler import cmd_start
-src/presentation/telegram/handlers/__init__.py:1: in <module>
-    from . import (
-src/presentation/telegram/handlers/birthday_handlers.py:4: in <module>
-    from aiogram.fsm.context import FSMContext
-E   ModuleNotFoundError: No module named 'aiogram.fsm'; 'aiogram' is not a package
-
+collecting ... collected 179 items
+tests/application/test_assign_responsible_use_case.py::TestAssignResponsibleToDateUseCase::test_assign_responsible_success PASSED [  0%]
+tests/application/test_assign_responsible_use_case.py::TestAssignResponsibleToDateUseCase::test_assign_responsible_not_found PASSED [  1%]
+tests/application/test_check_panel_access_use_case.py::TestCheckPanelAccessUseCase::test_check_panel_access_has_access PASSED [  1%]
+tests/application/test_check_panel_access_use_case.py::TestCheckPanelAccessUseCase::test_check_panel_access_no_access PASSED [  2%]
+tests/application/test_create_birthday_use_case.py::TestCreateBirthdayUseCase::test_create_birthday_success PASSED [  2%]
+tests/application/test_create_birthday_use_case.py::TestCreateBirthdayUseCase::test_create_birthday_without_comment PASSED [  3%]
+tests/application/test_create_card_use_case.py::TestCreateCardUseCase::test_create_card_success PASSED [  3%]
+tests/application/test_create_card_use_case.py::TestCreateCardUseCase::test_create_card_without_qr PASSED [  4%]
+tests/application/test_create_card_use_case.py::TestCreateCardUseCase::test_create_card_birthday_not_found PASSED [  5%]
+tests/application/test_create_holiday_use_case.py::TestCreateHolidayUseCase::test_create_holiday_success PASSED [  5%]
+tests/application/test_create_holiday_use_case.py::TestCreateHolidayUseCase::test_create_holiday_without_description PASSED [  6%]
+tests/application/test_create_responsible_use_case.py::TestCreateResponsibleUseCase::test_create_responsible_success PASSED [  6%]
+tests/application/test_delete_birthday_use_case.py::TestDeleteBirthdayUseCase::test_delete_birthday_success PASSED [  7%]
+tests/application/test_delete_birthday_use_case.py::TestDeleteBirthdayUseCase::test_delete_birthday_not_found PASSED [  7%]
+tests/application/test_delete_holiday_use_case.py::TestDeleteHolidayUseCase::test_delete_holiday_success PASSED [  8%]
+tests/application/test_delete_holiday_use_case.py::TestDeleteHolidayUseCase::test_delete_holiday_not_found PASSED [  8%]
+tests/application/test_delete_responsible_use_case.py::TestDeleteResponsibleUseCase::test_delete_responsible_success PASSED [  9%]
+tests/application/test_delete_responsible_use_case.py::TestDeleteResponsibleUseCase::test_delete_responsible_not_found PASSED [ 10%]
+tests/application/test_generate_greeting_use_case.py::TestGenerateGreetingUseCase::test_generate_greeting_success PASSED [ 10%]
+tests/application/test_generate_greeting_use_case.py::TestGenerateGreetingUseCase::test_generate_greeting_with_theme PASSED [ 11%]
+tests/application/test_generate_greeting_use_case.py::TestGenerateGreetingUseCase::test_generate_greeting_birthday_not_found PASSED [ 11%]
+tests/application/test_get_all_birthdays_use_case.py::TestGetAllBirthdaysUseCase::test_get_all_birthdays_success PASSED [ 12%]
+tests/application/test_get_all_birthdays_use_case.py::TestGetAllBirthdaysUseCase::test_get_all_birthdays_empty PASSED [ 12%]
+tests/application/test_get_all_responsible_use_case.py::TestGetAllResponsibleUseCase::test_get_all_responsible_success PASSED [ 13%]
+tests/application/test_get_all_responsible_use_case.py::TestGetAllResponsibleUseCase::test_get_all_responsible_empty PASSED [ 13%]
+tests/application/test_get_birthdays_by_date.py::TestGetBirthdaysByDateUseCase::test_get_birthdays_by_date_success PASSED [ 14%]
+tests/application/test_get_birthdays_by_date.py::TestGetBirthdaysByDateUseCase::test_get_birthdays_by_date_empty PASSED [ 15%]
+tests/application/test_get_birthdays_by_date.py::TestGetBirthdaysByDateUseCase::test_get_birthdays_by_date_repository_error PASSED [ 15%]
+tests/application/test_get_calendar_data_use_case.py::TestGetCalendarDataUseCase::test_get_calendar_data_success PASSED [ 16%]
+tests/application/test_get_calendar_data_use_case.py::TestGetCalendarDataUseCase::test_get_calendar_data_empty PASSED [ 16%]
+tests/application/test_get_calendar_data_use_case.py::TestGetCalendarDataUseCase::test_get_calendar_data_repository_error PASSED [ 17%]
+tests/application/test_record_panel_access_use_case.py::TestRecordPanelAccessUseCase::test_record_panel_access_success PASSED [ 17%]
+tests/application/test_record_panel_access_use_case.py::TestRecordPanelAccessUseCase::test_record_panel_access_different_user PASSED [ 18%]
+tests/application/test_search_people.py::TestSearchPeopleUseCase::test_search_success PASSED [ 18%]
+tests/application/test_search_people.py::TestSearchPeopleUseCase::test_search_empty_result PASSED [ 19%]
+tests/application/test_search_people.py::TestSearchPeopleUseCase::test_search_only_birthdays PASSED [ 20%]
+tests/application/test_search_people.py::TestSearchPeopleUseCase::test_search_only_responsible PASSED [ 20%]
+tests/application/test_search_people.py::TestSearchPeopleUseCase::test_search_repository_error PASSED [ 21%]
+tests/application/test_update_birthday_use_case.py::TestUpdateBirthdayUseCase::test_update_birthday_success PASSED [ 21%]
+tests/application/test_update_birthday_use_case.py::TestUpdateBirthdayUseCase::test_update_birthday_not_found PASSED [ 22%]
+tests/application/test_update_holiday_use_case.py::TestUpdateHolidayUseCase::test_update_holiday_success PASSED [ 22%]
+tests/application/test_update_holiday_use_case.py::TestUpdateHolidayUseCase::test_update_holiday_partial PASSED [ 23%]
+tests/application/test_update_holiday_use_case.py::TestUpdateHolidayUseCase::test_update_holiday_not_found PASSED [ 24%]
+tests/application/test_update_responsible_use_case.py::TestUpdateResponsibleUseCase::test_update_responsible_success PASSED [ 24%]
+tests/application/test_update_responsible_use_case.py::TestUpdateResponsibleUseCase::test_update_responsible_not_found PASSED [ 25%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_birthday_use_cases PASSED [ 25%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_calendar_use_case PASSED [ 26%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_responsible_use_cases PASSED [ 26%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_search_use_case PASSED [ 27%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_greeting_use_cases PASSED [ 27%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_panel_access_use_case PASSED [ 28%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_create_auth_use_case PASSED [ 29%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_lazy_initialization_repositories PASSED [ 29%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_factory_without_session PASSED [ 30%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_openrouter_client_missing_env PASSED [ 30%]
+tests/application/test_use_case_factory.py::TestUseCaseFactory::test_auth_use_case_missing_token PASSED [ 31%]
+tests/application/test_verify_telegram_auth_use_case.py::TestVerifyTelegramAuthUseCase::test_verify_telegram_auth_success PASSED [ 31%]
+tests/application/test_verify_telegram_auth_use_case.py::TestVerifyTelegramAuthUseCase::test_verify_telegram_auth_invalid PASSED [ 32%]
+tests/application/test_verify_telegram_auth_use_case.py::TestVerifyTelegramAuthUseCase::test_verify_telegram_auth_empty_user_data PASSED [ 32%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_birthday_creation PASSED [ 33%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_birthday_without_comment PASSED [ 34%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_calculate_age_same_year PASSED [ 34%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_calculate_age_next_year PASSED [ 35%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_calculate_age_before_birthday PASSED [ 35%]
+tests/domain/test_birthday_entity.py::TestBirthdayEntity::test_calculate_age_after_birthday PASSED [ 36%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_create_birthday PASSED [ 36%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_by_id_found PASSED [ 37%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_by_id_not_found PASSED [ 37%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_by_date PASSED [ 38%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_delete_birthday PASSED [ 39%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_by_date_range PASSED [ 39%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_by_date_range_empty PASSED [ 40%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_update_birthday PASSED [ 40%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_update_birthday_no_id PASSED [ 41%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_update_birthday_not_found PASSED [ 41%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_search PASSED [ 42%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_search_empty PASSED [ 43%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_search_by_company PASSED [ 43%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_all PASSED [ 44%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_get_all_empty PASSED [ 44%]
+tests/infrastructure/test_birthday_repository.py::TestBirthdayRepositoryImpl::test_to_model_conversion PASSED [ 45%]
+tests/infrastructure/test_card_generator.py::TestCardGeneratorImpl::test_generate_card_handles_font_load_error_with_specific_exception PASSED [ 45%]
+tests/infrastructure/test_card_generator.py::TestCardGeneratorImpl::test_generate_card_handles_ioerror_with_specific_exception PASSED [ 46%]
+tests/infrastructure/test_database.py::TestDatabase::test_database_initialization PASSED [ 46%]
+tests/infrastructure/test_database.py::TestDatabase::test_get_session PASSED [ 47%]
+tests/infrastructure/test_database.py::TestDatabase::test_create_tables PASSED [ 48%]
+tests/infrastructure/test_database.py::TestDatabase::test_multiple_sessions PASSED [ 48%]
+tests/infrastructure/test_database_factory.py::TestDatabaseFactory::test_singleton_pattern PASSED [ 49%]
+tests/infrastructure/test_database_factory.py::TestDatabaseFactory::test_create_database_with_env PASSED [ 49%]
+tests/infrastructure/test_database_factory.py::TestDatabaseFactory::test_missing_database_url PASSED [ 50%]
+tests/infrastructure/test_database_factory.py::TestDatabaseFactory::test_database_url_empty_string PASSED [ 50%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_create_holiday PASSED [ 51%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_get_by_id_exists PASSED [ 51%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_get_by_id_not_exists PASSED [ 52%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_get_by_date PASSED [ 53%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_update_holiday PASSED [ 53%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_update_holiday_no_id PASSED [ 54%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_update_holiday_not_found PASSED [ 54%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_delete_holiday PASSED [ 55%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_delete_holiday_not_exists PASSED [ 55%]
+tests/infrastructure/test_holiday_repository.py::TestHolidayRepositoryImpl::test_get_all PASSED [ 56%]
+tests/infrastructure/test_notification_service_impl.py::TestNotificationServiceImpl::test_send_today_notifications_logs_error_on_failure PASSED [ 56%]
+tests/infrastructure/test_notification_service_impl.py::TestNotificationServiceImpl::test_send_week_notifications_logs_error_on_failure PASSED [ 57%]
+tests/infrastructure/test_notification_service_impl.py::TestNotificationServiceImpl::test_send_month_notifications_logs_error_on_failure PASSED [ 58%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_scheduler_initialization PASSED [ 58%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_scheduler_start PASSED [ 59%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_scheduler_stop PASSED [ 59%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_scheduler_jobs_configuration PASSED [ 60%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_today_execution FAILED [ 60%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_week_execution FAILED [ 61%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_month_execution FAILED [ 62%]
+tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_today_error_handling FAILED [ 62%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_success PASSED [ 63%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_with_theme PASSED [ 63%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_http_error PASSED [ 64%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_timeout_error PASSED [ 64%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_not_dict PASSED [ 65%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_missing_choices PASSED [ 65%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_empty_choices PASSED [ 66%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_missing_message PASSED [ 67%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_missing_content PASSED [ 67%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_invalid_response_content_not_string PASSED [ 68%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_generate_greeting_retry_on_http_error PASSED [ 68%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_build_prompt_without_theme PASSED [ 69%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_build_prompt_with_theme PASSED [ 69%]
+tests/infrastructure/test_openrouter_client.py::TestOpenRouterClientImpl::test_build_prompt_unknown_style_and_length PASSED [ 70%]
+tests/infrastructure/test_panel_access_repository.py::TestPanelAccessRepositoryImpl::test_has_access_true PASSED [ 70%]
+tests/infrastructure/test_panel_access_repository.py::TestPanelAccessRepositoryImpl::test_has_access_false PASSED [ 71%]
+tests/infrastructure/test_panel_access_repository.py::TestPanelAccessRepositoryImpl::test_record_access PASSED [ 72%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_create_responsible PASSED [ 72%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_get_by_id_exists PASSED [ 73%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_get_by_id_not_exists PASSED [ 73%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_get_by_date_exists PASSED [ 74%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_get_by_date_not_exists PASSED [ 74%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_assign_to_date PASSED [ 75%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_update_responsible PASSED [ 75%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_update_responsible_no_id PASSED [ 76%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_update_responsible_not_found PASSED [ 77%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_delete_responsible PASSED [ 77%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_delete_responsible_not_exists PASSED [ 78%]
+tests/infrastructure/test_responsible_repository.py::TestResponsibleRepositoryImpl::test_get_all PASSED [ 78%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_verify_init_data_success PASSED [ 79%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_verify_init_data_invalid_hash PASSED [ 79%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_verify_init_data_missing_hash PASSED [ 80%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_verify_init_data_invalid_format PASSED [ 81%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_parse_init_data_success PASSED [ 81%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_parse_init_data_without_user PASSED [ 82%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_parse_init_data_invalid_json PASSED [ 82%]
+tests/infrastructure/test_telegram_auth.py::TestTelegramAuthServiceImpl::test_parse_init_data_invalid_format PASSED [ 83%]
+tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_verify_telegram_init_data_function PASSED [ 83%]
+tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_parse_init_data_function PASSED [ 84%]
+tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_get_user_id_from_init_data_success PASSED [ 84%]
+tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_get_user_id_from_init_data_no_user PASSED [ 85%]
+tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_get_user_id_from_init_data_no_id PASSED [ 86%]
+tests/presentation/web/test_api.py::TestAuthEndpoints::test_verify_init_data_success PASSED [ 86%]
+tests/presentation/web/test_api.py::TestAuthEndpoints::test_verify_init_data_invalid PASSED [ 87%]
+tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_success FAILED [ 87%]
+tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_invalid_date PASSED [ 88%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_success PASSED [ 88%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_no_auth PASSED [ 89%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays FAILED [ 89%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_birthday_success FAILED [ 90%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success FAILED [ 91%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success FAILED [ 91%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible FAILED [ 92%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_responsible_success FAILED [ 92%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success FAILED [ 93%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_responsible_success FAILED [ 93%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_assign_responsible_success FAILED [ 94%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people FAILED [ 94%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success FAILED [ 95%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success FAILED [ 96%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found FAILED [ 96%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_birthday_validation_error FAILED [ 97%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_birthday_not_found FAILED [ 97%]
+tests/presentation/web/test_app.py::TestWebApp::test_app_creation PASSED [ 98%]
+tests/presentation/web/test_app.py::TestWebApp::test_root_endpoint PASSED [ 98%]
+tests/presentation/web/test_app.py::TestWebApp::test_cors_middleware_configured PASSED [ 99%]
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/ast.py:50: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+  return compile(source, filename, mode, flags,
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+tests/presentation/web/test_app.py::TestWebApp::test_router_included PASSED [100%]
+=================================== FAILURES ===================================
+_____________ TestNotificationsScheduler.test_send_today_execution _____________
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/unittest/mock.py:918: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+During handling of the above exception, another exception occurred:
+tests/infrastructure/test_notifications_scheduler.py:132: in test_send_today_execution
+    mock_service.send_today_notifications.assert_called_once()
+E   AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+_____________ TestNotificationsScheduler.test_send_week_execution ______________
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/unittest/mock.py:918: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_week_notifications' to have been called once. Called 0 times.
+During handling of the above exception, another exception occurred:
+tests/infrastructure/test_notifications_scheduler.py:186: in test_send_week_execution
+    mock_service.send_week_notifications.assert_called_once()
+E   AssertionError: Expected 'send_week_notifications' to have been called once. Called 0 times.
+_____________ TestNotificationsScheduler.test_send_month_execution _____________
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/unittest/mock.py:918: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_month_notifications' to have been called once. Called 0 times.
+During handling of the above exception, another exception occurred:
+tests/infrastructure/test_notifications_scheduler.py:240: in test_send_month_execution
+    mock_service.send_month_notifications.assert_called_once()
+E   AssertionError: Expected 'send_month_notifications' to have been called once. Called 0 times.
+__________ TestNotificationsScheduler.test_send_today_error_handling ___________
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/unittest/mock.py:918: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+During handling of the above exception, another exception occurred:
+tests/infrastructure/test_notifications_scheduler.py:298: in test_send_today_error_handling
+    mock_service.send_today_notifications.assert_called_once()
+E   AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+_______________ TestCalendarEndpoints.test_get_calendar_success ________________
+tests/presentation/web/test_api.py:116: in test_get_calendar_success
+    response = client.get("/api/calendar/2024-01-15")
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
+    await self.app(scope, receive, sender)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
+    await route.handle(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
+    response = await func(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
+    raw_response = await run_endpoint_function(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
+    return await dependant.call(**values)
+src/presentation/web/routes/api.py:127: in get_calendar
+    return await use_case.execute(check_date)
+src/application/use_cases/calendar/get_calendar_data.py:24: in execute
+    birthdays = await self.birthday_repository.get_by_date(check_date)
+src/infrastructure/database/repositories/birthday_repository_impl.py:61: in get_by_date
+    models = result.scalars().all()
+E   AttributeError: 'coroutine' object has no attribute 'all'
+____________________ TestPanelEndpoints.test_list_birthdays ____________________
+tests/presentation/web/test_api.py:204: in test_list_birthdays
+    response = client.get("/api/panel/birthdays")
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
+    await self.app(scope, receive, sender)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
+    await route.handle(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
+    response = await func(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
+    raw_response = await run_endpoint_function(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
+    return await dependant.call(**values)
+src/presentation/web/routes/api.py:152: in list_birthdays
+    birthdays = await use_case.execute()
+src/application/use_cases/birthday/get_all_birthdays.py:13: in execute
+    return await self.birthday_repository.get_all()
+src/infrastructure/database/repositories/birthday_repository_impl.py:120: in get_all
+    models = result.scalars().all()
+E   AttributeError: 'coroutine' object has no attribute 'all'
+_______________ TestPanelEndpoints.test_create_birthday_success ________________
+tests/presentation/web/test_api.py:252: in test_create_birthday_success
+    assert response.json()["id"] == 1
+E   assert None == 1
+_______________ TestPanelEndpoints.test_update_birthday_success ________________
+tests/presentation/web/test_api.py:292: in test_update_birthday_success
+    assert response.status_code == 200
+E   assert 400 == 200
+E    +  where 400 = <Response [400 Bad Request]>.status_code
+_______________ TestPanelEndpoints.test_delete_birthday_success ________________
+tests/presentation/web/test_api.py:320: in test_delete_birthday_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:258 Unexpected error in delete_birthday
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 250, in delete_birthday
+    await use_case.execute(birthday_id)
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/birthday/delete_birthday.py", line 10, in execute
+    existing = await self.birthday_repository.get_by_id(birthday_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+___________________ TestPanelEndpoints.test_list_responsible ___________________
+tests/presentation/web/test_api.py:350: in test_list_responsible
+    response = client.get("/api/panel/responsible")
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
+    await self.app(scope, receive, sender)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
+    await route.handle(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
+    response = await func(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
+    raw_response = await run_endpoint_function(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
+    return await dependant.call(**values)
+src/presentation/web/routes/api.py:267: in list_responsible
+    responsible = await use_case.execute()
+src/application/use_cases/responsible/get_all_responsible.py:13: in execute
+    return await self.responsible_repository.get_all()
+src/infrastructure/database/repositories/responsible_repository_impl.py:126: in get_all
+    models = result.scalars().all()
+E   AttributeError: 'coroutine' object has no attribute 'all'
+______________ TestPanelEndpoints.test_create_responsible_success ______________
+tests/presentation/web/test_api.py:395: in test_create_responsible_success
+    assert response.json()["id"] == 1
+E   assert None == 1
+___________ TestAdditionalEndpoints.test_update_responsible_success ____________
+tests/presentation/web/test_api_additional.py:83: in test_update_responsible_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:343 Unexpected error in update_responsible
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 319, in update_responsible
+    responsible = await use_case.execute(
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/update_responsible.py", line 17, in execute
+    existing = await self.responsible_repository.get_by_id(responsible_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+___________ TestAdditionalEndpoints.test_delete_responsible_success ____________
+tests/presentation/web/test_api_additional.py:109: in test_delete_responsible_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:366 Unexpected error in delete_responsible
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 358, in delete_responsible
+    await use_case.execute(responsible_id)
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/delete_responsible.py", line 10, in execute
+    existing = await self.responsible_repository.get_by_id(responsible_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+___________ TestAdditionalEndpoints.test_assign_responsible_success ____________
+tests/presentation/web/test_api_additional.py:141: in test_assign_responsible_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:395 Unexpected error in assign_responsible
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 381, in assign_responsible
+    await use_case.execute(data.responsible_id, data.date)
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/assign_responsible_to_date.py", line 12, in execute
+    existing = await self.responsible_repository.get_by_id(responsible_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+__________________ TestAdditionalEndpoints.test_search_people __________________
+tests/presentation/web/test_api_additional.py:171: in test_search_people
+    response = client.get("/api/panel/search?q=Иван")
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
+    raise exc
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
+    await self.app(scope, receive, sender)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
+    await route.handle(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
+    await self.app(scope, receive, send)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
+    response = await func(request)
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
+    raw_response = await run_endpoint_function(
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
+    return await dependant.call(**values)
+src/presentation/web/routes/api.py:407: in search_people
+    results = await use_case.execute(q)
+src/application/use_cases/search/search_people.py:26: in execute
+    birthdays = await self.birthday_repository.search(query)
+src/infrastructure/database/repositories/birthday_repository_impl.py:115: in search
+    models = result.scalars().all()
+E   AttributeError: 'coroutine' object has no attribute 'all'
+____________ TestAdditionalEndpoints.test_generate_greeting_success ____________
+tests/presentation/web/test_api_additional.py:207: in test_generate_greeting_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:445 Unexpected error in generate_greeting
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 431, in generate_greeting
+    greeting_text = await use_case.execute(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
+    birthday = await self.birthday_repository.get_by_id(birthday_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+_______________ TestAdditionalEndpoints.test_create_card_success _______________
+tests/presentation/web/test_api_additional.py:239: in test_create_card_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:474 Unexpected error in create_card
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 459, in create_card
+    card_bytes = await use_case.execute(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/create_card.py", line 22, in execute
+    birthday = await self.birthday_repository.get_by_id(birthday_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+___________ TestAdditionalEndpoints.test_generate_greeting_not_found ___________
+tests/presentation/web/test_api_additional.py:274: in test_generate_greeting_not_found
+    assert response.status_code == 404
+E   assert 500 == 404
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:445 Unexpected error in generate_greeting
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 431, in generate_greeting
+    greeting_text = await use_case.execute(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
+    birthday = await self.birthday_repository.get_by_id(birthday_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
+________ TestAdditionalEndpoints.test_create_birthday_validation_error _________
+tests/presentation/web/test_api_additional.py:309: in test_create_birthday_validation_error
+    assert response.status_code == 400
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+____________ TestAdditionalEndpoints.test_delete_birthday_not_found ____________
+tests/presentation/web/test_api_additional.py:336: in test_delete_birthday_not_found
+    assert response.status_code == 404
+E   assert 500 == 404
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:258 Unexpected error in delete_birthday
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 250, in delete_birthday
+    await use_case.execute(birthday_id)
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/birthday/delete_birthday.py", line 10, in execute
+    existing = await self.birthday_repository.get_by_id(birthday_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
+    return self._to_entity(model) if model else None
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
+    id=model.id,
+       ^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'id'
 ---------- coverage: platform linux, python 3.11.14-final-0 ----------
-Name                                                                       Stmts   Miss  Cover
-----------------------------------------------------------------------------------------------
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
 src/__init__.py                                                                0      0   100%
 src/application/__init__.py                                                    0      0   100%
 src/application/factories/__init__.py                                          0      0   100%
-src/application/factories/use_case_factory.py                                 94     45    52%
+src/application/factories/use_case_factory.py                                 94      1    99%   141
 src/application/ports/__init__.py                                              0      0   100%
 src/application/ports/birthday_repository.py                                   4      0   100%
 src/application/ports/card_generator.py                                        2      0   100%
@@ -172,92 +700,112 @@ src/application/ports/responsible_repository.py                                4
 src/application/ports/telegram_auth_service.py                                 2      0   100%
 src/application/use_cases/__init__.py                                          0      0   100%
 src/application/use_cases/auth/__init__.py                                     0      0   100%
-src/application/use_cases/auth/verify_telegram_auth.py                        10      6    40%
+src/application/use_cases/auth/verify_telegram_auth.py                        10      0   100%
 src/application/use_cases/birthday/__init__.py                                 0      0   100%
-src/application/use_cases/birthday/create_birthday.py                          9      3    67%
-src/application/use_cases/birthday/delete_birthday.py                          9      5    44%
-src/application/use_cases/birthday/get_all_birthdays.py                        7      2    71%
-src/application/use_cases/birthday/get_birthdays_by_date.py                    8      2    75%
-src/application/use_cases/birthday/update_birthday.py                         12      6    50%
+src/application/use_cases/birthday/create_birthday.py                          9      0   100%
+src/application/use_cases/birthday/delete_birthday.py                          9      0   100%
+src/application/use_cases/birthday/get_all_birthdays.py                        7      0   100%
+src/application/use_cases/birthday/get_birthdays_by_date.py                    8      0   100%
+src/application/use_cases/birthday/update_birthday.py                         12      0   100%
 src/application/use_cases/calendar/__init__.py                                 0      0   100%
-src/application/use_cases/calendar/get_calendar_data.py                       14      7    50%
+src/application/use_cases/calendar/get_calendar_data.py                       14      0   100%
 src/application/use_cases/greeting/__init__.py                                 0      0   100%
-src/application/use_cases/greeting/create_card.py                             12      6    50%
-src/application/use_cases/greeting/generate_greeting.py                       11      6    45%
+src/application/use_cases/greeting/create_card.py                             12      0   100%
+src/application/use_cases/greeting/generate_greeting.py                       11      0   100%
 src/application/use_cases/holiday/__init__.py                                  0      0   100%
-src/application/use_cases/holiday/create_holiday.py                            9      3    67%
-src/application/use_cases/holiday/delete_holiday.py                            9      5    44%
-src/application/use_cases/holiday/update_holiday.py                           12      6    50%
+src/application/use_cases/holiday/create_holiday.py                            9      0   100%
+src/application/use_cases/holiday/delete_holiday.py                            9      0   100%
+src/application/use_cases/holiday/update_holiday.py                           12      0   100%
 src/application/use_cases/panel/__init__.py                                    0      0   100%
-src/application/use_cases/panel/check_panel_access.py                          6      2    67%
-src/application/use_cases/panel/record_panel_access.py                         6      2    67%
+src/application/use_cases/panel/check_panel_access.py                          6      0   100%
+src/application/use_cases/panel/record_panel_access.py                         6      0   100%
 src/application/use_cases/responsible/__init__.py                              0      0   100%
-src/application/use_cases/responsible/assign_responsible_to_date.py           10      5    50%
-src/application/use_cases/responsible/create_responsible.py                    8      3    62%
-src/application/use_cases/responsible/delete_responsible.py                    9      5    44%
-src/application/use_cases/responsible/get_all_responsible.py                   7      2    71%
-src/application/use_cases/responsible/update_responsible.py                   11      6    45%
+src/application/use_cases/responsible/assign_responsible_to_date.py           10      0   100%
+src/application/use_cases/responsible/create_responsible.py                    8      0   100%
+src/application/use_cases/responsible/delete_responsible.py                    9      0   100%
+src/application/use_cases/responsible/get_all_responsible.py                   7      0   100%
+src/application/use_cases/responsible/update_responsible.py                   11      0   100%
 src/application/use_cases/search/__init__.py                                   0      0   100%
-src/application/use_cases/search/search_people.py                             17     10    41%
+src/application/use_cases/search/search_people.py                             17      0   100%
 src/domain/entities/__init__.py                                                0      0   100%
-src/domain/entities/birthday.py                                               15      4    73%
+src/domain/entities/birthday.py                                               15      0   100%
 src/domain/entities/professional_holiday.py                                    8      0   100%
 src/domain/entities/responsible_person.py                                      7      0   100%
 src/domain/exceptions/__init__.py                                              5      0   100%
-src/domain/exceptions/api_exceptions.py                                       12      4    67%
+src/domain/exceptions/api_exceptions.py                                       12      0   100%
 src/domain/exceptions/base.py                                                  2      0   100%
 src/domain/exceptions/business.py                                              3      0   100%
 src/domain/exceptions/not_found.py                                             7      0   100%
 src/domain/exceptions/validation.py                                            5      0   100%
 src/infrastructure/__init__.py                                                 0      0   100%
 src/infrastructure/config/__init__.py                                          0      0   100%
-src/infrastructure/config/openrouter_config.py                                18      8    56%
+src/infrastructure/config/openrouter_config.py                                18      0   100%
 src/infrastructure/database/__init__.py                                        0      0   100%
-src/infrastructure/database/database.py                                       12      6    50%
-src/infrastructure/database/database_factory.py                               10      6    40%
+src/infrastructure/database/database.py                                       12      0   100%
+src/infrastructure/database/database_factory.py                               10      0   100%
 src/infrastructure/database/models.py                                         47      0   100%
 src/infrastructure/database/repositories/__init__.py                           0      0   100%
-src/infrastructure/database/repositories/birthday_repository_impl.py          61     43    30%
-src/infrastructure/database/repositories/holiday_repository_impl.py           48     33    31%
-src/infrastructure/database/repositories/panel_access_repository_impl.py      15      7    53%
-src/infrastructure/database/repositories/responsible_repository_impl.py       65     48    26%
+src/infrastructure/database/repositories/birthday_repository_impl.py          61      0   100%
+src/infrastructure/database/repositories/holiday_repository_impl.py           48      0   100%
+src/infrastructure/database/repositories/panel_access_repository_impl.py      15      0   100%
+src/infrastructure/database/repositories/responsible_repository_impl.py       65      5    92%   100, 111-122
 src/infrastructure/external/__init__.py                                        0      0   100%
-src/infrastructure/external/openrouter_client_impl.py                         56     47    16%
-src/infrastructure/external/telegram_auth.py                                  43     32    26%
+src/infrastructure/external/openrouter_client_impl.py                         56      2    96%   98-100
+src/infrastructure/external/telegram_auth.py                                  43      2    95%   41-42
 src/infrastructure/image/__init__.py                                           0      0   100%
-src/infrastructure/image/card_generator.py                                    79     67    15%
+src/infrastructure/image/card_generator.py                                    79     18    77%   42-44, 102-103, 113-116, 137-139, 148-153
 src/infrastructure/services/__init__.py                                        0      0   100%
-src/infrastructure/services/notification_service_impl.py                      87     69    21%
-src/infrastructure/services/notifications_scheduler.py                        30     24    20%
+src/infrastructure/services/notification_service_impl.py                      87      5    94%   40, 67, 92, 97, 124
+src/infrastructure/services/notifications_scheduler.py                        30      0   100%
 src/presentation/__init__.py                                                   0      0   100%
 src/presentation/telegram/__init__.py                                          0      0   100%
-src/presentation/telegram/bot.py                                              26     22    15%
-src/presentation/telegram/handlers/__init__.py                                 2      1    50%
-src/presentation/telegram/handlers/birthday_handlers.py                       64     61     5%
-src/presentation/telegram/handlers/calendar_handler.py                        72     72     0%
-src/presentation/telegram/handlers/greeting_handlers.py                       87     87     0%
-src/presentation/telegram/handlers/panel_handler.py                           17     17     0%
-src/presentation/telegram/handlers/responsible_handlers.py                    45     45     0%
-src/presentation/telegram/handlers/start_handler.py                            8      8     0%
-src/presentation/telegram/keyboards.py                                        19     18     5%
+src/presentation/telegram/bot.py                                              26     26     0%   1-47
+src/presentation/telegram/handlers/__init__.py                                 2      2     0%   1-10
+src/presentation/telegram/handlers/birthday_handlers.py                       64     64     0%   1-103
+src/presentation/telegram/handlers/calendar_handler.py                        72     72     0%   1-109
+src/presentation/telegram/handlers/greeting_handlers.py                       87     87     0%   1-148
+src/presentation/telegram/handlers/panel_handler.py                           17     17     0%   1-33
+src/presentation/telegram/handlers/responsible_handlers.py                    45     45     0%   1-74
+src/presentation/telegram/handlers/start_handler.py                            8      8     0%   1-13
+src/presentation/telegram/keyboards.py                                        19     19     0%   1-106
 src/presentation/web/__init__.py                                               0      0   100%
-src/presentation/web/app.py                                                   15      2    87%
+src/presentation/web/app.py                                                   15      1    93%   14
 src/presentation/web/routes/__init__.py                                        0      0   100%
-src/presentation/web/routes/api.py                                           248    170    31%
-----------------------------------------------------------------------------------------------
-TOTAL                                                                       1548   1038    33%
+src/presentation/web/routes/api.py                                           248     59    76%   89-96, 139, 153, 193-202, 225-226, 251-252, 254-255, 268, 302-304, 325-326, 333-334, 336-337, 339-340, 359-360, 362-363, 382-383, 385-386, 388-389, 391-392, 409, 437, 439, 441, 443, 464-466, 468, 470, 472
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                       1548    433    72%
 Coverage HTML written to dir htmlcov
 Coverage XML written to file coverage.xml
-
 =========================== short test summary info ============================
-ERROR tests/presentation/telegram/test_bot.py
-ERROR tests/presentation/telegram/test_keyboards.py
-ERROR tests/presentation/telegram/handlers/test_birthday_handlers.py
-ERROR tests/presentation/telegram/handlers/test_calendar_handler.py
-ERROR tests/presentation/telegram/handlers/test_greeting_handlers.py
-ERROR tests/presentation/telegram/handlers/test_panel_handler.py
-ERROR tests/presentation/telegram/handlers/test_responsible_handlers.py
-ERROR tests/presentation/telegram/handlers/test_start_handler.py
-!!!!!!!!!!!!!!!!!!! Interrupted: 8 errors during collection !!!!!!!!!!!!!!!!!!!!
-======================== 2 warnings, 8 errors in 3.78s =========================
-Error: Process completed with exit code 2.
+FAILED tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_today_execution - AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+FAILED tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_week_execution - AssertionError: Expected 'send_week_notifications' to have been called once. Called 0 times.
+FAILED tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_month_execution - AssertionError: Expected 'send_month_notifications' to have been called once. Called 0 times.
+FAILED tests/infrastructure/test_notifications_scheduler.py::TestNotificationsScheduler::test_send_today_error_handling - AssertionError: Expected 'send_today_notifications' to have been called once. Called 0 times.
+FAILED tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_success - AttributeError: 'coroutine' object has no attribute 'all'
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays - AttributeError: 'coroutine' object has no attribute 'all'
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_birthday_success - assert None == 1
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success - assert 400 == 200
+ +  where 400 = <Response [400 Bad Request]>.status_code
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible - AttributeError: 'coroutine' object has no attribute 'all'
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_responsible_success - assert None == 1
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_responsible_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_assign_responsible_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people - AttributeError: 'coroutine' object has no attribute 'all'
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found - assert 500 == 404
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_birthday_validation_error - assert 200 == 400
+ +  where 200 = <Response [200 OK]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_birthday_not_found - assert 500 == 404
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+================= 20 failed, 159 passed, 10 warnings in 12.10s =================
+Error: Process completed with exit code 1.
