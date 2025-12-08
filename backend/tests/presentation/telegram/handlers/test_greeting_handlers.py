@@ -24,7 +24,7 @@ class TestGreetingHandlers:
     @pytest.fixture
     def mock_callback(self):
         """Мок callback query."""
-        callback = MagicMock(spec=CallbackQuery)
+        callback = MagicMock()
         callback.data = "panel_greetings"
         callback.message = MagicMock()
         callback.message.edit_text = AsyncMock()
@@ -35,9 +35,9 @@ class TestGreetingHandlers:
     @pytest.fixture
     def mock_message(self):
         """Мок сообщения."""
-        message = MagicMock(spec=Message)
-        message.from_user = MagicMock(spec=User)
-        message.chat = MagicMock(spec=Chat)
+        message = MagicMock()
+        message.from_user = MagicMock()
+        message.chat = MagicMock()
         message.text = "123"
         message.answer = AsyncMock()
         message.answer_photo = AsyncMock()
@@ -46,7 +46,7 @@ class TestGreetingHandlers:
     @pytest.fixture
     def mock_state(self):
         """Мок FSM context."""
-        state = MagicMock(spec=FSMContext)
+        state = MagicMock()
         state.set_state = AsyncMock()
         state.update_data = AsyncMock()
         state.get_data = AsyncMock(return_value={
@@ -62,7 +62,7 @@ class TestGreetingHandlers:
     @pytest.fixture
     def mock_session(self):
         """Мок сессии БД."""
-        session = AsyncMock(spec=AsyncSession)
+        session = AsyncMock()
         return session
 
     @pytest.mark.asyncio

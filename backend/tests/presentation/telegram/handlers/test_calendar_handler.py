@@ -17,9 +17,9 @@ class TestCalendarHandler:
     @pytest.fixture
     def mock_message(self):
         """Мок сообщения."""
-        message = MagicMock(spec=Message)
-        message.from_user = MagicMock(spec=User)
-        message.chat = MagicMock(spec=Chat)
+        message = MagicMock()
+        message.from_user = MagicMock()
+        message.chat = MagicMock()
         message.text = "📅 Календарь"
         message.answer = AsyncMock()
         return message
@@ -27,7 +27,7 @@ class TestCalendarHandler:
     @pytest.fixture
     def mock_callback(self):
         """Мок callback query."""
-        callback = MagicMock(spec=CallbackQuery)
+        callback = MagicMock()
         callback.data = "cal_prev_2024_5"
         callback.message = MagicMock()
         callback.message.edit_text = AsyncMock()
@@ -38,7 +38,7 @@ class TestCalendarHandler:
     @pytest.fixture
     def mock_session(self):
         """Мок сессии БД."""
-        session = AsyncMock(spec=AsyncSession)
+        session = AsyncMock()
         return session
 
     @pytest.mark.asyncio

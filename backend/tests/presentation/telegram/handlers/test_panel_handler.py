@@ -12,17 +12,17 @@ class TestPanelHandler:
     @pytest.fixture
     def mock_message(self):
         """Мок сообщения."""
-        message = MagicMock(spec=Message)
-        message.from_user = MagicMock(spec=User)
+        message = MagicMock()
+        message.from_user = MagicMock()
         message.from_user.id = 12345
-        message.chat = MagicMock(spec=Chat)
+        message.chat = MagicMock()
         message.answer = AsyncMock()
         return message
 
     @pytest.fixture
     def mock_session(self):
         """Мок сессии БД."""
-        session = AsyncMock(spec=AsyncSession)
+        session = AsyncMock()
         session.add = MagicMock()
         session.commit = AsyncMock()
         return session
@@ -30,7 +30,7 @@ class TestPanelHandler:
     @pytest.fixture
     def mock_callback(self):
         """Мок callback query."""
-        callback = MagicMock(spec=CallbackQuery)
+        callback = MagicMock()
         callback.data = "panel_main"
         callback.message = MagicMock()
         callback.message.edit_text = AsyncMock()

@@ -11,9 +11,9 @@ class TestStartHandler:
     @pytest.fixture
     def mock_message(self):
         """Мок сообщения."""
-        message = MagicMock(spec=Message)
-        message.from_user = MagicMock(spec=User)
-        message.chat = MagicMock(spec=Chat)
+        message = MagicMock()
+        message.from_user = MagicMock()
+        message.chat = MagicMock()
         message.answer = AsyncMock()
         return message
 
