@@ -1,4 +1,3 @@
-
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.openrouter_client import OpenRouterClient
 
@@ -32,4 +31,3 @@ class GenerateGreetingUseCase:
             length=length,
             theme=theme,
         )
-

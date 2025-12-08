@@ -46,11 +46,14 @@ class GetCalendarDataUseCase:
                 }
                 for h in holidays
             ],
-            "responsible": {
-                "id": responsible.id,
-                "full_name": responsible.full_name,
-                "company": responsible.company,
-                "position": responsible.position,
-            } if responsible else None,
+            "responsible": (
+                {
+                    "id": responsible.id,
+                    "full_name": responsible.full_name,
+                    "company": responsible.company,
+                    "position": responsible.position,
+                }
+                if responsible
+                else None
+            ),
         }
-

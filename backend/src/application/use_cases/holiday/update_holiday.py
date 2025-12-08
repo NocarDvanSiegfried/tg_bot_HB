@@ -27,4 +27,3 @@ class UpdateHolidayUseCase:
             date=date if date is not None else existing.date,
         )
         return await self.holiday_repository.update(updated)
-

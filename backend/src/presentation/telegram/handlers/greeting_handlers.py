@@ -137,6 +137,7 @@ async def process_qr_url(message: Message, state: FSMContext, session: AsyncSess
         )
 
         from aiogram.types import BufferedInputFile
+
         await message.answer_photo(
             BufferedInputFile(card_bytes, filename="card.png"),
             caption="Открытка создана!",
@@ -145,4 +146,3 @@ async def process_qr_url(message: Message, state: FSMContext, session: AsyncSess
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()
-

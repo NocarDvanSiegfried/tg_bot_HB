@@ -15,4 +15,3 @@ def get_database() -> Database:
             raise ValueError("DATABASE_URL environment variable is required")
         _database = Database(database_url)
     return _database
-

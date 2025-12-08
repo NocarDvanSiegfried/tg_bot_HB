@@ -45,7 +45,7 @@ class CardGeneratorImpl(CardGeneratorPort):
         except OSError as e:
             logger.warning(
                 "Failed to load custom font, using default",
-                extra={"error": str(e), "font_path": self.font_path}
+                extra={"error": str(e), "font_path": self.font_path},
             )
             title_font = ImageFont.load_default()
             name_font = ImageFont.load_default()
@@ -151,4 +151,3 @@ class CardGeneratorImpl(CardGeneratorPort):
         qr_img = qr.make_image(fill_color="black", back_color="white")
         qr_img = qr_img.resize((size, size))
         return qr_img
-

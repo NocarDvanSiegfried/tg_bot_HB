@@ -19,4 +19,3 @@ class NotificationService(ABC):
     def get_birthdays_this_month(self, month_start: date) -> list[Birthday]:
         """Получить дни рождения в месяце, начиная с указанной даты."""
         pass
-

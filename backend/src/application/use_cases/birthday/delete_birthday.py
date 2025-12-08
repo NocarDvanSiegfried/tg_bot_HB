@@ -11,4 +11,3 @@ class DeleteBirthdayUseCase:
         if not existing:
             raise ValueError(f"Birthday with id {birthday_id} not found")
         await self.birthday_repository.delete(birthday_id)
-

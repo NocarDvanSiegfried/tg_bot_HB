@@ -14,4 +14,3 @@ class OpenRouterClient(ABC):
     ) -> str:
         """Сгенерировать поздравление через DeepSeek."""
         pass
-

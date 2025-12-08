@@ -31,4 +31,3 @@ async def panel_main_callback(callback: CallbackQuery):
         reply_markup=get_panel_menu_keyboard(),
     )
     await callback.answer()
-

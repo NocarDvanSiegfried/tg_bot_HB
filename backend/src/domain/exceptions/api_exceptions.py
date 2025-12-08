@@ -3,6 +3,7 @@
 
 class OpenRouterAPIError(Exception):
     """Базовое исключение для ошибок OpenRouter API."""
+
     pass
 
 
@@ -26,4 +27,3 @@ class OpenRouterInvalidResponseError(OpenRouterAPIError):
 
     def __init__(self, message: str = "Invalid response structure"):
         super().__init__(f"OpenRouter API invalid response: {message}")
-

@@ -19,9 +19,7 @@ class BirthdayModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("idx_birthday_search", "full_name", "company", "position"),
-    )
+    __table_args__ = (Index("idx_birthday_search", "full_name", "company", "position"),)
 
 
 class ResponsiblePersonModel(Base):
@@ -34,11 +32,11 @@ class ResponsiblePersonModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    assignments = relationship("DateResponsibleAssignmentModel", back_populates="responsible_person")
-
-    __table_args__ = (
-        Index("idx_responsible_search", "full_name", "company", "position"),
+    assignments = relationship(
+        "DateResponsibleAssignmentModel", back_populates="responsible_person"
     )
+
+    __table_args__ = (Index("idx_responsible_search", "full_name", "company", "position"),)
 
 
 class DateResponsibleAssignmentModel(Base):
@@ -52,7 +50,9 @@ class DateResponsibleAssignmentModel(Base):
     responsible_person = relationship("ResponsiblePersonModel", back_populates="assignments")
 
     __table_args__ = (
-        Index("idx_date_responsible_unique", "assignment_date", "responsible_person_id", unique=True),
+        Index(
+            "idx_date_responsible_unique", "assignment_date", "responsible_person_id", unique=True
+        ),
     )
 
 
@@ -73,4 +73,3 @@ class PanelAccessModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False, index=True)
     accessed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-

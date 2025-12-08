@@ -16,30 +16,24 @@ class TelegramAuthServiceImpl(TelegramAuthService):
             parsed_data = urllib.parse.parse_qs(init_data)
 
             # Извлекаем hash
-            received_hash = parsed_data.get('hash', [None])[0]
+            received_hash = parsed_data.get("hash", [None])[0]
             if not received_hash:
                 return False
 
             # Удаляем hash из данных и формируем строку для проверки
             data_check_string = []
             for key in sorted(parsed_data.keys()):
-                if key != 'hash':
+                if key != "hash":
                     data_check_string.append(f"{key}={parsed_data[key][0]}")
 
-            data_check_string = '\n'.join(data_check_string)
+            data_check_string = "\n".join(data_check_string)
 
             # Вычисляем секретный ключ
-            secret_key = hmac.new(
-                b"WebAppData",
-                bot_token.encode(),
-                hashlib.sha256
-            ).digest()
+            secret_key = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
 
             # Вычисляем hash
             calculated_hash = hmac.new(
-                secret_key,
-                data_check_string.encode(),
-                hashlib.sha256
+                secret_key, data_check_string.encode(), hashlib.sha256
             ).hexdigest()
 
             # Сравниваем
@@ -53,8 +47,8 @@ class TelegramAuthServiceImpl(TelegramAuthService):
             parsed = urllib.parse.parse_qs(init_data)
             user_data = {}
 
-            if 'user' in parsed:
-                user_data = json.loads(parsed['user'][0])
+            if "user" in parsed:
+                user_data = json.loads(parsed["user"][0])
 
             return user_data
         except Exception:
@@ -78,7 +72,6 @@ def get_user_id_from_init_data(init_data: str) -> int | None:
     """Извлечь user_id из initData."""
     service = TelegramAuthServiceImpl()
     user_data = service.parse_init_data(init_data)
-    if user_data and 'id' in user_data:
-        return user_data['id']
+    if user_data and "id" in user_data:
+        return user_data["id"]
     return None
-

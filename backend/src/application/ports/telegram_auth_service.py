@@ -13,4 +13,3 @@ class TelegramAuthService(ABC):
     def parse_init_data(self, init_data: str) -> dict | None:
         """Парсить initData и извлечь данные пользователя."""
         pass
-

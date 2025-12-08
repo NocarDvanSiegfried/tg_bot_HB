@@ -44,4 +44,3 @@ class ResponsibleRepository(ABC):
     async def get_all(self) -> list[ResponsiblePerson]:
         """Получить всех ответственных."""
         pass
-

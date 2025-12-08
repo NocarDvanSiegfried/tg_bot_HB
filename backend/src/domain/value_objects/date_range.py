@@ -10,4 +10,3 @@ class DateRange:
     def contains(self, check_date: date) -> bool:
         """Проверяет, входит ли дата в диапазон."""
         return self.start_date <= check_date <= self.end_date
-

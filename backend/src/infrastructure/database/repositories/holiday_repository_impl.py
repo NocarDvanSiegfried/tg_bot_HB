@@ -80,4 +80,3 @@ class HolidayRepositoryImpl(HolidayRepository):
         result = await self.session.execute(select(ProfessionalHolidayModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
-

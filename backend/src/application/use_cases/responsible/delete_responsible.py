@@ -11,4 +11,3 @@ class DeleteResponsibleUseCase:
         if not existing:
             raise ValueError(f"Responsible with id {responsible_id} not found")
         await self.responsible_repository.delete(responsible_id)
-

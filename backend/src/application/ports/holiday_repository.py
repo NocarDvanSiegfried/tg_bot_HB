@@ -34,4 +34,3 @@ class HolidayRepository(ABC):
     async def get_all(self) -> list[ProfessionalHoliday]:
         """Получить все праздники."""
         pass
-

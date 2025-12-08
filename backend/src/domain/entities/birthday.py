@@ -14,7 +14,9 @@ class Birthday:
     def calculate_age(self, reference_date: date) -> int:
         """Вычисляет возраст на указанную дату."""
         age = reference_date.year - self.birth_date.year
-        if (reference_date.month, reference_date.day) < (self.birth_date.month, self.birth_date.day):
+        if (reference_date.month, reference_date.day) < (
+            self.birth_date.month,
+            self.birth_date.day,
+        ):
             age -= 1
         return age
-

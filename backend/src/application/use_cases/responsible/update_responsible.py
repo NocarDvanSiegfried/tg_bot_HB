@@ -1,4 +1,3 @@
-
 from src.application.ports.responsible_repository import ResponsibleRepository
 from src.domain.entities.responsible_person import ResponsiblePerson
 
@@ -26,4 +25,3 @@ class UpdateResponsibleUseCase:
             position=position if position is not None else existing.position,
         )
         return await self.responsible_repository.update(updated)
-

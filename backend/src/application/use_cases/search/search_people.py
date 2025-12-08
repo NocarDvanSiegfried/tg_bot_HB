@@ -1,4 +1,3 @@
-
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.responsible_repository import ResponsibleRepository
 from src.domain.entities.birthday import Birthday
@@ -32,4 +31,3 @@ class SearchPeopleUseCase:
             results.extend(responsible)
 
         return results
-

@@ -74,17 +74,13 @@ async def get_db_session() -> AsyncSession:
 
 
 # Dependency для получения фабрики use-cases
-async def get_use_case_factory(
-    session: AsyncSession = Depends(get_db_session)
-) -> UseCaseFactory:
+async def get_use_case_factory(session: AsyncSession = Depends(get_db_session)) -> UseCaseFactory:
     """Dependency для получения фабрики use-cases."""
     return UseCaseFactory(session)
 
 
 # Dependency для проверки авторизации через Telegram
-async def verify_telegram_auth(
-    x_init_data: str | None = Header(None, alias="X-Init-Data")
-) -> dict:
+async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-Init-Data")) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
     if not x_init_data:
         raise HTTPException(status_code=401, detail="Missing initData")
@@ -120,10 +116,7 @@ async def verify_init_data(data: VerifyInitDataRequest):
 
 # Public endpoints
 @router.get("/api/calendar/{date_str}")
-async def get_calendar(
-    date_str: str,
-    factory: UseCaseFactory = Depends(get_use_case_factory)
-):
+async def get_calendar(date_str: str, factory: UseCaseFactory = Depends(get_use_case_factory)):
     """Получить данные календаря на дату."""
     try:
         check_date = date.fromisoformat(date_str)
@@ -469,6 +462,7 @@ async def create_card(
             qr_url=data.qr_url,
         )
         from fastapi.responses import Response
+
         return Response(content=card_bytes, media_type="image/png")
     except BirthdayNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
@@ -479,4 +473,3 @@ async def create_card(
     except Exception as e:
         logger.error("Unexpected error in create_card", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error") from e
-

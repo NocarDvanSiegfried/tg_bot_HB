@@ -31,4 +31,3 @@ class UpdateBirthdayUseCase:
             comment=comment if comment is not None else existing.comment,
         )
         return await self.birthday_repository.update(updated)
-

@@ -8,4 +8,3 @@ class ProfessionalHoliday:
     name: str
     description: str | None
     date: date
-

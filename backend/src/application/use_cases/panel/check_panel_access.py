@@ -8,4 +8,3 @@ class CheckPanelAccessUseCase:
     async def execute(self, user_id: int) -> bool:
         """Проверить доступ пользователя к панели управления."""
         return await self.panel_access_repository.has_access(user_id)
-

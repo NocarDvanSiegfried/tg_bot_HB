@@ -20,4 +20,3 @@ class CreateResponsibleUseCase:
             position=position,
         )
         return await self.responsible_repository.create(responsible)
-

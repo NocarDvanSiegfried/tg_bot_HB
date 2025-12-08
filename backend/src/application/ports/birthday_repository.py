@@ -44,4 +44,3 @@ class BirthdayRepository(ABC):
     async def get_all(self) -> list[Birthday]:
         """Получить все дни рождения."""
         pass
-

@@ -1,4 +1,3 @@
-
 from src.application.ports.responsible_repository import ResponsibleRepository
 from src.domain.entities.responsible_person import ResponsiblePerson
 
@@ -12,4 +11,3 @@ class GetAllResponsibleUseCase:
     async def execute(self) -> list[ResponsiblePerson]:
         """Получить всех ответственных."""
         return await self.responsible_repository.get_all()
-

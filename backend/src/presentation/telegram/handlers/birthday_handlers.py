@@ -101,4 +101,3 @@ async def process_comment(message: Message, state: FSMContext, session: AsyncSes
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()
-

@@ -22,4 +22,3 @@ class CreateHolidayUseCase:
             date=date,
         )
         return await self.holiday_repository.create(holiday)
-

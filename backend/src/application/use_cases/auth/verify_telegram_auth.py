@@ -1,4 +1,3 @@
-
 from src.application.ports.telegram_auth_service import TelegramAuthService
 
 
@@ -16,4 +15,3 @@ class VerifyTelegramAuthUseCase:
 
         user_data = self.auth_service.parse_init_data(init_data)
         return user_data or {}
-

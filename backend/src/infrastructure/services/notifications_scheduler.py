@@ -15,6 +15,7 @@ async def setup_notifications(bot: Bot, db: Database):
             from src.infrastructure.database.repositories.birthday_repository_impl import (
                 BirthdayRepositoryImpl,
             )
+
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_today_notifications()
@@ -24,6 +25,7 @@ async def setup_notifications(bot: Bot, db: Database):
             from src.infrastructure.database.repositories.birthday_repository_impl import (
                 BirthdayRepositoryImpl,
             )
+
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_week_notifications()
@@ -33,6 +35,7 @@ async def setup_notifications(bot: Bot, db: Database):
             from src.infrastructure.database.repositories.birthday_repository_impl import (
                 BirthdayRepositoryImpl,
             )
+
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_month_notifications()
@@ -60,4 +63,3 @@ async def setup_notifications(bot: Bot, db: Database):
 
     scheduler.start()
     return scheduler
-

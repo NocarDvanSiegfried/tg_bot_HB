@@ -13,4 +13,3 @@ class AssignResponsibleToDateUseCase:
         if not existing:
             raise ValueError(f"Responsible with id {responsible_id} not found")
         await self.responsible_repository.assign_to_date(responsible_id, assignment_date)
-

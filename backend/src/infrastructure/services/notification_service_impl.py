@@ -52,7 +52,7 @@ class NotificationServiceImpl:
                         "user_id": user_id,
                         "error_type": type(e).__name__,
                         "error_message": str(e),
-                    }
+                    },
                 )
 
     async def send_week_notifications(self):
@@ -79,7 +79,7 @@ class NotificationServiceImpl:
                         "user_id": user_id,
                         "error_type": type(e).__name__,
                         "error_message": str(e),
-                    }
+                    },
                 )
 
     async def send_month_notifications(self):
@@ -109,7 +109,7 @@ class NotificationServiceImpl:
                         "user_id": user_id,
                         "error_type": type(e).__name__,
                         "error_message": str(e),
-                    }
+                    },
                 )
 
     def _format_today_message(self, birthdays: list[Birthday], check_date: date) -> str:
@@ -146,4 +146,3 @@ class NotificationServiceImpl:
             text += f"  {bd.company}, {bd.position}\n"
             text += f"  Исполняется {age} лет\n\n"
         return text
-

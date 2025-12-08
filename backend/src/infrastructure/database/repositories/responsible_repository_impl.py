@@ -125,4 +125,3 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         result = await self.session.execute(select(ResponsiblePersonModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
-

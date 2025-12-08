@@ -15,4 +15,3 @@ __all__ = [
     "responsible_handlers",
     "greeting_handlers",
 ]
-

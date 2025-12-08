@@ -87,11 +87,11 @@ class OpenRouterClientImpl(OpenRouterClient):
                 except httpx.HTTPStatusError as e:
                     if attempt == self.max_retries - 1:
                         raise OpenRouterHTTPError(e.response.status_code) from e
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(2**attempt)
                 except httpx.TimeoutException as e:
                     if attempt == self.max_retries - 1:
                         raise OpenRouterTimeoutError() from e
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(2**attempt)
                 except OpenRouterAPIError:
                     # Если это уже наше доменное исключение, пробрасываем дальше
                     raise
@@ -144,4 +144,3 @@ class OpenRouterClientImpl(OpenRouterClient):
 Напиши только текст поздравления, без дополнительных комментариев."""
 
         return prompt
-

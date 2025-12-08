@@ -72,4 +72,3 @@ async def process_position(message: Message, state: FSMContext, session: AsyncSe
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()
-

@@ -26,4 +26,3 @@ class CreateBirthdayUseCase:
             comment=comment,
         )
         return await self.birthday_repository.create(birthday)
-

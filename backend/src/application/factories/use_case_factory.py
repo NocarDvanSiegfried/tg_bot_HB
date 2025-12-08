@@ -73,6 +73,7 @@ class UseCaseFactory:
     def openrouter_client(self):
         if self._openrouter_client is None:
             from src.infrastructure.config.openrouter_config import OpenRouterConfig
+
             api_key = os.getenv("OPENROUTER_API_KEY")
             if not api_key:
                 raise ValueError("OPENROUTER_API_KEY environment variable is required")
@@ -140,4 +141,3 @@ class UseCaseFactory:
         if not bot_token:
             raise ValueError("TELEGRAM_BOT_TOKEN environment variable is required")
         return VerifyTelegramAuthUseCase(self.telegram_auth_service, bot_token)
-

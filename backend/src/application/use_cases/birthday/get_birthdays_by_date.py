@@ -11,4 +11,3 @@ class GetBirthdaysByDateUseCase:
     async def execute(self, check_date: date) -> list[Birthday]:
         """Получить дни рождения на указанную дату."""
         return await self.birthday_repository.get_by_date(check_date)
-

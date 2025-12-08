@@ -56,9 +56,7 @@ class BirthdayRepositoryImpl(BirthdayRepository):
 
     async def get_by_date(self, check_date: date) -> list[Birthday]:
         result = await self.session.execute(
-            select(BirthdayModel).where(
-                BirthdayModel.birth_date == check_date
-            )
+            select(BirthdayModel).where(BirthdayModel.birth_date == check_date)
         )
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -121,4 +119,3 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         result = await self.session.execute(select(BirthdayModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
-

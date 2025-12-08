@@ -11,4 +11,3 @@ class DeleteHolidayUseCase:
         if not existing:
             raise ValueError(f"Holiday with id {holiday_id} not found")
         await self.holiday_repository.delete(holiday_id)
-

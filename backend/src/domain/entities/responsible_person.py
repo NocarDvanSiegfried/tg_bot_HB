@@ -7,4 +7,3 @@ class ResponsiblePerson:
     full_name: str
     company: str
     position: str
-

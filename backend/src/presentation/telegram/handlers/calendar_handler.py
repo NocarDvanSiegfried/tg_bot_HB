@@ -107,4 +107,3 @@ async def date_selected_callback(callback: CallbackQuery, session: AsyncSession)
 
     await callback.message.answer(text)
     await callback.answer()
-

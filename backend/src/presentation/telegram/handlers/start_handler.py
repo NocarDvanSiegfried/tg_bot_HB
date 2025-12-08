@@ -14,4 +14,3 @@ async def cmd_start(message: Message):
         "Добро пожаловать! Выберите действие:",
         reply_markup=get_main_menu_keyboard(),
     )
-

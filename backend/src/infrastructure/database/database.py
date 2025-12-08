@@ -25,4 +25,3 @@ class Database:
         """Получить сессию БД."""
         async with self.async_session_maker() as session:
             yield session
-

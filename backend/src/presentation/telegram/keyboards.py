@@ -20,8 +20,16 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🎂 Управление ДР", callback_data="panel_birthdays")],
-            [InlineKeyboardButton(text="👤 Управление ответственными", callback_data="panel_responsible")],
-            [InlineKeyboardButton(text="🎉 Генерация поздравлений", callback_data="panel_greetings")],
+            [
+                InlineKeyboardButton(
+                    text="👤 Управление ответственными", callback_data="panel_responsible"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🎉 Генерация поздравлений", callback_data="panel_greetings"
+                )
+            ],
             [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
         ]
     )
@@ -59,9 +67,21 @@ def get_responsible_management_keyboard() -> InlineKeyboardMarkup:
     """Меню управления ответственными."""
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="➕ Добавить ответственного", callback_data="responsible_add")],
-            [InlineKeyboardButton(text="✏️ Редактировать ответственного", callback_data="responsible_edit")],
-            [InlineKeyboardButton(text="🗑️ Удалить ответственного", callback_data="responsible_delete")],
+            [
+                InlineKeyboardButton(
+                    text="➕ Добавить ответственного", callback_data="responsible_add"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✏️ Редактировать ответственного", callback_data="responsible_edit"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🗑️ Удалить ответственного", callback_data="responsible_delete"
+                )
+            ],
             [InlineKeyboardButton(text="📅 Назначить на дату", callback_data="responsible_assign")],
             [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")],
         ]
@@ -74,10 +94,13 @@ def get_greeting_options_keyboard() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="✏️ Написать вручную", callback_data="greeting_manual")],
-            [InlineKeyboardButton(text="🤖 Сгенерировать через DeepSeek", callback_data="greeting_generate")],
+            [
+                InlineKeyboardButton(
+                    text="🤖 Сгенерировать через DeepSeek", callback_data="greeting_generate"
+                )
+            ],
             [InlineKeyboardButton(text="🖼️ Создать открытку", callback_data="greeting_card")],
             [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")],
         ]
     )
     return keyboard
-

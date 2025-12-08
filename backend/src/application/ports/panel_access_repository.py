@@ -6,4 +6,3 @@ class PanelAccessRepository(ABC):
     async def has_access(self, user_id: int) -> bool:
         """Проверить, есть ли у пользователя доступ к панели."""
         pass
-
