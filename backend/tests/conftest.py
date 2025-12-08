@@ -6,7 +6,7 @@ def _setup_python_path():
     """Setup Python path before any imports."""
     # Add project root to Python path to ensure src is importable
     # This ensures paths are set up BEFORE any imports that might need them
-    # Priority: PYTHONPATH (CI) > pytest.ini pythonpath > explicit path addition (local)
+    # Priority: PYTHONPATH (CI) > explicit path addition (local)
     project_root = Path(__file__).parent.parent
     project_root_str = str(project_root.resolve())
 
@@ -32,14 +32,20 @@ def _setup_python_path():
 
     # Only add to sys.path if not already present
     # This must happen BEFORE any imports that use src.* modules
-    # Note: pytest.ini pythonpath = . should handle this, but we keep this as fallback
+    # Insert at position 1 (after current directory, before site-packages)
+    # This ensures installed packages like aiogram are still found first
     if not in_sys_path and not in_pythonpath:
-        # Insert at position 1 (after current directory, before site-packages)
-        # This ensures installed packages like aiogram are still found first
         sys.path.insert(1, project_root_str)
 
 # Setup path immediately when conftest is imported
+# This runs before pytest collects tests, even with --import-mode=importlib
 _setup_python_path()
+
+# Also set up path in pytest_configure hook as a fallback
+# This ensures path is set even if conftest imports happen in unexpected order
+def pytest_configure(config):
+    """Configure pytest - ensure Python path is set up."""
+    _setup_python_path()
 
 import pytest
 from datetime import date
