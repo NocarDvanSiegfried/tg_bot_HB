@@ -53,3 +53,21 @@ class TestPanelAccessRepositoryImpl:
         # Assert
         assert result is False
 
+    @pytest.mark.asyncio
+    async def test_record_access(self, repository, mock_session):
+        """Тест записи доступа к панели."""
+        # Arrange
+        user_id = 123
+        mock_session.add = MagicMock()
+        mock_session.commit = AsyncMock()
+
+        # Act
+        await repository.record_access(user_id)
+
+        # Assert
+        mock_session.add.assert_called_once()
+        added_model = mock_session.add.call_args[0][0]
+        assert isinstance(added_model, PanelAccessModel)
+        assert added_model.user_id == user_id
+        mock_session.commit.assert_called_once()
+

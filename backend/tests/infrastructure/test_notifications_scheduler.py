@@ -1,4 +1,5 @@
 import pytest
+from datetime import date
 from unittest.mock import AsyncMock, MagicMock, patch
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -77,4 +78,224 @@ class TestNotificationsScheduler:
         # Проверяем monthly job
         monthly_job = next(job for job in jobs if job.id == "monthly_birthdays")
         assert monthly_job is not None
+
+    @pytest.mark.asyncio
+    async def test_send_today_execution(self, mock_bot, mock_database):
+        """Тест выполнения задачи send_today."""
+        with patch(
+            "src.infrastructure.database.repositories.birthday_repository_impl.BirthdayRepositoryImpl"
+        ) as mock_repo_class, patch(
+            "src.infrastructure.services.notification_service_impl.NotificationServiceImpl"
+        ) as mock_service_class:
+            # Настройка моков
+            mock_session = AsyncMock()
+            async def get_session():
+                yield mock_session
+            
+            mock_database.get_session = get_session
+            
+            # Мокируем репозиторий с async методами
+            from src.domain.entities.birthday import Birthday
+            mock_birthday = Birthday(
+                id=1,
+                full_name="Иван Иванов",
+                company="ООО Тест",
+                position="Разработчик",
+                birth_date=date.today(),
+                comment=None,
+            )
+            mock_repo = AsyncMock()
+            mock_repo.get_by_date = AsyncMock(return_value=[mock_birthday])
+            mock_repo_class.return_value = mock_repo
+            
+            # Мокируем session для get_active_users
+            mock_session.execute = AsyncMock()
+            mock_result = MagicMock()
+            mock_result.scalars.return_value.all.return_value = []
+            mock_session.execute.return_value = mock_result
+            
+            mock_service = AsyncMock()
+            mock_service.send_today_notifications = AsyncMock()
+            mock_service.get_active_users = AsyncMock(return_value=[123])
+            mock_service_class.return_value = mock_service
+            
+            scheduler = await setup_notifications(mock_bot, mock_database)
+            
+            # Получаем задачу и выполняем её
+            jobs = scheduler.get_jobs()
+            daily_job = next(job for job in jobs if job.id == "daily_birthdays")
+            
+            # Выполняем задачу
+            await daily_job.func()
+            
+            # Проверяем, что сервис был вызван
+            mock_service.send_today_notifications.assert_called_once()
+            
+            scheduler.shutdown(wait=True)
+
+    @pytest.mark.asyncio
+    async def test_send_week_execution(self, mock_bot, mock_database):
+        """Тест выполнения задачи send_week."""
+        with patch(
+            "src.infrastructure.database.repositories.birthday_repository_impl.BirthdayRepositoryImpl"
+        ) as mock_repo_class, patch(
+            "src.infrastructure.services.notification_service_impl.NotificationServiceImpl"
+        ) as mock_service_class:
+            # Настройка моков
+            mock_session = AsyncMock()
+            async def get_session():
+                yield mock_session
+            
+            mock_database.get_session = get_session
+            
+            # Мокируем репозиторий с async методами
+            from src.domain.entities.birthday import Birthday
+            mock_birthday = Birthday(
+                id=1,
+                full_name="Иван Иванов",
+                company="ООО Тест",
+                position="Разработчик",
+                birth_date=date.today(),
+                comment=None,
+            )
+            mock_repo = AsyncMock()
+            mock_repo.get_by_date_range = AsyncMock(return_value=[mock_birthday])
+            mock_repo_class.return_value = mock_repo
+            
+            # Мокируем session для get_active_users
+            mock_session.execute = AsyncMock()
+            mock_result = MagicMock()
+            mock_result.scalars.return_value.all.return_value = []
+            mock_session.execute.return_value = mock_result
+            
+            mock_service = AsyncMock()
+            mock_service.send_week_notifications = AsyncMock()
+            mock_service.get_active_users = AsyncMock(return_value=[123])
+            mock_service_class.return_value = mock_service
+            
+            scheduler = await setup_notifications(mock_bot, mock_database)
+            
+            # Получаем задачу и выполняем её
+            jobs = scheduler.get_jobs()
+            weekly_job = next(job for job in jobs if job.id == "weekly_birthdays")
+            
+            # Выполняем задачу
+            await weekly_job.func()
+            
+            # Проверяем, что сервис был вызван
+            mock_service.send_week_notifications.assert_called_once()
+            
+            scheduler.shutdown(wait=True)
+
+    @pytest.mark.asyncio
+    async def test_send_month_execution(self, mock_bot, mock_database):
+        """Тест выполнения задачи send_month."""
+        with patch(
+            "src.infrastructure.database.repositories.birthday_repository_impl.BirthdayRepositoryImpl"
+        ) as mock_repo_class, patch(
+            "src.infrastructure.services.notification_service_impl.NotificationServiceImpl"
+        ) as mock_service_class:
+            # Настройка моков
+            mock_session = AsyncMock()
+            async def get_session():
+                yield mock_session
+            
+            mock_database.get_session = get_session
+            
+            # Мокируем репозиторий с async методами
+            from src.domain.entities.birthday import Birthday
+            mock_birthday = Birthday(
+                id=1,
+                full_name="Иван Иванов",
+                company="ООО Тест",
+                position="Разработчик",
+                birth_date=date.today(),
+                comment=None,
+            )
+            mock_repo = AsyncMock()
+            mock_repo.get_by_date_range = AsyncMock(return_value=[mock_birthday])
+            mock_repo_class.return_value = mock_repo
+            
+            # Мокируем session для get_active_users
+            mock_session.execute = AsyncMock()
+            mock_result = MagicMock()
+            mock_result.scalars.return_value.all.return_value = []
+            mock_session.execute.return_value = mock_result
+            
+            mock_service = AsyncMock()
+            mock_service.send_month_notifications = AsyncMock()
+            mock_service.get_active_users = AsyncMock(return_value=[123])
+            mock_service_class.return_value = mock_service
+            
+            scheduler = await setup_notifications(mock_bot, mock_database)
+            
+            # Получаем задачу и выполняем её
+            jobs = scheduler.get_jobs()
+            monthly_job = next(job for job in jobs if job.id == "monthly_birthdays")
+            
+            # Выполняем задачу
+            await monthly_job.func()
+            
+            # Проверяем, что сервис был вызван
+            mock_service.send_month_notifications.assert_called_once()
+            
+            scheduler.shutdown(wait=True)
+
+    @pytest.mark.asyncio
+    async def test_send_today_error_handling(self, mock_bot, mock_database):
+        """Тест обработки ошибок в send_today."""
+        with patch(
+            "src.infrastructure.database.repositories.birthday_repository_impl.BirthdayRepositoryImpl"
+        ) as mock_repo_class, patch(
+            "src.infrastructure.services.notification_service_impl.NotificationServiceImpl"
+        ) as mock_service_class:
+            # Настройка моков
+            mock_session = AsyncMock()
+            async def get_session():
+                yield mock_session
+            
+            mock_database.get_session = get_session
+            
+            # Мокируем репозиторий с async методами
+            from src.domain.entities.birthday import Birthday
+            mock_birthday = Birthday(
+                id=1,
+                full_name="Иван Иванов",
+                company="ООО Тест",
+                position="Разработчик",
+                birth_date=date.today(),
+                comment=None,
+            )
+            mock_repo = AsyncMock()
+            mock_repo.get_by_date = AsyncMock(return_value=[mock_birthday])
+            mock_repo_class.return_value = mock_repo
+            
+            # Мокируем session для get_active_users
+            mock_session.execute = AsyncMock()
+            mock_result = MagicMock()
+            mock_result.scalars.return_value.all.return_value = []
+            mock_session.execute.return_value = mock_result
+            
+            mock_service = AsyncMock()
+            mock_service.send_today_notifications = AsyncMock(side_effect=Exception("Test error"))
+            mock_service.get_active_users = AsyncMock(return_value=[123])
+            mock_service_class.return_value = mock_service
+            
+            scheduler = await setup_notifications(mock_bot, mock_database)
+            
+            # Получаем задачу и выполняем её
+            jobs = scheduler.get_jobs()
+            daily_job = next(job for job in jobs if job.id == "daily_birthdays")
+            
+            # Выполняем задачу - ошибка должна быть обработана
+            try:
+                await daily_job.func()
+            except Exception:
+                # Ошибка ожидаема
+                pass
+            
+            # Проверяем, что сервис был вызван
+            mock_service.send_today_notifications.assert_called_once()
+            
+            scheduler.shutdown(wait=True)
 

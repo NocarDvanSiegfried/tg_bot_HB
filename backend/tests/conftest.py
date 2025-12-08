@@ -1,11 +1,22 @@
 import sys
+import os
 from pathlib import Path
 
 # Add project root to Python path to ensure src is importable
-# This is needed when pytest.ini doesn't have pythonpath set
+# This ensures paths are set up BEFORE any imports that might need them
+# Check PYTHONPATH first to avoid conflicts
 project_root = Path(__file__).parent.parent
-if str(project_root) not in sys.path:
-    sys.path.insert(0, str(project_root))
+project_root_str = str(project_root.resolve())
+
+# Only add to sys.path if not already in PYTHONPATH or sys.path
+# This must happen BEFORE any imports that use src.* modules
+pythonpath = os.environ.get("PYTHONPATH", "")
+if project_root_str not in sys.path:
+    # Check if it's in PYTHONPATH (can be colon/semicolon separated)
+    if project_root_str not in pythonpath.split(os.pathsep):
+        # Insert at position 1 (after current directory, before site-packages)
+        # This ensures installed packages are still found first
+        sys.path.insert(1, project_root_str)
 
 import pytest
 from datetime import date

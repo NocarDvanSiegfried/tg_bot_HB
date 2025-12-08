@@ -4,7 +4,7 @@ import uvicorn
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from src.infrastructure.database.database import Database
+from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
     start_handler,
     panel_handler,
@@ -32,8 +32,9 @@ async def start_bot():
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
 
-    # Инициализация БД
-    db = Database(database_url)
+    # Инициализация БД через factory
+    os.environ["DATABASE_URL"] = database_url
+    db = get_database()
     await db.create_tables()
 
     # Настройка уведомлений
