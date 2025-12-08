@@ -1,4 +1,17 @@
 Run pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
+  pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
+  shell: /usr/bin/bash -e {0}
+  env:
+    pythonLocation: /opt/hostedtoolcache/Python/3.11.14/x64
+    PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib/pkgconfig
+    Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+    Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+    Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+    LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib
+    PYTHONPATH: /home/runner/work/tg_bot_HB/tg_bot_HB/backend
+    DATABASE_URL: sqlite+aiosqlite:///:memory:
+    TELEGRAM_BOT_TOKEN: test_token
+    OPENROUTER_API_KEY: test_key
 ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
 cachedir: .pytest_cache
@@ -246,5 +259,5 @@ ERROR tests/presentation/telegram/handlers/test_panel_handler.py
 ERROR tests/presentation/telegram/handlers/test_responsible_handlers.py
 ERROR tests/presentation/telegram/handlers/test_start_handler.py
 !!!!!!!!!!!!!!!!!!! Interrupted: 8 errors during collection !!!!!!!!!!!!!!!!!!!!
-======================== 2 warnings, 8 errors in 3.51s =========================
+======================== 2 warnings, 8 errors in 3.78s =========================
 Error: Process completed with exit code 2.
