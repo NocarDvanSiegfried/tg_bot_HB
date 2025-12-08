@@ -19,4 +19,3 @@ class ResponsibleNotFoundError(NotFoundError):
     """Ответственный не найден."""
 
     pass
-
