@@ -30,9 +30,7 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_initialization(self, mock_bot, mock_database):
         """Тест инициализации scheduler."""
-            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
-            importlib.reload(notifications_scheduler)
-            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
+        scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler is not None
         assert isinstance(scheduler, AsyncIOScheduler)
@@ -41,9 +39,7 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_start(self, mock_bot, mock_database):
         """Тест запуска scheduler."""
-            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
-            importlib.reload(notifications_scheduler)
-            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
+        scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler.running
         # Проверяем, что задачи добавлены
@@ -57,9 +53,7 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_stop(self, mock_bot, mock_database):
         """Тест остановки scheduler."""
-            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
-            importlib.reload(notifications_scheduler)
-            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
+        scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         assert scheduler.running
         scheduler.shutdown(wait=True)
@@ -70,9 +64,7 @@ class TestNotificationsScheduler:
     @pytest.mark.asyncio
     async def test_scheduler_jobs_configuration(self, mock_bot, mock_database):
         """Тест конфигурации задач scheduler."""
-            # Перезагружаем модуль после патчей, чтобы импорты внутри функций использовали патченные классы
-            importlib.reload(notifications_scheduler)
-            scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
+        scheduler = await notifications_scheduler.setup_notifications(mock_bot, mock_database)
         
         jobs = scheduler.get_jobs()
         
