@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from src.application.ports.holiday_repository import HolidayRepository
 from src.domain.entities.professional_holiday import ProfessionalHoliday
@@ -13,7 +12,7 @@ class CreateHolidayUseCase:
         self,
         name: str,
         date: date,
-        description: Optional[str] = None,
+        description: str | None = None,
     ) -> ProfessionalHoliday:
         """Создать новый профессиональный праздник."""
         holiday = ProfessionalHoliday(

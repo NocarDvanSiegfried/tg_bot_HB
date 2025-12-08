@@ -1,4 +1,5 @@
 import os
+
 from src.infrastructure.database.database import Database
 
 # Singleton Database instance
@@ -10,7 +11,7 @@ def get_database() -> Database:
     global _database
     if _database is None:
         database_url = os.getenv("DATABASE_URL")
-        if not database_url:
+        if not database_url or database_url.strip() == "":
             raise ValueError("DATABASE_URL environment variable is required")
         _database = Database(database_url)
     return _database

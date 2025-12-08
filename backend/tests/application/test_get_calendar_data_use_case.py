@@ -105,3 +105,24 @@ class TestGetCalendarDataUseCase:
         assert result["holidays"] == []
         assert result["responsible"] is None
 
+    @pytest.mark.asyncio
+    async def test_get_calendar_data_repository_error(self):
+        """Тест обработки ошибок репозиториев."""
+        # Arrange
+        mock_birthday_repo = AsyncMock()
+        mock_holiday_repo = AsyncMock()
+        mock_responsible_repo = AsyncMock()
+        
+        check_date = date(2024, 5, 15)
+        mock_birthday_repo.get_by_date.side_effect = Exception("Database connection error")
+        
+        use_case = GetCalendarDataUseCase(
+            mock_birthday_repo,
+            mock_holiday_repo,
+            mock_responsible_repo,
+        )
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Database connection error"):
+            await use_case.execute(check_date)
+

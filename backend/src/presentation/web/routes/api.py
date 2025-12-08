@@ -1,9 +1,7 @@
 import logging
-import os
 from datetime import date
-from typing import List, Optional, Dict
 
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,15 +21,15 @@ class BirthdayCreate(BaseModel):
     company: str
     position: str
     birth_date: date
-    comment: Optional[str] = None
+    comment: str | None = None
 
 
 class BirthdayUpdate(BaseModel):
-    full_name: Optional[str] = None
-    company: Optional[str] = None
-    position: Optional[str] = None
-    birth_date: Optional[date] = None
-    comment: Optional[str] = None
+    full_name: str | None = None
+    company: str | None = None
+    position: str | None = None
+    birth_date: date | None = None
+    comment: str | None = None
 
 
 class ResponsibleCreate(BaseModel):
@@ -41,9 +39,9 @@ class ResponsibleCreate(BaseModel):
 
 
 class ResponsibleUpdate(BaseModel):
-    full_name: Optional[str] = None
-    company: Optional[str] = None
-    position: Optional[str] = None
+    full_name: str | None = None
+    company: str | None = None
+    position: str | None = None
 
 
 class AssignResponsibleRequest(BaseModel):
@@ -55,13 +53,13 @@ class GenerateGreetingRequest(BaseModel):
     birthday_id: int
     style: str
     length: str
-    theme: Optional[str] = None
+    theme: str | None = None
 
 
 class CreateCardRequest(BaseModel):
     birthday_id: int
     greeting_text: str
-    qr_url: Optional[str] = None
+    qr_url: str | None = None
 
 
 class VerifyInitDataRequest(BaseModel):
@@ -85,21 +83,21 @@ async def get_use_case_factory(
 
 # Dependency для проверки авторизации через Telegram
 async def verify_telegram_auth(
-    x_init_data: Optional[str] = Header(None, alias="X-Init-Data")
-) -> Dict:
+    x_init_data: str | None = Header(None, alias="X-Init-Data")
+) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
     if not x_init_data:
         raise HTTPException(status_code=401, detail="Missing initData")
-    
+
     # Создаем use-case через фабрику (не требует session)
     factory = UseCaseFactory(session=None)  # Auth use-case не требует БД сессии
     use_case = factory.create_auth_use_case()
-    
+
     try:
         user_data = await use_case.execute(x_init_data)
         return user_data
-    except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid initData")
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail="Invalid initData") from e
 
 
 # Auth endpoints
@@ -109,15 +107,15 @@ async def verify_init_data(data: VerifyInitDataRequest):
     # Создаем use-case через фабрику (не требует session)
     factory = UseCaseFactory(session=None)  # Auth use-case не требует БД сессии
     use_case = factory.create_auth_use_case()
-    
+
     try:
         user_data = await use_case.execute(data.init_data)
         return {
             "valid": True,
             "user": user_data,
         }
-    except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid initData")
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail="Invalid initData") from e
 
 
 # Public endpoints
@@ -129,8 +127,8 @@ async def get_calendar(
     """Получить данные календаря на дату."""
     try:
         check_date = date.fromisoformat(date_str)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Invalid date format") from e
 
     use_case = factory.create_calendar_use_case()
     return await use_case.execute(check_date)
@@ -139,16 +137,16 @@ async def get_calendar(
 # Panel endpoints
 @router.get("/api/panel/check-access")
 async def check_panel_access(
-    user: Dict = Depends(verify_telegram_auth),
+    user: dict = Depends(verify_telegram_auth),
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Проверить доступ пользователя к панели управления."""
     user_id = user.get("id")
     if not user_id:
         raise HTTPException(status_code=401, detail="User ID not found in initData")
-    
+
     use_case = factory.create_panel_access_use_case()
-    
+
     has_access = await use_case.execute(user_id)
     return {"has_access": has_access}
 
@@ -201,14 +199,14 @@ async def create_birthday(
         }
     except ValidationError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         await session.rollback()
         logger.error("Unexpected error in create_birthday", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.put("/api/panel/birthdays/{birthday_id}")
@@ -242,7 +240,7 @@ async def update_birthday(
         }
     except Exception as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/api/panel/birthdays/{birthday_id}")
@@ -261,11 +259,11 @@ async def delete_birthday(
         return {"status": "deleted"}
     except BirthdayNotFoundError as e:
         await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         await session.rollback()
         logger.error("Unexpected error in delete_birthday", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.get("/api/panel/responsible")
@@ -310,7 +308,7 @@ async def create_responsible(
         }
     except Exception as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.put("/api/panel/responsible/{responsible_id}")
@@ -340,17 +338,17 @@ async def update_responsible(
         }
     except ResponsibleNotFoundError as e:
         await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except ValidationError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         await session.rollback()
         logger.error("Unexpected error in update_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.delete("/api/panel/responsible/{responsible_id}")
@@ -369,11 +367,11 @@ async def delete_responsible(
         return {"status": "deleted"}
     except ResponsibleNotFoundError as e:
         await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         await session.rollback()
         logger.error("Unexpected error in delete_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.post("/api/panel/assign-responsible")
@@ -392,17 +390,17 @@ async def assign_responsible(
         return {"status": "assigned"}
     except (BirthdayNotFoundError, ResponsibleNotFoundError) as e:
         await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except ValidationError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
         await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         await session.rollback()
         logger.error("Unexpected error in assign_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.get("/api/panel/search")
@@ -445,14 +443,14 @@ async def generate_greeting(
         )
         return {"greeting": greeting_text}
     except BirthdayNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error("Unexpected error in generate_greeting", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 @router.post("/api/panel/create-card")
@@ -473,12 +471,12 @@ async def create_card(
         from fastapi.responses import Response
         return Response(content=card_bytes, media_type="image/png")
     except BirthdayNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error("Unexpected error in create_card", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 

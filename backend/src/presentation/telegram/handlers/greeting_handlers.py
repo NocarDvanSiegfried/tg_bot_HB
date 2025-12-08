@@ -51,7 +51,7 @@ async def process_birthday_id(message: Message, state: FSMContext):
     try:
         birthday_id = int(message.text)
         await state.update_data(birthday_id=birthday_id)
-        
+
         # Определяем, какой путь выбран
         current_state = await state.get_state()
         if current_state == GreetingForm.waiting_for_birthday_id:
@@ -135,7 +135,7 @@ async def process_qr_url(message: Message, state: FSMContext, session: AsyncSess
             greeting_text=data["greeting_text"],
             qr_url=qr_url,
         )
-        
+
         from aiogram.types import BufferedInputFile
         await message.answer_photo(
             BufferedInputFile(card_bytes, filename="card.png"),

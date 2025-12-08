@@ -1,16 +1,15 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional
 
 
 @dataclass
 class Birthday:
-    id: Optional[int]
+    id: int | None
     full_name: str
     company: str
     position: str
     birth_date: date
-    comment: Optional[str]
+    comment: str | None
 
     def calculate_age(self, reference_date: date) -> int:
         """Вычисляет возраст на указанную дату."""

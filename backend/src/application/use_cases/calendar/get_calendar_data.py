@@ -1,12 +1,8 @@
 from datetime import date
-from typing import List, Optional
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.holiday_repository import HolidayRepository
 from src.application.ports.responsible_repository import ResponsibleRepository
-from src.domain.entities.birthday import Birthday
-from src.domain.entities.professional_holiday import ProfessionalHoliday
-from src.domain.entities.responsible_person import ResponsiblePerson
 
 
 class GetCalendarDataUseCase:

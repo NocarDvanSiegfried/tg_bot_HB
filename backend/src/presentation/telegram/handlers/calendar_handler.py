@@ -1,6 +1,7 @@
 from datetime import date, datetime
+
 from aiogram import Router
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
@@ -23,7 +24,7 @@ async def show_calendar(message: Message):
 async def calendar_callback(callback: CallbackQuery, session: AsyncSession):
     """Обработка навигации по календарю."""
     data = callback.data
-    
+
     if data == "cal_info":
         await callback.answer("Информация о календаре")
         return
@@ -98,7 +99,7 @@ async def date_selected_callback(callback: CallbackQuery, session: AsyncSession)
     # Ответственный
     if calendar_data["responsible"]:
         resp = calendar_data["responsible"]
-        text += f"👤 Ответственное лицо:\n"
+        text += "👤 Ответственное лицо:\n"
         text += f"• {resp['full_name']}\n"
         text += f"  {resp['company']}, {resp['position']}\n"
     else:

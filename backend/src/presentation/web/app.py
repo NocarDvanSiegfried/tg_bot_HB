@@ -1,9 +1,9 @@
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.presentation.web.routes.api import router
-
 
 app = FastAPI(title="Telegram Birthday Calendar API")
 

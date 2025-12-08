@@ -1,9 +1,11 @@
-from . import start_handler
-from . import panel_handler
-from . import calendar_handler
-from . import birthday_handlers
-from . import responsible_handlers
-from . import greeting_handlers
+from . import (
+    birthday_handlers,
+    calendar_handler,
+    greeting_handlers,
+    panel_handler,
+    responsible_handlers,
+    start_handler,
+)
 
 __all__ = [
     "start_handler",

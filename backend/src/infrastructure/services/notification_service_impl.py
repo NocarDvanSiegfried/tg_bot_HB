@@ -1,6 +1,5 @@
 import logging
 from datetime import date, timedelta
-from typing import List
 
 from aiogram import Bot
 from sqlalchemy import select
@@ -24,7 +23,7 @@ class NotificationServiceImpl:
         self.birthday_repository = birthday_repository
         self.session = session
 
-    async def get_active_users(self) -> List[int]:
+    async def get_active_users(self) -> list[int]:
         """Получить список активных пользователей (тех, кто взаимодействовал с ботом)."""
         result = await self.session.execute(
             select(PanelAccessModel).distinct(PanelAccessModel.user_id)
@@ -113,7 +112,7 @@ class NotificationServiceImpl:
                     }
                 )
 
-    def _format_today_message(self, birthdays: List[Birthday], check_date: date) -> str:
+    def _format_today_message(self, birthdays: list[Birthday], check_date: date) -> str:
         """Форматировать сообщение о ДР сегодня."""
         text = f"🎂 Сегодня ({check_date.strftime('%d.%m.%Y')}) дни рождения:\n\n"
         for bd in birthdays:
@@ -127,7 +126,7 @@ class NotificationServiceImpl:
         return text
 
     def _format_week_message(
-        self, birthdays: List[Birthday], week_start: date, week_end: date
+        self, birthdays: list[Birthday], week_start: date, week_end: date
     ) -> str:
         """Форматировать сообщение о ДР на неделе."""
         text = f"📅 На этой неделе ({week_start.strftime('%d.%m')} - {week_end.strftime('%d.%m.%Y')}) дни рождения:\n\n"
@@ -138,7 +137,7 @@ class NotificationServiceImpl:
             text += f"  Исполняется {age} лет\n\n"
         return text
 
-    def _format_month_message(self, birthdays: List[Birthday], month_start: date) -> str:
+    def _format_month_message(self, birthdays: list[Birthday], month_start: date) -> str:
         """Форматировать сообщение о ДР в месяце."""
         text = f"📅 В этом месяце ({month_start.strftime('%B %Y')}) дни рождения:\n\n"
         for bd in birthdays:

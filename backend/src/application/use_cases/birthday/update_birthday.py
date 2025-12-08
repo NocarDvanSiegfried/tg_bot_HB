@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.domain.entities.birthday import Birthday
@@ -12,11 +11,11 @@ class UpdateBirthdayUseCase:
     async def execute(
         self,
         birthday_id: int,
-        full_name: Optional[str] = None,
-        company: Optional[str] = None,
-        position: Optional[str] = None,
-        birth_date: Optional[date] = None,
-        comment: Optional[str] = None,
+        full_name: str | None = None,
+        company: str | None = None,
+        position: str | None = None,
+        birth_date: date | None = None,
+        comment: str | None = None,
     ) -> Birthday:
         """Обновить день рождения."""
         existing = await self.birthday_repository.get_by_id(birthday_id)

@@ -7,3 +7,4 @@ class BusinessRuleError(DomainException):
     """Ошибка нарушения бизнес-правила."""
     pass
 
+

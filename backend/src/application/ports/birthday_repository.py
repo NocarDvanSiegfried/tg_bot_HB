@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
 
 from src.domain.entities.birthday import Birthday
 
@@ -12,17 +11,17 @@ class BirthdayRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, birthday_id: int) -> Optional[Birthday]:
+    async def get_by_id(self, birthday_id: int) -> Birthday | None:
         """Получить день рождения по ID."""
         pass
 
     @abstractmethod
-    async def get_by_date(self, check_date: date) -> List[Birthday]:
+    async def get_by_date(self, check_date: date) -> list[Birthday]:
         """Получить дни рождения на указанную дату."""
         pass
 
     @abstractmethod
-    async def get_by_date_range(self, start_date: date, end_date: date) -> List[Birthday]:
+    async def get_by_date_range(self, start_date: date, end_date: date) -> list[Birthday]:
         """Получить дни рождения в диапазоне дат."""
         pass
 
@@ -37,12 +36,12 @@ class BirthdayRepository(ABC):
         pass
 
     @abstractmethod
-    async def search(self, query: str) -> List[Birthday]:
+    async def search(self, query: str) -> list[Birthday]:
         """Поиск по ФИО, компании, должности."""
         pass
 
     @abstractmethod
-    async def get_all(self) -> List[Birthday]:
+    async def get_all(self) -> list[Birthday]:
         """Получить все дни рождения."""
         pass
 

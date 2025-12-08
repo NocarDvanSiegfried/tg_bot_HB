@@ -1,4 +1,3 @@
-from typing import Optional
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.card_generator import CardGeneratorPort
@@ -18,7 +17,7 @@ class CreateCardUseCase:
         self,
         birthday_id: int,
         greeting_text: str,
-        qr_url: Optional[str] = None,
+        qr_url: str | None = None,
     ) -> bytes:
         """Создать открытку для сотрудника."""
         birthday = await self.birthday_repository.get_by_id(birthday_id)

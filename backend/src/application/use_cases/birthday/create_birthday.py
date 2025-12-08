@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.domain.entities.birthday import Birthday
@@ -15,7 +14,7 @@ class CreateBirthdayUseCase:
         company: str,
         position: str,
         birth_date: date,
-        comment: Optional[str] = None,
+        comment: str | None = None,
     ) -> Birthday:
         """Создать новый день рождения."""
         birthday = Birthday(

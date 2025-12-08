@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from src.application.ports.holiday_repository import HolidayRepository
 from src.domain.entities.professional_holiday import ProfessionalHoliday
@@ -12,9 +11,9 @@ class UpdateHolidayUseCase:
     async def execute(
         self,
         holiday_id: int,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        date: Optional[date] = None,
+        name: str | None = None,
+        description: str | None = None,
+        date: date | None = None,
     ) -> ProfessionalHoliday:
         """Обновить праздник."""
         existing = await self.holiday_repository.get_by_id(holiday_id)

@@ -1,8 +1,6 @@
-import os
+from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from aiogram import Bot
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database.database import Database
 from src.infrastructure.services.notification_service_impl import NotificationServiceImpl
@@ -14,21 +12,27 @@ async def setup_notifications(bot: Bot, db: Database):
 
     async def send_today():
         async for session in db.get_session():
-            from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
+            from src.infrastructure.database.repositories.birthday_repository_impl import (
+                BirthdayRepositoryImpl,
+            )
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_today_notifications()
 
     async def send_week():
         async for session in db.get_session():
-            from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
+            from src.infrastructure.database.repositories.birthday_repository_impl import (
+                BirthdayRepositoryImpl,
+            )
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_week_notifications()
 
     async def send_month():
         async for session in db.get_session():
-            from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
+            from src.infrastructure.database.repositories.birthday_repository_impl import (
+                BirthdayRepositoryImpl,
+            )
             birthday_repo = BirthdayRepositoryImpl(session)
             service = NotificationServiceImpl(bot, birthday_repo, session)
             await service.send_month_notifications()

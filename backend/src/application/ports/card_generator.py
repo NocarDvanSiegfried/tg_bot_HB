@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class CardGeneratorPort(ABC):
@@ -12,9 +11,10 @@ class CardGeneratorPort(ABC):
         company: str,
         position: str,
         greeting_text: str,
-        comment: Optional[str] = None,
-        qr_url: Optional[str] = None,
+        comment: str | None = None,
+        qr_url: str | None = None,
     ) -> bytes:
         """Сгенерировать открытку."""
         pass
+
 

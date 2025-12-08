@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class ResponsiblePerson:
-    id: Optional[int]
+    id: int | None
     full_name: str
     company: str
     position: str

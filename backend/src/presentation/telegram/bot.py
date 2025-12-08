@@ -1,15 +1,17 @@
+import asyncio
 import os
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from src.infrastructure.database.database import Database
 from src.presentation.telegram.handlers import (
-    start_handler,
-    panel_handler,
-    calendar_handler,
     birthday_handlers,
-    responsible_handlers,
+    calendar_handler,
     greeting_handlers,
+    panel_handler,
+    responsible_handlers,
+    start_handler,
 )
 
 

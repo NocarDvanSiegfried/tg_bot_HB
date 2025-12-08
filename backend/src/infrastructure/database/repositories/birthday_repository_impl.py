@@ -1,7 +1,6 @@
 from datetime import date
-from typing import List, Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.birthday_repository import BirthdayRepository
@@ -48,14 +47,14 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def get_by_id(self, birthday_id: int) -> Optional[Birthday]:
+    async def get_by_id(self, birthday_id: int) -> Birthday | None:
         result = await self.session.execute(
             select(BirthdayModel).where(BirthdayModel.id == birthday_id)
         )
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_date(self, check_date: date) -> List[Birthday]:
+    async def get_by_date(self, check_date: date) -> list[Birthday]:
         result = await self.session.execute(
             select(BirthdayModel).where(
                 BirthdayModel.birth_date == check_date
@@ -64,7 +63,7 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_by_date_range(self, start_date: date, end_date: date) -> List[Birthday]:
+    async def get_by_date_range(self, start_date: date, end_date: date) -> list[Birthday]:
         result = await self.session.execute(
             select(BirthdayModel).where(
                 BirthdayModel.birth_date >= start_date,
@@ -77,20 +76,20 @@ class BirthdayRepositoryImpl(BirthdayRepository):
     async def update(self, birthday: Birthday) -> Birthday:
         if not birthday.id:
             raise ValueError("Birthday ID is required for update")
-        
+
         result = await self.session.execute(
             select(BirthdayModel).where(BirthdayModel.id == birthday.id)
         )
         model = result.scalar_one_or_none()
         if not model:
             raise ValueError(f"Birthday with id {birthday.id} not found")
-        
+
         model.full_name = birthday.full_name
         model.company = birthday.company
         model.position = birthday.position
         model.birth_date = birthday.birth_date
         model.comment = birthday.comment
-        
+
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
@@ -104,7 +103,7 @@ class BirthdayRepositoryImpl(BirthdayRepository):
             await self.session.delete(model)
             await self.session.flush()
 
-    async def search(self, query: str) -> List[Birthday]:
+    async def search(self, query: str) -> list[Birthday]:
         search_pattern = f"%{query}%"
         result = await self.session.execute(
             select(BirthdayModel).where(
@@ -118,7 +117,7 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_all(self) -> List[Birthday]:
+    async def get_all(self) -> list[Birthday]:
         result = await self.session.execute(select(BirthdayModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]

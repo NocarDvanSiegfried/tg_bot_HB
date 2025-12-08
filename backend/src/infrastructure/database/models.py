@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import datetime
 
-from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, Text, Index
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -45,14 +45,14 @@ class DateResponsibleAssignmentModel(Base):
     __tablename__ = "date_responsible_assignments"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False, index=True)
+    assignment_date = Column(Date, nullable=False, index=True)
     responsible_person_id = Column(Integer, ForeignKey("responsible_persons.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     responsible_person = relationship("ResponsiblePersonModel", back_populates="assignments")
 
     __table_args__ = (
-        Index("idx_date_responsible_unique", "date", "responsible_person_id", unique=True),
+        Index("idx_date_responsible_unique", "assignment_date", "responsible_person_id", unique=True),
     )
 
 
@@ -62,7 +62,7 @@ class ProfessionalHolidayModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    date = Column(Date, nullable=False, index=True)
+    holiday_date = Column(Date, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

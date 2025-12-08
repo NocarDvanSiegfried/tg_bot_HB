@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional
 
 
 @dataclass
 class ProfessionalHoliday:
-    id: Optional[int]
+    id: int | None
     name: str
-    description: Optional[str]
+    description: str | None
     date: date
 

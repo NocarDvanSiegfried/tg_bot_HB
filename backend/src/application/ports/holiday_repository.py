@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
 
 from src.domain.entities.professional_holiday import ProfessionalHoliday
 
@@ -12,12 +11,12 @@ class HolidayRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, holiday_id: int) -> Optional[ProfessionalHoliday]:
+    async def get_by_id(self, holiday_id: int) -> ProfessionalHoliday | None:
         """Получить праздник по ID."""
         pass
 
     @abstractmethod
-    async def get_by_date(self, check_date: date) -> List[ProfessionalHoliday]:
+    async def get_by_date(self, check_date: date) -> list[ProfessionalHoliday]:
         """Получить праздники на указанную дату."""
         pass
 
@@ -32,7 +31,7 @@ class HolidayRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_all(self) -> List[ProfessionalHoliday]:
+    async def get_all(self) -> list[ProfessionalHoliday]:
         """Получить все праздники."""
         pass
 

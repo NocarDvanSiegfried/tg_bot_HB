@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class OpenRouterClient(ABC):
@@ -11,7 +10,7 @@ class OpenRouterClient(ABC):
         person_position: str,
         style: str,
         length: str,
-        theme: Optional[str] = None,
+        theme: str | None = None,
     ) -> str:
         """Сгенерировать поздравление через DeepSeek."""
         pass

@@ -1,4 +1,3 @@
-from typing import Optional
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.openrouter_client import OpenRouterClient
@@ -18,7 +17,7 @@ class GenerateGreetingUseCase:
         birthday_id: int,
         style: str,
         length: str,
-        theme: Optional[str] = None,
+        theme: str | None = None,
     ) -> str:
         """Сгенерировать поздравление для сотрудника."""
         birthday = await self.birthday_repository.get_by_id(birthday_id)

@@ -1,20 +1,19 @@
 import os
-from typing import Optional
 
 
 class OpenRouterConfig:
     """Конфигурация для OpenRouter API клиента."""
-    
+
     def __init__(
         self,
         api_key: str,
-        base_url: Optional[str] = None,
-        timeout: Optional[float] = None,
-        max_retries: Optional[int] = None,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        model: Optional[str] = None,
-        referer: Optional[str] = None,
+        base_url: str | None = None,
+        timeout: float | None = None,
+        max_retries: int | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        model: str | None = None,
+        referer: str | None = None,
     ):
         self.api_key = api_key
         self.base_url = base_url or os.getenv(

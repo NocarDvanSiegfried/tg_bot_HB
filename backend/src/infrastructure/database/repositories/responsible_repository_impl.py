@@ -1,12 +1,14 @@
 from datetime import date
-from typing import List, Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.responsible_repository import ResponsibleRepository
 from src.domain.entities.responsible_person import ResponsiblePerson
-from src.infrastructure.database.models import ResponsiblePersonModel, DateResponsibleAssignmentModel
+from src.infrastructure.database.models import (
+    DateResponsibleAssignmentModel,
+    ResponsiblePersonModel,
+)
 
 
 class ResponsibleRepositoryImpl(ResponsibleRepository):
@@ -33,23 +35,23 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def get_by_id(self, responsible_id: int) -> Optional[ResponsiblePerson]:
+    async def get_by_id(self, responsible_id: int) -> ResponsiblePerson | None:
         result = await self.session.execute(
             select(ResponsiblePersonModel).where(ResponsiblePersonModel.id == responsible_id)
         )
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_date(self, check_date: date) -> Optional[ResponsiblePerson]:
+    async def get_by_date(self, check_date: date) -> ResponsiblePerson | None:
         result = await self.session.execute(
             select(DateResponsibleAssignmentModel).where(
-                DateResponsibleAssignmentModel.date == check_date
+                DateResponsibleAssignmentModel.assignment_date == check_date
             )
         )
         assignment = result.scalar_one_or_none()
         if not assignment:
             return None
-        
+
         result = await self.session.execute(
             select(ResponsiblePersonModel).where(
                 ResponsiblePersonModel.id == assignment.responsible_person_id
@@ -61,18 +63,18 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
     async def update(self, responsible: ResponsiblePerson) -> ResponsiblePerson:
         if not responsible.id:
             raise ValueError("Responsible ID is required for update")
-        
+
         result = await self.session.execute(
             select(ResponsiblePersonModel).where(ResponsiblePersonModel.id == responsible.id)
         )
         model = result.scalar_one_or_none()
         if not model:
             raise ValueError(f"Responsible with id {responsible.id} not found")
-        
+
         model.full_name = responsible.full_name
         model.company = responsible.company
         model.position = responsible.position
-        
+
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
@@ -90,22 +92,22 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         # Удаляем существующее назначение на эту дату
         result = await self.session.execute(
             select(DateResponsibleAssignmentModel).where(
-                DateResponsibleAssignmentModel.date == assignment_date
+                DateResponsibleAssignmentModel.assignment_date == assignment_date
             )
         )
         existing = result.scalar_one_or_none()
         if existing:
             await self.session.delete(existing)
-        
+
         # Создаем новое назначение
         assignment = DateResponsibleAssignmentModel(
-            date=assignment_date,
+            assignment_date=assignment_date,
             responsible_person_id=responsible_id,
         )
         self.session.add(assignment)
         await self.session.flush()
 
-    async def search(self, query: str) -> List[ResponsiblePerson]:
+    async def search(self, query: str) -> list[ResponsiblePerson]:
         search_pattern = f"%{query}%"
         result = await self.session.execute(
             select(ResponsiblePersonModel).where(
@@ -119,7 +121,7 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_all(self) -> List[ResponsiblePerson]:
+    async def get_all(self) -> list[ResponsiblePerson]:
         result = await self.session.execute(select(ResponsiblePersonModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]

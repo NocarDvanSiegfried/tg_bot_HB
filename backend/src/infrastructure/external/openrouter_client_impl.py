@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 
 import httpx
 
@@ -28,13 +27,13 @@ class OpenRouterClientImpl(OpenRouterClient):
         person_position: str,
         style: str,
         length: str,
-        theme: Optional[str] = None,
+        theme: str | None = None,
     ) -> str:
         """Сгенерировать поздравление через DeepSeek."""
         prompt = self._build_prompt(
             person_name, person_company, person_position, style, length, theme
         )
-        
+
         payload = {
             "model": self.config.model,
             "messages": [
@@ -63,42 +62,42 @@ class OpenRouterClientImpl(OpenRouterClient):
                     )
                     response.raise_for_status()
                     data = response.json()
-                    
+
                     # Валидация структуры ответа
                     if not isinstance(data, dict):
                         raise OpenRouterInvalidResponseError("Response is not a dictionary")
-                    
+
                     if "choices" not in data:
                         raise OpenRouterInvalidResponseError("Missing 'choices' field in response")
-                    
+
                     if not isinstance(data["choices"], list) or len(data["choices"]) == 0:
                         raise OpenRouterInvalidResponseError("Invalid or empty 'choices' array")
-                    
+
                     if "message" not in data["choices"][0]:
                         raise OpenRouterInvalidResponseError("Missing 'message' field in choice")
-                    
+
                     if "content" not in data["choices"][0]["message"]:
                         raise OpenRouterInvalidResponseError("Missing 'content' field in message")
-                    
+
                     content = data["choices"][0]["message"]["content"]
                     if not isinstance(content, str):
                         raise OpenRouterInvalidResponseError("Content is not a string")
-                    
+
                     return content.strip()
                 except httpx.HTTPStatusError as e:
                     if attempt == self.max_retries - 1:
-                        raise OpenRouterHTTPError(e.response.status_code)
+                        raise OpenRouterHTTPError(e.response.status_code) from e
                     await asyncio.sleep(2 ** attempt)
-                except httpx.TimeoutException:
+                except httpx.TimeoutException as e:
                     if attempt == self.max_retries - 1:
-                        raise OpenRouterTimeoutError()
+                        raise OpenRouterTimeoutError() from e
                     await asyncio.sleep(2 ** attempt)
                 except OpenRouterAPIError:
                     # Если это уже наше доменное исключение, пробрасываем дальше
                     raise
                 except Exception as e:
                     # Иначе оборачиваем в базовое исключение
-                    raise OpenRouterAPIError(f"OpenRouter API error: {str(e)}")
+                    raise OpenRouterAPIError(f"OpenRouter API error: {str(e)}") from e
 
     def _build_prompt(
         self,
@@ -107,7 +106,7 @@ class OpenRouterClientImpl(OpenRouterClient):
         person_position: str,
         style: str,
         length: str,
-        theme: Optional[str] = None,
+        theme: str | None = None,
     ) -> str:
         """Построить промпт для генерации поздравления."""
         length_map = {

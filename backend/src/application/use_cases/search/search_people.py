@@ -1,4 +1,3 @@
-from typing import List, Union
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.application.ports.responsible_repository import ResponsibleRepository
@@ -20,7 +19,7 @@ class SearchPeopleUseCase:
         query: str,
         search_birthdays: bool = True,
         search_responsible: bool = True,
-    ) -> List[Union[Birthday, ResponsiblePerson]]:
+    ) -> list[Birthday | ResponsiblePerson]:
         """Поиск людей по ФИО, компании, должности."""
         results = []
 

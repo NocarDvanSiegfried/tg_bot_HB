@@ -1,5 +1,4 @@
 from datetime import date
-from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,31 +18,31 @@ class HolidayRepositoryImpl(HolidayRepository):
             id=model.id,
             name=model.name,
             description=model.description,
-            date=model.date,
+            date=model.holiday_date,
         )
 
     async def create(self, holiday: ProfessionalHoliday) -> ProfessionalHoliday:
         model = ProfessionalHolidayModel(
             name=holiday.name,
             description=holiday.description,
-            date=holiday.date,
+            holiday_date=holiday.date,
         )
         self.session.add(model)
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def get_by_id(self, holiday_id: int) -> Optional[ProfessionalHoliday]:
+    async def get_by_id(self, holiday_id: int) -> ProfessionalHoliday | None:
         result = await self.session.execute(
             select(ProfessionalHolidayModel).where(ProfessionalHolidayModel.id == holiday_id)
         )
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_date(self, check_date: date) -> List[ProfessionalHoliday]:
+    async def get_by_date(self, check_date: date) -> list[ProfessionalHoliday]:
         result = await self.session.execute(
             select(ProfessionalHolidayModel).where(
-                ProfessionalHolidayModel.date == check_date
+                ProfessionalHolidayModel.holiday_date == check_date
             )
         )
         models = result.scalars().all()
@@ -52,18 +51,18 @@ class HolidayRepositoryImpl(HolidayRepository):
     async def update(self, holiday: ProfessionalHoliday) -> ProfessionalHoliday:
         if not holiday.id:
             raise ValueError("Holiday ID is required for update")
-        
+
         result = await self.session.execute(
             select(ProfessionalHolidayModel).where(ProfessionalHolidayModel.id == holiday.id)
         )
         model = result.scalar_one_or_none()
         if not model:
             raise ValueError(f"Holiday with id {holiday.id} not found")
-        
+
         model.name = holiday.name
         model.description = holiday.description
-        model.date = holiday.date
-        
+        model.holiday_date = holiday.date
+
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
@@ -77,7 +76,7 @@ class HolidayRepositoryImpl(HolidayRepository):
             await self.session.delete(model)
             await self.session.flush()
 
-    async def get_all(self) -> List[ProfessionalHoliday]:
+    async def get_all(self) -> list[ProfessionalHoliday]:
         result = await self.session.execute(select(ProfessionalHolidayModel))
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]

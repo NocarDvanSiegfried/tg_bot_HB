@@ -1,9 +1,9 @@
 import io
 import logging
-from typing import Optional
+import os
 
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 import qrcode
+from PIL import Image, ImageDraw, ImageFont
 
 from src.application.ports.card_generator import CardGeneratorPort
 
@@ -17,6 +17,12 @@ class CardGeneratorImpl(CardGeneratorPort):
         self.background_color = (255, 255, 255)
         self.text_color = (0, 0, 0)
         self.accent_color = (70, 130, 180)
+        # Конфигурация шрифтов из переменных окружения
+        self.font_path = os.getenv("CARD_FONT_PATH", "arial.ttf")
+        self.title_font_size = int(os.getenv("CARD_TITLE_FONT_SIZE", "48"))
+        self.name_font_size = int(os.getenv("CARD_NAME_FONT_SIZE", "36"))
+        self.text_font_size = int(os.getenv("CARD_TEXT_FONT_SIZE", "24"))
+        self.small_font_size = int(os.getenv("CARD_SMALL_FONT_SIZE", "20"))
 
     def generate_card(
         self,
@@ -24,22 +30,22 @@ class CardGeneratorImpl(CardGeneratorPort):
         company: str,
         position: str,
         greeting_text: str,
-        comment: Optional[str] = None,
-        qr_url: Optional[str] = None,
+        comment: str | None = None,
+        qr_url: str | None = None,
     ) -> bytes:
         """Сгенерировать открытку."""
         img = Image.new("RGB", (self.width, self.height), self.background_color)
         draw = ImageDraw.Draw(img)
 
         try:
-            title_font = ImageFont.truetype("arial.ttf", 48)
-            name_font = ImageFont.truetype("arial.ttf", 36)
-            text_font = ImageFont.truetype("arial.ttf", 24)
-            small_font = ImageFont.truetype("arial.ttf", 20)
-        except (OSError, IOError) as e:
+            title_font = ImageFont.truetype(self.font_path, self.title_font_size)
+            name_font = ImageFont.truetype(self.font_path, self.name_font_size)
+            text_font = ImageFont.truetype(self.font_path, self.text_font_size)
+            small_font = ImageFont.truetype(self.font_path, self.small_font_size)
+        except OSError as e:
             logger.warning(
                 "Failed to load custom font, using default",
-                extra={"error": str(e), "font_path": "arial.ttf"}
+                extra={"error": str(e), "font_path": self.font_path}
             )
             title_font = ImageFont.load_default()
             name_font = ImageFont.load_default()

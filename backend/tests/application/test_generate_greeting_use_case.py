@@ -110,3 +110,4 @@ class TestGenerateGreetingUseCase:
         mock_birthday_repo.get_by_id.assert_called_once_with(999)
         mock_openrouter_client.generate_greeting.assert_not_called()
 
+
