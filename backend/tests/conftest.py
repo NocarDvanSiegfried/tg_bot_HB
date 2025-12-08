@@ -6,9 +6,8 @@ from pathlib import Path
 def _setup_python_path_unified(project_root_str=None):
     """Unified function to setup Python path.
     
-    Always adds project root to sys.path if not present (needed for importlib mode).
-    importlib mode may not properly use PYTHONPATH for resolving imports,
-    so we must explicitly modify sys.path regardless of PYTHONPATH value.
+    In CI with importlib mode and PYTHONPATH set, don't modify sys.path to avoid conflicts.
+    In local development or without importlib, add project root to sys.path.
     Adding to end ensures installed packages (like aiogram) are found first.
     """
     if project_root_str is None:
@@ -35,8 +34,16 @@ def _setup_python_path_unified(project_root_str=None):
         if p
     )
     
-    # Always add to sys.path if not present (needed for importlib mode)
-    # importlib mode may not properly use PYTHONPATH for resolving imports
+    # Check if we're in importlib mode (check sys.argv for pytest arguments)
+    is_importlib_mode = any("--import-mode=importlib" in arg for arg in sys.argv)
+    
+    # In CI with importlib mode and PYTHONPATH set, don't modify sys.path
+    # This avoids conflicts where Python might find local files instead of installed packages
+    if is_importlib_mode and pythonpath and in_pythonpath:
+        # Rely on PYTHONPATH in CI with importlib mode
+        return
+    
+    # Otherwise, add to sys.path if not present
     # Adding to end ensures installed packages (like aiogram) are found first
     if not in_sys_path:
         sys.path.append(project_root_str)
@@ -46,6 +53,18 @@ def _setup_python_path_unified(project_root_str=None):
 # This ensures sys.path is configured before Python starts importing modules,
 # which is critical for importlib mode compatibility
 _setup_python_path_unified()
+
+# Verify that aiogram can be imported correctly after path setup
+# This helps detect conflicts where local files might shadow installed packages
+try:
+    import aiogram
+    # Verify aiogram is a package, not a module
+    if not hasattr(aiogram, '__path__'):
+        raise ImportError("aiogram is not a package - possible name conflict")
+except ImportError as e:
+    # Log warning but don't fail - this is just a diagnostic check
+    import warnings
+    warnings.warn(f"Could not verify aiogram import: {e}", ImportWarning)
 
 
 def pytest_load_initial_conftests(early_config, parser, args):
