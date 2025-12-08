@@ -2,38 +2,44 @@ import sys
 import os
 from pathlib import Path
 
-# Add project root to Python path to ensure src is importable
-# This ensures paths are set up BEFORE any imports that might need them
-# Priority: PYTHONPATH (CI) > explicit path addition (local)
-project_root = Path(__file__).parent.parent
-project_root_str = str(project_root.resolve())
+def _setup_python_path():
+    """Setup Python path before any imports."""
+    # Add project root to Python path to ensure src is importable
+    # This ensures paths are set up BEFORE any imports that might need them
+    # Priority: PYTHONPATH (CI) > pytest.ini pythonpath > explicit path addition (local)
+    project_root = Path(__file__).parent.parent
+    project_root_str = str(project_root.resolve())
 
-# Check PYTHONPATH first (used in CI)
-pythonpath = os.environ.get("PYTHONPATH", "")
-pythonpath_paths = pythonpath.split(os.pathsep) if pythonpath else []
+    # Check PYTHONPATH first (used in CI)
+    pythonpath = os.environ.get("PYTHONPATH", "")
+    pythonpath_paths = pythonpath.split(os.pathsep) if pythonpath else []
 
-# Normalize paths for cross-platform compatibility
-normalized_project_root = os.path.normpath(project_root_str)
+    # Normalize paths for cross-platform compatibility
+    normalized_project_root = os.path.normpath(project_root_str)
 
-# Check if project root is already in PYTHONPATH or sys.path
-in_pythonpath = any(
-    os.path.normpath(p) == normalized_project_root 
-    for p in pythonpath_paths
-    if p
-) if pythonpath_paths else False
+    # Check if project root is already in PYTHONPATH or sys.path
+    in_pythonpath = any(
+        os.path.normpath(p) == normalized_project_root 
+        for p in pythonpath_paths
+        if p
+    ) if pythonpath_paths else False
 
-in_sys_path = any(
-    os.path.normpath(p) == normalized_project_root
-    for p in sys.path
-    if p
-)
+    in_sys_path = any(
+        os.path.normpath(p) == normalized_project_root
+        for p in sys.path
+        if p
+    )
 
-# Only add to sys.path if not already present
-# This must happen BEFORE any imports that use src.* modules
-if not in_sys_path and not in_pythonpath:
-    # Insert at position 1 (after current directory, before site-packages)
-    # This ensures installed packages are still found first
-    sys.path.insert(1, project_root_str)
+    # Only add to sys.path if not already present
+    # This must happen BEFORE any imports that use src.* modules
+    # Note: pytest.ini pythonpath = . should handle this, but we keep this as fallback
+    if not in_sys_path and not in_pythonpath:
+        # Insert at position 1 (after current directory, before site-packages)
+        # This ensures installed packages like aiogram are still found first
+        sys.path.insert(1, project_root_str)
+
+# Setup path immediately when conftest is imported
+_setup_python_path()
 
 import pytest
 from datetime import date
