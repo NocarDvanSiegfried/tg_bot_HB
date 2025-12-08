@@ -1,3 +1,12 @@
+import sys
+from pathlib import Path
+
+# Add project root to Python path to ensure src is importable
+# This is needed when pytest.ini doesn't have pythonpath set
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 import pytest
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock
@@ -47,4 +56,3 @@ def sample_holiday():
         description="Профессиональный праздник",
         date=date(2024, 9, 13),
     )
-
