@@ -14,6 +14,7 @@ class OpenRouterConfig:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         model: Optional[str] = None,
+        referer: Optional[str] = None,
     ):
         self.api_key = api_key
         self.base_url = base_url or os.getenv(
@@ -24,4 +25,5 @@ class OpenRouterConfig:
         self.temperature = temperature or float(os.getenv("OPENROUTER_TEMPERATURE", "0.7"))
         self.max_tokens = max_tokens or int(os.getenv("OPENROUTER_MAX_TOKENS", "500"))
         self.model = model or os.getenv("OPENROUTER_MODEL", "tng/deepseek-r1t2-chimera")
+        self.referer = referer or os.getenv("OPENROUTER_REFERER", "")
 

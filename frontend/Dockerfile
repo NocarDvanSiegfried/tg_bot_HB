@@ -24,9 +24,9 @@ RUN npm ci && npm cache clean --force
 COPY . .
 
 # Create non-root user for security
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser && \
-    chown -R appuser:appuser /app
+RUN addgroup -g 1000 appuser 2>/dev/null || true && \
+    adduser -D -u 1000 -G appuser appuser 2>/dev/null || true && \
+    chown -R appuser:appuser /app 2>/dev/null || true
 USER appuser
 
 EXPOSE 3000

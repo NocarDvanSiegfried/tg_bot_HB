@@ -47,11 +47,10 @@ class OpenRouterClientImpl(OpenRouterClient):
             "max_tokens": self.config.max_tokens,
         }
 
-        import os
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": os.getenv("OPENROUTER_REFERER", ""),
+            "HTTP-Referer": self.config.referer,
         }
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
