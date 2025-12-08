@@ -40,21 +40,24 @@ def client(mock_session, mock_factory):
     os.environ.setdefault("TELEGRAM_BOT_TOKEN", "test_token")
     os.environ.setdefault("OPENROUTER_API_KEY", "test_key")
     
-    with patch(
-        "src.presentation.web.routes.api.get_database"
-    ) as mock_get_db, patch(
-        "src.presentation.web.routes.api.get_use_case_factory"
-    ) as mock_get_factory:
-        mock_db = MagicMock()
-        async def get_session():
-            yield mock_session
-        mock_db.get_session = get_session
-        mock_get_db.return_value = mock_db
-        
-        # Используем переданный mock_factory
-        mock_get_factory.return_value = mock_factory
-        
+    # Переопределяем зависимости через FastAPI dependency_overrides
+    from fastapi import Depends
+    from src.presentation.web.routes.api import get_use_case_factory, get_db_session
+    from src.application.factories.use_case_factory import UseCaseFactory
+    
+    async def get_mock_session():
+        yield mock_session
+    
+    async def get_mock_factory(session: AsyncSession = Depends(get_mock_session)) -> UseCaseFactory:
+        return mock_factory
+    
+    app.dependency_overrides[get_use_case_factory] = get_mock_factory
+    app.dependency_overrides[get_db_session] = get_mock_session
+    
+    try:
         yield TestClient(app)
+    finally:
+        app.dependency_overrides.clear()
 
 
 class TestAdditionalEndpoints:

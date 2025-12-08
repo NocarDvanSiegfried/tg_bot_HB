@@ -1,5 +1,5 @@
-12s
 Run # Запускаем основные тесты
+  
 ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
 cachedir: .pytest_cache
@@ -8,7 +8,6 @@ configfile: pytest.ini
 plugins: anyio-3.7.1, asyncio-0.21.1, mock-3.12.0, cov-4.1.0
 asyncio: mode=Mode.AUTO
 collecting ... collected 179 items
-
 tests/application/test_assign_responsible_use_case.py::TestAssignResponsibleToDateUseCase::test_assign_responsible_success PASSED [  0%]
 tests/application/test_assign_responsible_use_case.py::TestAssignResponsibleToDateUseCase::test_assign_responsible_not_found PASSED [  1%]
 tests/application/test_check_panel_access_use_case.py::TestCheckPanelAccessUseCase::test_check_panel_access_has_access PASSED [  1%]
@@ -171,8 +170,8 @@ tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_no_auth PASSED [ 89%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays FAILED [ 89%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_birthday_success FAILED [ 90%]
-tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success PASSED [ 91%]
-tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success PASSED [ 91%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success FAILED [ 91%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success FAILED [ 91%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible FAILED [ 92%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_responsible_success FAILED [ 92%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success FAILED [ 93%]
@@ -187,57 +186,55 @@ tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_del
 tests/presentation/web/test_app.py::TestWebApp::test_app_creation PASSED [ 98%]
 tests/presentation/web/test_app.py::TestWebApp::test_root_endpoint PASSED [ 98%]
 tests/presentation/web/test_app.py::TestWebApp::test_cors_middleware_configured PASSED [ 99%]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/ast.py:50: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
-  return compile(source, filename, mode, flags,
-RuntimeWarning: Enable tracemalloc to get the object allocation traceback
 tests/presentation/web/test_app.py::TestWebApp::test_router_included PASSED [100%]
-
 =================================== FAILURES ===================================
 ____________________ TestPanelEndpoints.test_list_birthdays ____________________
-tests/presentation/web/test_api.py:214: in test_list_birthdays
+tests/presentation/web/test_api.py:210: in test_list_birthdays
     assert len(response.json()) == 1
 E   assert 0 == 1
 E    +  where 0 = len([])
 E    +    where [] = <bound method Response.json of <Response [200 OK]>>()
 E    +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
 _______________ TestPanelEndpoints.test_create_birthday_success ________________
-tests/presentation/web/test_api.py:259: in test_create_birthday_success
+tests/presentation/web/test_api.py:240: in test_create_birthday_success
     assert response.json()["id"] == 1
 E   assert None == 1
+_______________ TestPanelEndpoints.test_update_birthday_success ________________
+tests/presentation/web/test_api.py:280: in test_update_birthday_success
+    assert response.status_code == 200
+E   assert 400 == 200
+E    +  where 400 = <Response [400 Bad Request]>.status_code
+_______________ TestPanelEndpoints.test_delete_birthday_success ________________
+tests/presentation/web/test_api.py:308: in test_delete_birthday_success
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.presentation.web.routes.api:api.py:258 Unexpected error in delete_birthday
+Traceback (most recent call last):
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 250, in delete_birthday
+    await use_case.execute(birthday_id)
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/birthday/delete_birthday.py", line 12, in execute
+    raise ValueError(f"Birthday with id {birthday_id} not found")
+ValueError: Birthday with id 1 not found
 ___________________ TestPanelEndpoints.test_list_responsible ___________________
-tests/presentation/web/test_api.py:360: in test_list_responsible
+tests/presentation/web/test_api.py:328: in test_list_responsible
     assert len(response.json()) == 1
 E   assert 0 == 1
 E    +  where 0 = len([])
 E    +    where [] = <bound method Response.json of <Response [200 OK]>>()
 E    +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
 ______________ TestPanelEndpoints.test_create_responsible_success ______________
-tests/presentation/web/test_api.py:402: in test_create_responsible_success
+tests/presentation/web/test_api.py:355: in test_create_responsible_success
     assert response.json()["id"] == 1
 E   assert None == 1
 ___________ TestAdditionalEndpoints.test_update_responsible_success ____________
-tests/presentation/web/test_api_additional.py:83: in test_update_responsible_success
+tests/presentation/web/test_api_additional.py:84: in test_update_responsible_success
     assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.routes.api:api.py:343 Unexpected error in update_responsible
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 319, in update_responsible
-    responsible = await use_case.execute(
-                  ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/update_responsible.py", line 17, in execute
-    existing = await self.responsible_repository.get_by_id(responsible_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+E   assert 400 == 200
+E    +  where 400 = <Response [400 Bad Request]>.status_code
 ___________ TestAdditionalEndpoints.test_delete_responsible_success ____________
-tests/presentation/web/test_api_additional.py:109: in test_delete_responsible_success
+tests/presentation/web/test_api_additional.py:97: in test_delete_responsible_success
     assert response.status_code == 200
 E   assert 500 == 200
 E    +  where 500 = <Response [500 Internal Server Error]>.status_code
@@ -246,172 +243,43 @@ ERROR    src.presentation.web.routes.api:api.py:366 Unexpected error in delete_r
 Traceback (most recent call last):
   File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 358, in delete_responsible
     await use_case.execute(responsible_id)
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/delete_responsible.py", line 10, in execute
-    existing = await self.responsible_repository.get_by_id(responsible_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/delete_responsible.py", line 12, in execute
+    raise ValueError(f"Responsible with id {responsible_id} not found")
+ValueError: Responsible with id 1 not found
 ___________ TestAdditionalEndpoints.test_assign_responsible_success ____________
-tests/presentation/web/test_api_additional.py:141: in test_assign_responsible_success
+tests/presentation/web/test_api_additional.py:116: in test_assign_responsible_success
     assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.routes.api:api.py:395 Unexpected error in assign_responsible
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 381, in assign_responsible
-    await use_case.execute(data.responsible_id, data.date)
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/responsible/assign_responsible_to_date.py", line 12, in execute
-    existing = await self.responsible_repository.get_by_id(responsible_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 43, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/responsible_repository_impl.py", line 21, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+E   assert 400 == 200
+E    +  where 400 = <Response [400 Bad Request]>.status_code
 __________________ TestAdditionalEndpoints.test_search_people __________________
-tests/presentation/web/test_api_additional.py:171: in test_search_people
-    response = client.get("/api/panel/search?q=Иван")
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-src/presentation/web/routes/api.py:407: in search_people
-    results = await use_case.execute(q)
-src/application/use_cases/search/search_people.py:26: in execute
-    birthdays = await self.birthday_repository.search(query)
-src/infrastructure/database/repositories/birthday_repository_impl.py:115: in search
-    models = result.scalars().all()
-E   AttributeError: 'coroutine' object has no attribute 'all'
+tests/presentation/web/test_api_additional.py:136: in test_search_people
+    assert len(response.json()) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+E    +    where [] = <bound method Response.json of <Response [200 OK]>>()
+E    +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
 ____________ TestAdditionalEndpoints.test_generate_greeting_success ____________
-tests/presentation/web/test_api_additional.py:207: in test_generate_greeting_success
+tests/presentation/web/test_api_additional.py:156: in test_generate_greeting_success
     assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.routes.api:api.py:445 Unexpected error in generate_greeting
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 431, in generate_greeting
-    greeting_text = await use_case.execute(
-                    ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+E   assert 400 == 200
+E    +  where 400 = <Response [400 Bad Request]>.status_code
 _______________ TestAdditionalEndpoints.test_create_card_success _______________
-tests/presentation/web/test_api_additional.py:239: in test_create_card_success
+tests/presentation/web/test_api_additional.py:175: in test_create_card_success
     assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.routes.api:api.py:474 Unexpected error in create_card
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 459, in create_card
-    card_bytes = await use_case.execute(
-                 ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/create_card.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
 ___________ TestAdditionalEndpoints.test_generate_greeting_not_found ___________
-tests/presentation/web/test_api_additional.py:274: in test_generate_greeting_not_found
+tests/presentation/web/test_api_additional.py:197: in test_generate_greeting_not_found
     assert response.status_code == 404
-E   assert 500 == 404
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.routes.api:api.py:445 Unexpected error in generate_greeting
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 431, in generate_greeting
-    greeting_text = await use_case.execute(
-                    ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
+E   assert 400 == 404
+E    +  where 400 = <Response [400 Bad Request]>.status_code
 ________ TestAdditionalEndpoints.test_create_birthday_validation_error _________
-tests/presentation/web/test_api_additional.py:309: in test_create_birthday_validation_error
+tests/presentation/web/test_api_additional.py:219: in test_create_birthday_validation_error
     assert response.status_code == 400
 E   assert 200 == 400
 E    +  where 200 = <Response [200 OK]>.status_code
 ____________ TestAdditionalEndpoints.test_delete_birthday_not_found ____________
-tests/presentation/web/test_api_additional.py:336: in test_delete_birthday_not_found
+tests/presentation/web/test_api_additional.py:233: in test_delete_birthday_not_found
     assert response.status_code == 404
 E   assert 500 == 404
 E    +  where 500 = <Response [500 Internal Server Error]>.status_code
@@ -420,17 +288,9 @@ ERROR    src.presentation.web.routes.api:api.py:258 Unexpected error in delete_b
 Traceback (most recent call last):
   File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 250, in delete_birthday
     await use_case.execute(birthday_id)
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/birthday/delete_birthday.py", line 10, in execute
-    existing = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 55, in get_by_id
-    return self._to_entity(model) if model else None
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/birthday_repository_impl.py", line 18, in _to_entity
-    id=model.id,
-       ^^^^^^^^
-AttributeError: 'coroutine' object has no attribute 'id'
-
+  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/birthday/delete_birthday.py", line 12, in execute
+    raise ValueError(f"Birthday with id {birthday_id} not found")
+ValueError: Birthday with id 999 not found
 ---------- coverage: platform linux, python 3.11.14-final-0 ----------
 Name                                                                       Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------------------------------------------
@@ -496,7 +356,7 @@ src/infrastructure/database/repositories/__init__.py                           0
 src/infrastructure/database/repositories/birthday_repository_impl.py          61      0   100%
 src/infrastructure/database/repositories/holiday_repository_impl.py           48      0   100%
 src/infrastructure/database/repositories/panel_access_repository_impl.py      15      0   100%
-src/infrastructure/database/repositories/responsible_repository_impl.py       65      5    92%   100, 111-122
+src/infrastructure/database/repositories/responsible_repository_impl.py       65      1    98%   100
 src/infrastructure/external/__init__.py                                        0      0   100%
 src/infrastructure/external/openrouter_client_impl.py                         56      2    96%   98-100
 src/infrastructure/external/telegram_auth.py                                  43      2    95%   41-42
@@ -519,39 +379,45 @@ src/presentation/telegram/keyboards.py                                        19
 src/presentation/web/__init__.py                                               0      0   100%
 src/presentation/web/app.py                                                   15      1    93%   14
 src/presentation/web/routes/__init__.py                                        0      0   100%
-src/presentation/web/routes/api.py                                           248     56    77%   89-96, 139, 193-202, 234-236, 254-255, 302-304, 325-326, 333-334, 336-337, 339-340, 359-360, 362-363, 382-383, 385-386, 388-389, 391-392, 409, 437, 439, 441, 443, 464-466, 468, 470, 472
+src/presentation/web/routes/api.py                                           248     66    73%   89-96, 139, 193-202, 225-226, 251-252, 254-255, 302-304, 325-326, 333-334, 336-337, 341-344, 359-360, 362-363, 382-383, 385-386, 388-389, 393-396, 437, 439, 441, 444-446, 464-466, 469-475
 --------------------------------------------------------------------------------------------------------
-TOTAL                                                                       1548    430    72%
+TOTAL                                                                       1548    436    72%
 Coverage HTML written to dir htmlcov
 Coverage XML written to file coverage.xml
-
 =========================== short test summary info ============================
 FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays - assert 0 == 1
  +  where 0 = len([])
  +    where [] = <bound method Response.json of <Response [200 OK]>>()
  +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
 FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_birthday_success - assert None == 1
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success - assert 400 == 200
+ +  where 400 = <Response [400 Bad Request]>.status_code
+FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success - assert 500 == 200
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
 FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible - assert 0 == 1
  +  where 0 = len([])
  +    where [] = <bound method Response.json of <Response [200 OK]>>()
  +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
 FAILED tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_responsible_success - assert None == 1
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success - assert 500 == 200
- +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success - assert 400 == 200
+ +  where 400 = <Response [400 Bad Request]>.status_code
 FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_responsible_success - assert 500 == 200
  +  where 500 = <Response [500 Internal Server Error]>.status_code
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_assign_responsible_success - assert 500 == 200
- +  where 500 = <Response [500 Internal Server Error]>.status_code
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people - AttributeError: 'coroutine' object has no attribute 'all'
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success - assert 500 == 200
- +  where 500 = <Response [500 Internal Server Error]>.status_code
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success - assert 500 == 200
- +  where 500 = <Response [500 Internal Server Error]>.status_code
-FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found - assert 500 == 404
- +  where 500 = <Response [500 Internal Server Error]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_assign_responsible_success - assert 400 == 200
+ +  where 400 = <Response [400 Bad Request]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people - assert 0 == 1
+ +  where 0 = len([])
+ +    where [] = <bound method Response.json of <Response [200 OK]>>()
+ +      where <bound method Response.json of <Response [200 OK]>> = <Response [200 OK]>.json
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success - assert 400 == 200
+ +  where 400 = <Response [400 Bad Request]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success - assert 404 == 200
+ +  where 404 = <Response [404 Not Found]>.status_code
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found - assert 400 == 404
+ +  where 400 = <Response [400 Bad Request]>.status_code
 FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_birthday_validation_error - assert 200 == 400
  +  where 200 = <Response [200 OK]>.status_code
 FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_birthday_not_found - assert 500 == 404
  +  where 500 = <Response [500 Internal Server Error]>.status_code
-================= 13 failed, 166 passed, 9 warnings in 10.48s ==================
+================= 15 failed, 164 passed, 2 warnings in 10.03s ==================
 Error: Process completed with exit code 1.
