@@ -15,17 +15,27 @@ from src.domain.entities.professional_holiday import ProfessionalHoliday
 def mock_session():
     """Мок сессии БД."""
     session = AsyncMock(spec=AsyncSession)
-    # Настраиваем мок для session.execute() -> result.scalars().all()
+    # Настраиваем мок для session.execute() -> result.scalars().all() и result.scalar_one_or_none()
     mock_result = MagicMock()
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = []
     mock_result.scalars.return_value = mock_scalars
+    mock_result.scalar_one_or_none.return_value = None
     session.execute = AsyncMock(return_value=mock_result)
+    session.add = MagicMock()
+    session.commit = AsyncMock()
+    session.rollback = AsyncMock()
     return session
 
 
 @pytest.fixture
-def client(mock_session):
+def mock_factory():
+    """Мок фабрики use cases."""
+    return MagicMock()
+
+
+@pytest.fixture
+def client(mock_session, mock_factory):
     """Тестовый клиент FastAPI."""
     # Устанавливаем переменные окружения для тестов
     import os
@@ -45,8 +55,7 @@ def client(mock_session):
         mock_db.get_session = get_session
         mock_get_db.return_value = mock_db
         
-        # Мокируем фабрику use cases
-        mock_factory = MagicMock()
+        # Используем переданный mock_factory
         mock_get_factory.return_value = mock_factory
         
         yield TestClient(app)
@@ -179,84 +188,56 @@ class TestPanelEndpoints:
         
         assert response.status_code == 401
 
-    def test_list_birthdays(self, client, mock_session):
+    def test_list_birthdays(self, client, mock_factory):
         """Тест получения списка дней рождения."""
-        with patch(
-            "src.presentation.web.routes.api.get_database"
-        ) as mock_get_db, patch(
-            "src.presentation.web.routes.api.get_use_case_factory"
-        ) as mock_get_factory:
-            # Мокируем database
-            mock_db = MagicMock()
-            async def get_session():
-                yield mock_session
-            mock_db.get_session = get_session
-            mock_get_db.return_value = mock_db
-            mock_factory = MagicMock()
-            mock_use_cases = {
-                "get_all": AsyncMock()
-            }
-            mock_birthday = Birthday(
-                id=1,
-                full_name="Иван Иванов",
-                company="ООО Тест",
-                position="Разработчик",
-                birth_date=date(1990, 5, 15),
-                comment=None,
-            )
-            mock_use_cases["get_all"].execute = AsyncMock(return_value=[mock_birthday])
-            mock_factory.create_birthday_use_cases.return_value = mock_use_cases
-            mock_get_factory.return_value = mock_factory
-            
-            response = client.get("/api/panel/birthdays")
-            
-            assert response.status_code == 200
-            assert len(response.json()) == 1
-            assert response.json()[0]["id"] == 1
+        mock_use_cases = {
+            "get_all": AsyncMock()
+        }
+        mock_birthday = Birthday(
+            id=1,
+            full_name="Иван Иванов",
+            company="ООО Тест",
+            position="Разработчик",
+            birth_date=date(1990, 5, 15),
+            comment=None,
+        )
+        mock_use_cases["get_all"].execute = AsyncMock(return_value=[mock_birthday])
+        mock_factory.create_birthday_use_cases.return_value = mock_use_cases
+        
+        response = client.get("/api/panel/birthdays")
+        
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert response.json()[0]["id"] == 1
 
-    def test_create_birthday_success(self, client, mock_session):
+    def test_create_birthday_success(self, client, mock_factory, mock_session):
         """Тест создания дня рождения."""
-        with patch(
-            "src.presentation.web.routes.api.get_database"
-        ) as mock_get_db, patch(
-            "src.presentation.web.routes.api.get_use_case_factory"
-        ) as mock_get_factory:
-            # Мокируем database
-            mock_db = MagicMock()
-            async def get_session():
-                yield mock_session
-            mock_db.get_session = get_session
-            mock_get_db.return_value = mock_db
-            mock_factory = MagicMock()
-            mock_use_cases = {
-                "create": AsyncMock()
+        mock_use_cases = {
+            "create": AsyncMock()
+        }
+        mock_birthday = Birthday(
+            id=1,
+            full_name="Иван Иванов",
+            company="ООО Тест",
+            position="Разработчик",
+            birth_date=date(1990, 5, 15),
+            comment=None,
+        )
+        mock_use_cases["create"].execute = AsyncMock(return_value=mock_birthday)
+        mock_factory.create_birthday_use_cases.return_value = mock_use_cases
+        
+        response = client.post(
+            "/api/panel/birthdays",
+            json={
+                "full_name": "Иван Иванов",
+                "company": "ООО Тест",
+                "position": "Разработчик",
+                "birth_date": "1990-05-15",
             }
-            mock_birthday = Birthday(
-                id=1,
-                full_name="Иван Иванов",
-                company="ООО Тест",
-                position="Разработчик",
-                birth_date=date(1990, 5, 15),
-                comment=None,
-            )
-            mock_use_cases["create"].execute = AsyncMock(return_value=mock_birthday)
-            mock_factory.create_birthday_use_cases.return_value = mock_use_cases
-            mock_get_factory.return_value = mock_factory
-            
-            mock_session.commit = AsyncMock()
-            
-            response = client.post(
-                "/api/panel/birthdays",
-                json={
-                    "full_name": "Иван Иванов",
-                    "company": "ООО Тест",
-                    "position": "Разработчик",
-                    "birth_date": "1990-05-15",
-                }
-            )
-            
-            assert response.status_code == 200
-            assert response.json()["id"] == 1
+        )
+        
+        assert response.status_code == 200
+        assert response.json()["id"] == 1
 
     def test_update_birthday_success(self, client, mock_session):
         """Тест обновления дня рождения."""
@@ -327,77 +308,49 @@ class TestPanelEndpoints:
             assert response.status_code == 200
             assert response.json()["status"] == "deleted"
 
-    def test_list_responsible(self, client, mock_session):
+    def test_list_responsible(self, client, mock_factory):
         """Тест получения списка ответственных."""
-        with patch(
-            "src.presentation.web.routes.api.get_database"
-        ) as mock_get_db, patch(
-            "src.presentation.web.routes.api.get_use_case_factory"
-        ) as mock_get_factory:
-            # Мокируем database
-            mock_db = MagicMock()
-            async def get_session():
-                yield mock_session
-            mock_db.get_session = get_session
-            mock_get_db.return_value = mock_db
-            mock_factory = MagicMock()
-            mock_use_cases = {
-                "get_all": AsyncMock()
-            }
-            mock_responsible = ResponsiblePerson(
-                id=1,
-                full_name="Петр Петров",
-                company="ООО Тест",
-                position="Менеджер",
-            )
-            mock_use_cases["get_all"].execute = AsyncMock(return_value=[mock_responsible])
-            mock_factory.create_responsible_use_cases.return_value = mock_use_cases
-            mock_get_factory.return_value = mock_factory
-            
-            response = client.get("/api/panel/responsible")
-            
-            assert response.status_code == 200
-            assert len(response.json()) == 1
-            assert response.json()[0]["id"] == 1
+        mock_use_cases = {
+            "get_all": AsyncMock()
+        }
+        mock_responsible = ResponsiblePerson(
+            id=1,
+            full_name="Петр Петров",
+            company="ООО Тест",
+            position="Менеджер",
+        )
+        mock_use_cases["get_all"].execute = AsyncMock(return_value=[mock_responsible])
+        mock_factory.create_responsible_use_cases.return_value = mock_use_cases
+        
+        response = client.get("/api/panel/responsible")
+        
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert response.json()[0]["id"] == 1
 
-    def test_create_responsible_success(self, client, mock_session):
+    def test_create_responsible_success(self, client, mock_factory):
         """Тест создания ответственного."""
-        with patch(
-            "src.presentation.web.routes.api.get_database"
-        ) as mock_get_db, patch(
-            "src.presentation.web.routes.api.get_use_case_factory"
-        ) as mock_get_factory:
-            # Мокируем database
-            mock_db = MagicMock()
-            async def get_session():
-                yield mock_session
-            mock_db.get_session = get_session
-            mock_get_db.return_value = mock_db
-            mock_factory = MagicMock()
-            mock_use_cases = {
-                "create": AsyncMock()
+        mock_use_cases = {
+            "create": AsyncMock()
+        }
+        mock_responsible = ResponsiblePerson(
+            id=1,
+            full_name="Петр Петров",
+            company="ООО Тест",
+            position="Менеджер",
+        )
+        mock_use_cases["create"].execute = AsyncMock(return_value=mock_responsible)
+        mock_factory.create_responsible_use_cases.return_value = mock_use_cases
+        
+        response = client.post(
+            "/api/panel/responsible",
+            json={
+                "full_name": "Петр Петров",
+                "company": "ООО Тест",
+                "position": "Менеджер",
             }
-            mock_responsible = ResponsiblePerson(
-                id=1,
-                full_name="Петр Петров",
-                company="ООО Тест",
-                position="Менеджер",
-            )
-            mock_use_cases["create"].execute = AsyncMock(return_value=mock_responsible)
-            mock_factory.create_responsible_use_cases.return_value = mock_use_cases
-            mock_get_factory.return_value = mock_factory
-            
-            mock_session.commit = AsyncMock()
-            
-            response = client.post(
-                "/api/panel/responsible",
-                json={
-                    "full_name": "Петр Петров",
-                    "company": "ООО Тест",
-                    "position": "Менеджер",
-                }
-            )
-            
-            assert response.status_code == 200
-            assert response.json()["id"] == 1
+        )
+        
+        assert response.status_code == 200
+        assert response.json()["id"] == 1
 
