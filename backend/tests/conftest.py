@@ -3,6 +3,43 @@ import os
 from pathlib import Path
 
 
+def _setup_python_path_unified(project_root_str=None):
+    """Unified function to setup Python path.
+    
+    If PYTHONPATH is set (CI), don't modify sys.path.
+    If path needs to be added, append to end to ensure installed packages are found first.
+    """
+    if project_root_str is None:
+        project_root = Path(__file__).parent.parent
+        project_root_str = str(project_root.resolve())
+    
+    # Check PYTHONPATH first (used in CI)
+    pythonpath = os.environ.get("PYTHONPATH", "")
+    pythonpath_paths = pythonpath.split(os.pathsep) if pythonpath else []
+    
+    # Normalize paths for cross-platform compatibility
+    normalized_project_root = os.path.normpath(project_root_str)
+    
+    # Check if project root is already in PYTHONPATH or sys.path
+    in_pythonpath = any(
+        os.path.normpath(p) == normalized_project_root 
+        for p in pythonpath_paths
+        if p
+    ) if pythonpath_paths else False
+    
+    in_sys_path = any(
+        os.path.normpath(p) == normalized_project_root
+        for p in sys.path
+        if p
+    )
+    
+    # If PYTHONPATH is set (CI), don't modify sys.path
+    # If not in sys.path and not in PYTHONPATH, append to end
+    # This ensures installed packages (like aiogram) are found first
+    if not in_sys_path and not in_pythonpath:
+        sys.path.append(project_root_str)
+
+
 def pytest_load_initial_conftests(early_config, parser, args):
     """Load initial conftests - setup path before any imports.
     
@@ -23,74 +60,29 @@ def pytest_load_initial_conftests(early_config, parser, args):
         # This should work in CI where PYTHONPATH is set
         project_root_str = os.getcwd()
     
-    # Check PYTHONPATH first (used in CI)
-    pythonpath = os.environ.get("PYTHONPATH", "")
-    pythonpath_paths = pythonpath.split(os.pathsep) if pythonpath else []
-    
-    normalized_project_root = os.path.normpath(project_root_str)
-    
-    in_pythonpath = any(
-        os.path.normpath(p) == normalized_project_root 
-        for p in pythonpath_paths
-        if p
-    ) if pythonpath_paths else False
-    
-    in_sys_path = any(
-        os.path.normpath(p) == normalized_project_root
-        for p in sys.path
-        if p
-    )
-    
-    # Add to sys.path if not already present
-    # Append to end to ensure installed packages (like aiogram) are found first
-    if not in_sys_path and not in_pythonpath:
-        sys.path.append(project_root_str)
+    # Use unified function to setup path
+    _setup_python_path_unified(project_root_str)
 
 
 def _setup_python_path():
     """Setup Python path before any imports."""
-    # Add project root to Python path to ensure src is importable
-    # This ensures paths are set up BEFORE any imports that might need them
-    # Priority: PYTHONPATH (CI) > explicit path addition (local)
-    project_root = Path(__file__).parent.parent
-    project_root_str = str(project_root.resolve())
-
-    # Check PYTHONPATH first (used in CI)
-    pythonpath = os.environ.get("PYTHONPATH", "")
-    pythonpath_paths = pythonpath.split(os.pathsep) if pythonpath else []
-
-    # Normalize paths for cross-platform compatibility
-    normalized_project_root = os.path.normpath(project_root_str)
-
-    # Check if project root is already in PYTHONPATH or sys.path
-    in_pythonpath = any(
-        os.path.normpath(p) == normalized_project_root 
-        for p in pythonpath_paths
-        if p
-    ) if pythonpath_paths else False
-
-    in_sys_path = any(
-        os.path.normpath(p) == normalized_project_root
-        for p in sys.path
-        if p
-    )
-
-    # Only add to sys.path if not already present
-    # This must happen BEFORE any imports that use src.* modules
-    # Insert at position 1 (after current directory, before site-packages)
-    # This ensures installed packages like aiogram are still found first
-    if not in_sys_path and not in_pythonpath:
-        sys.path.insert(1, project_root_str)
+    # Use unified function to setup path
+    _setup_python_path_unified()
 
 # Setup path immediately when conftest is imported
 # This runs before pytest collects tests, even with --import-mode=importlib
-_setup_python_path()
+# Only setup if PYTHONPATH is not set (local development)
+# In CI, PYTHONPATH is set, so we don't need to modify sys.path
+if not os.environ.get("PYTHONPATH"):
+    _setup_python_path()
 
 # Also set up path in pytest_configure hook as a fallback
 # This ensures path is set even if conftest imports happen in unexpected order
 def pytest_configure(config):
     """Configure pytest - ensure Python path is set up."""
-    _setup_python_path()
+    # Only setup if PYTHONPATH is not set (local development)
+    if not os.environ.get("PYTHONPATH"):
+        _setup_python_path()
 
 import pytest
 from datetime import date
