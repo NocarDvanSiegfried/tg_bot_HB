@@ -42,9 +42,9 @@ def pytest_load_initial_conftests(early_config, parser, args):
     )
     
     # Add to sys.path if not already present
-    # Insert at position 1 to ensure installed packages are found first
+    # Append to end to ensure installed packages (like aiogram) are found first
     if not in_sys_path and not in_pythonpath:
-        sys.path.insert(1, project_root_str)
+        sys.path.append(project_root_str)
 
 
 def _setup_python_path():
