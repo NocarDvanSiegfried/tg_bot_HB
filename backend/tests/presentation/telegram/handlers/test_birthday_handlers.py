@@ -52,6 +52,7 @@ class TestBirthdayHandlers:
             "position": "Test Position",
             "birth_date": date(1990, 5, 15)
         })
+        state.get_state = AsyncMock(return_value="BirthdayForm:waiting_for_comment")
         state.clear = AsyncMock()
         return state
 

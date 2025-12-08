@@ -44,6 +44,7 @@ class TestResponsibleHandlers:
         state.set_state = AsyncMock()
         state.update_data = AsyncMock()
         state.get_data = AsyncMock(return_value={"full_name": "Test Name", "company": "Test Company"})
+        state.get_state = AsyncMock(return_value="ResponsibleForm:waiting_for_position")
         state.clear = AsyncMock()
         return state
 

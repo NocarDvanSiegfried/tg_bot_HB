@@ -1,5 +1,4 @@
 Run pytest tests/ --cov=src --cov-report=xml --cov-report=term --cov-report=html -v --import-mode=importlib
-  
 ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
 cachedir: .pytest_cache
@@ -532,5 +531,5 @@ FAILED tests/presentation/telegram/handlers/test_responsible_handlers.py::TestRe
 FAILED tests/presentation/telegram/handlers/test_responsible_handlers.py::TestResponsibleHandlers::test_process_position_success - TypeError: object MagicMock can't be used in 'await' expression
 FAILED tests/presentation/telegram/handlers/test_responsible_handlers.py::TestResponsibleHandlers::test_process_position_error - TypeError: object MagicMock can't be used in 'await' expression
 FAILED tests/presentation/telegram/handlers/test_start_handler.py::TestStartHandler::test_cmd_start - TypeError: object MagicMock can't be used in 'await' expression
-================ 40 failed, 189 passed, 186 warnings in 11.17s =================
+================ 40 failed, 189 passed, 186 warnings in 11.07s =================
 Error: Process completed with exit code 1.
