@@ -111,3 +111,4 @@ class TestGenerateGreetingUseCase:
         mock_openrouter_client.generate_greeting.assert_not_called()
 
 
+

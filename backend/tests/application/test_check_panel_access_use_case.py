@@ -40,3 +40,4 @@ class TestCheckPanelAccessUseCase:
         mock_repository.has_access.assert_called_once_with(456)
 
 
+
