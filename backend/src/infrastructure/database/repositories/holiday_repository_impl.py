@@ -9,7 +9,9 @@ from src.infrastructure.database.models import ProfessionalHolidayModel
 from src.infrastructure.database.repositories.base_repository import BaseRepositoryImpl
 
 
-class HolidayRepositoryImpl(BaseRepositoryImpl[ProfessionalHoliday, ProfessionalHolidayModel], HolidayRepository):
+class HolidayRepositoryImpl(
+    BaseRepositoryImpl[ProfessionalHoliday, ProfessionalHolidayModel], HolidayRepository
+):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ProfessionalHolidayModel)
 
@@ -30,7 +32,6 @@ class HolidayRepositoryImpl(BaseRepositoryImpl[ProfessionalHoliday, Professional
             description=entity.description,
             holiday_date=entity.date,
         )
-
 
     async def get_by_date(self, check_date: date) -> list[ProfessionalHoliday]:
         result = await self.session.execute(
@@ -59,4 +60,3 @@ class HolidayRepositoryImpl(BaseRepositoryImpl[ProfessionalHoliday, Professional
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
-

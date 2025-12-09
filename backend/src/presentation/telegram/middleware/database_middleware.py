@@ -77,4 +77,3 @@ class DatabaseMiddleware(BaseMiddleware):
                         except Exception:
                             pass  # Не критично, если не удалось отправить сообщение
                 raise
-

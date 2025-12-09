@@ -12,9 +12,7 @@ from src.infrastructure.database.repositories.birthday_repository_impl import (
 from src.infrastructure.services.notification_service_impl import NotificationServiceImpl
 
 
-def _create_notification_service(
-    bot: Bot, session: AsyncSession
-) -> NotificationServiceImpl:
+def _create_notification_service(bot: Bot, session: AsyncSession) -> NotificationServiceImpl:
     """
     Создать экземпляр NotificationServiceImpl.
 
@@ -63,9 +61,7 @@ async def setup_notifications(bot: Bot, db: Database):
     # Каждый понедельник в указанное время
     scheduler.add_job(
         send_week,
-        trigger=CronTrigger(
-            day_of_week=0, hour=notification_hour, minute=notification_minute
-        ),
+        trigger=CronTrigger(day_of_week=0, hour=notification_hour, minute=notification_minute),
         id="weekly_birthdays",
     )
 

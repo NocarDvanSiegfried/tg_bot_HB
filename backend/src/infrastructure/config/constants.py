@@ -11,4 +11,3 @@ TELEGRAM_ORIGINS = [
     "https://telegram.org",
     "https://webk.telegram.org",  # Альтернативный домен Telegram Web
 ]
-

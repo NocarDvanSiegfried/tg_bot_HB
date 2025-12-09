@@ -118,7 +118,9 @@ class CreateCardRequest(BaseModel):
 
 
 class VerifyInitDataRequest(BaseModel):
-    init_data: str = Field(..., min_length=1, max_length=5000, description="Telegram WebApp initData")
+    init_data: str = Field(
+        ..., min_length=1, max_length=5000, description="Telegram WebApp initData"
+    )
 
 
 # Dependency для проверки авторизации через Telegram
@@ -164,8 +166,7 @@ async def require_panel_access(
 
     if not has_access:
         raise HTTPException(
-            status_code=403,
-            detail="Access denied. You don't have permission to access the panel."
+            status_code=403, detail="Access denied. You don't have permission to access the panel."
         )
 
     return user
@@ -195,7 +196,9 @@ async def verify_init_data(data: VerifyInitDataRequest):
 @limiter.limit(PUBLIC_ENDPOINT_LIMIT)
 async def get_calendar(
     request: Request,
-    date_str: str = Path(..., pattern="^\\d{4}-\\d{2}-\\d{2}$", description="Дата в формате YYYY-MM-DD"),
+    date_str: str = Path(
+        ..., pattern="^\\d{4}-\\d{2}-\\d{2}$", description="Дата в формате YYYY-MM-DD"
+    ),
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Получить данные календаря на дату."""

@@ -34,7 +34,9 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
 
     # Добавляем кнопку Mini App, если URL настроен
     if is_webapp_url_configured(webapp_url):
-        buttons.append([KeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))])
+        buttons.append(
+            [KeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))]
+        )
     else:
         # Логируем предупреждение, если URL не настроен
         logger.warning(
@@ -60,22 +62,15 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
                 text="👤 Управление ответственными", callback_data="panel_responsible"
             )
         ],
-        [
-            InlineKeyboardButton(
-                text="🎉 Генерация поздравлений", callback_data="panel_greetings"
-            )
-        ],
+        [InlineKeyboardButton(text="🎉 Генерация поздравлений", callback_data="panel_greetings")],
         [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
     ]
 
     # Добавляем кнопку Mini App, если URL настроен
     if is_webapp_url_configured(webapp_url):
-        inline_keyboard.append([
-            InlineKeyboardButton(
-                text="🌐 Открыть Mini App",
-                web_app=WebAppInfo(url=webapp_url)
-            )
-        ])
+        inline_keyboard.append(
+            [InlineKeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))]
+        )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard

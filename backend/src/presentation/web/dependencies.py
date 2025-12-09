@@ -46,4 +46,3 @@ async def get_readonly_use_case_factory() -> UseCaseFactory:
         finally:
             # Сессия автоматически закроется после завершения запроса
             pass
-

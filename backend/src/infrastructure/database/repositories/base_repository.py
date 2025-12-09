@@ -142,4 +142,3 @@ class BaseRepositoryImpl(ABC, Generic[TEntity, TModel]):
         if model:
             await self.session.delete(model)
             await self.session.flush()
-

@@ -112,4 +112,3 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
         )
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
-

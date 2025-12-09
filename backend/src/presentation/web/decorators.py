@@ -38,6 +38,7 @@ def handle_api_errors(func: Callable) -> Callable:
 
     Примечание: session должен быть передан через Depends(get_db_session) в FastAPI.
     """
+
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> Any:
         # Извлекаем session из kwargs (FastAPI передает через Depends)
@@ -76,21 +77,14 @@ def handle_api_errors(func: Callable) -> Callable:
         except OpenRouterRateLimitError as e:
             logger.error(f"OpenRouter rate limit error: {e}")
             raise HTTPException(
-                status_code=503,
-                detail="Service temporarily unavailable due to rate limiting"
+                status_code=503, detail="Service temporarily unavailable due to rate limiting"
             ) from e
         except OpenRouterTimeoutError as e:
             logger.error(f"OpenRouter timeout error: {e}")
-            raise HTTPException(
-                status_code=504,
-                detail="External service timeout"
-            ) from e
+            raise HTTPException(status_code=504, detail="External service timeout") from e
         except OpenRouterAPIError as e:
             logger.error(f"OpenRouter API error: {e}")
-            raise HTTPException(
-                status_code=502,
-                detail="External service error"
-            ) from e
+            raise HTTPException(status_code=502, detail="External service error") from e
         except ValueError as e:
             if session:
                 await session.rollback()
@@ -100,10 +94,6 @@ def handle_api_errors(func: Callable) -> Callable:
             if session:
                 await session.rollback()
             logger.error(f"Unexpected error in {func.__name__}", exc_info=True)
-            raise HTTPException(
-                status_code=500,
-                detail="Internal server error"
-            ) from e
+            raise HTTPException(status_code=500, detail="Internal server error") from e
 
     return wrapper
-

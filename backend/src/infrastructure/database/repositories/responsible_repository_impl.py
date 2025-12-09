@@ -16,7 +16,9 @@ from src.infrastructure.database.repositories.search_validator import (
 )
 
 
-class ResponsibleRepositoryImpl(BaseRepositoryImpl[ResponsiblePerson, ResponsiblePersonModel], ResponsibleRepository):
+class ResponsibleRepositoryImpl(
+    BaseRepositoryImpl[ResponsiblePerson, ResponsiblePersonModel], ResponsibleRepository
+):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ResponsiblePersonModel)
 
@@ -129,4 +131,3 @@ class ResponsibleRepositoryImpl(BaseRepositoryImpl[ResponsiblePerson, Responsibl
         )
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
-

@@ -50,4 +50,3 @@ def validate_and_sanitize_search_query(query: str) -> tuple[str, bool]:
         return "", False
 
     return sanitized.strip(), True
-

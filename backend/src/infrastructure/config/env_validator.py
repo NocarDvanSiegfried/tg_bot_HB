@@ -27,7 +27,11 @@ def validate_database_url(database_url: str) -> tuple[bool, str | None, str | No
 
     # Проверяем схему (должна быть postgresql+asyncpg или postgresql)
     if not parsed.scheme or not parsed.scheme.startswith("postgresql"):
-        return False, None, f"Неподдерживаемая схема: {parsed.scheme}. Ожидается postgresql или postgresql+asyncpg"
+        return (
+            False,
+            None,
+            f"Неподдерживаемая схема: {parsed.scheme}. Ожидается postgresql или postgresql+asyncpg",
+        )
 
     # Извлекаем имя базы данных из пути
     database_name = parsed.path.lstrip("/") if parsed.path else None
