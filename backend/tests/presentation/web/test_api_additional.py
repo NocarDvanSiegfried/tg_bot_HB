@@ -259,7 +259,7 @@ class TestAdditionalEndpoints:
             }
         )
         
-        assert response.status_code == 400
+        assert response.status_code == 422
 
     def test_delete_birthday_not_found(self, client, mock_factory, mock_panel_auth):
         """Тест удаления несуществующего ДР."""

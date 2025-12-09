@@ -197,23 +197,23 @@ tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_get_us
 tests/infrastructure/test_telegram_auth.py::TestDeprecatedFunctions::test_get_user_id_from_init_data_no_id PASSED [ 87%]
 tests/presentation/web/test_api.py::TestAuthEndpoints::test_verify_init_data_success PASSED [ 87%]
 tests/presentation/web/test_api.py::TestAuthEndpoints::test_verify_init_data_invalid PASSED [ 88%]
-tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_success FAILED [ 88%]
-tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_invalid_date FAILED [ 89%]
-tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_success FAILED [ 89%]
+tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_success PASSED [ 88%]
+tests/presentation/web/test_api.py::TestCalendarEndpoints::test_get_calendar_invalid_date PASSED [ 89%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_success PASSED [ 89%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_check_panel_access_no_auth PASSED [ 90%]
-tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays FAILED [ 90%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_birthdays PASSED [ 90%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_birthday_success PASSED [ 91%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_update_birthday_success PASSED [ 91%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_delete_birthday_success PASSED [ 92%]
-tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible FAILED [ 92%]
+tests/presentation/web/test_api.py::TestPanelEndpoints::test_list_responsible PASSED [ 92%]
 tests/presentation/web/test_api.py::TestPanelEndpoints::test_create_responsible_success PASSED [ 93%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_update_responsible_success PASSED [ 93%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_responsible_success PASSED [ 94%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_assign_responsible_success PASSED [ 94%]
-tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people FAILED [ 95%]
-tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success FAILED [ 95%]
-tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success FAILED [ 96%]
-tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found FAILED [ 96%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_search_people PASSED [ 95%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_success PASSED [ 95%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_card_success PASSED [ 96%]
+tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_generate_greeting_not_found PASSED [ 96%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_birthday_validation_error FAILED [ 97%]
 tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_delete_birthday_not_found PASSED [ 97%]
 tests/presentation/web/test_app.py::TestWebApp::test_app_creation PASSED [ 98%]
@@ -221,1026 +221,115 @@ tests/presentation/web/test_app.py::TestWebApp::test_root_endpoint PASSED [ 98%]
 tests/presentation/web/test_app.py::TestWebApp::test_cors_middleware_configured PASSED [ 99%]
 tests/presentation/web/test_app.py::TestWebApp::test_router_included PASSED [100%]
 =================================== FAILURES ===================================
-_______________ TestCalendarEndpoints.test_get_calendar_success ________________
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-tests/presentation/web/test_api.py:153: in test_get_calendar_success
-    response = client.get("/api/calendar/2024-01-15")
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/slowapi/extension.py:734: in async_wrapper
-    response = await func(*args, **kwargs)  # type: ignore
-src/presentation/web/routes/api.py:211: in get_calendar
-    return await use_case.execute(check_date)
-src/application/use_cases/calendar/get_calendar_data.py:24: in execute
-    birthdays = await self.birthday_repository.get_by_date(check_date)
-src/infrastructure/database/repositories/birthday_repository_impl.py:43: in get_by_date
-    result = await self.session.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:455: in execute
-    result = await greenlet_spawn(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2308: in execute
-    return self._execute_internal(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2190: in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py:293: in orm_execute_statement
-    result = conn.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1416: in execute
-    return meth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:516: in _execute_on_connection
-    return connection._execute_clauseelement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1639: in _execute_clauseelement
-    ret = self._execute_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
-    return self._exec_single_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
-    self._handle_dbapi_exception(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2343: in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: birthdays
-E   [SQL: SELECT birthdays.id, birthdays.full_name, birthdays.company, birthdays.position, birthdays.birth_date, birthdays.comment, birthdays.created_at, birthdays.updated_at 
-E   FROM birthdays 
-E   WHERE birthdays.birth_date = ?]
-E   [parameters: ('2024-01-15',)]
-E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
-_____________ TestCalendarEndpoints.test_get_calendar_invalid_date _____________
-tests/presentation/web/test_api.py:163: in test_get_calendar_invalid_date
+________ TestAdditionalEndpoints.test_create_birthday_validation_error _________
+tests/presentation/web/test_api_additional.py:262: in test_create_birthday_validation_error
     assert response.status_code == 400
 E   assert 422 == 400
 E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
-______________ TestPanelEndpoints.test_check_panel_access_success ______________
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlite3.OperationalError: no such table: panel_access
-The above exception was the direct cause of the following exception:
-tests/presentation/web/test_api.py:182: in test_check_panel_access_success
-    response = client.get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/slowapi/extension.py:734: in async_wrapper
-    response = await func(*args, **kwargs)  # type: ignore
-src/presentation/web/routes/api.py:229: in check_panel_access
-    has_access = await use_case.execute(user_id)
-src/application/use_cases/panel/check_panel_access.py:10: in execute
-    return await self.panel_access_repository.has_access(user_id)
-src/infrastructure/database/repositories/panel_access_repository_impl.py:15: in has_access
-    result = await self.session.execute(stmt)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:455: in execute
-    result = await greenlet_spawn(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2308: in execute
-    return self._execute_internal(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2190: in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py:293: in orm_execute_statement
-    result = conn.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1416: in execute
-    return meth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:516: in _execute_on_connection
-    return connection._execute_clauseelement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1639: in _execute_clauseelement
-    ret = self._execute_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
-    return self._exec_single_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
-    self._handle_dbapi_exception(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2343: in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: panel_access
-E   [SQL: SELECT panel_access.id, panel_access.user_id, panel_access.accessed_at 
-E   FROM panel_access 
-E   WHERE panel_access.user_id = ?
-E    LIMIT ? OFFSET ?]
-E   [parameters: (123, 1, 0)]
-E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
-____________________ TestPanelEndpoints.test_list_birthdays ____________________
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-tests/presentation/web/test_api.py:214: in test_list_birthdays
-    response = client.get("/api/panel/birthdays")
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/slowapi/extension.py:734: in async_wrapper
-    response = await func(*args, **kwargs)  # type: ignore
-src/presentation/web/routes/api.py:243: in list_birthdays
-    birthdays = await use_case.execute()
-src/application/use_cases/birthday/get_all_birthdays.py:13: in execute
-    return await self.birthday_repository.get_all()
-src/infrastructure/database/repositories/base_repository.py:94: in get_all
-    result = await self.session.execute(select(self.model_class))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:455: in execute
-    result = await greenlet_spawn(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2308: in execute
-    return self._execute_internal(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2190: in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py:293: in orm_execute_statement
-    result = conn.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1416: in execute
-    return meth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:516: in _execute_on_connection
-    return connection._execute_clauseelement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1639: in _execute_clauseelement
-    ret = self._execute_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
-    return self._exec_single_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
-    self._handle_dbapi_exception(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2343: in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: birthdays
-E   [SQL: SELECT birthdays.id, birthdays.full_name, birthdays.company, birthdays.position, birthdays.birth_date, birthdays.comment, birthdays.created_at, birthdays.updated_at 
-E   FROM birthdays]
-E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
-___________________ TestPanelEndpoints.test_list_responsible ___________________
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlite3.OperationalError: no such table: responsible_persons
-The above exception was the direct cause of the following exception:
-tests/presentation/web/test_api.py:302: in test_list_responsible
-    response = client.get("/api/panel/responsible")
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/slowapi/extension.py:734: in async_wrapper
-    response = await func(*args, **kwargs)  # type: ignore
-src/presentation/web/routes/api.py:352: in list_responsible
-    responsible = await use_case.execute()
-src/application/use_cases/responsible/get_all_responsible.py:13: in execute
-    return await self.responsible_repository.get_all()
-src/infrastructure/database/repositories/base_repository.py:94: in get_all
-    result = await self.session.execute(select(self.model_class))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:455: in execute
-    result = await greenlet_spawn(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2308: in execute
-    return self._execute_internal(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2190: in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py:293: in orm_execute_statement
-    result = conn.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1416: in execute
-    return meth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:516: in _execute_on_connection
-    return connection._execute_clauseelement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1639: in _execute_clauseelement
-    ret = self._execute_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
-    return self._exec_single_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
-    self._handle_dbapi_exception(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2343: in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: responsible_persons
-E   [SQL: SELECT responsible_persons.id, responsible_persons.full_name, responsible_persons.company, responsible_persons.position, responsible_persons.created_at, responsible_persons.updated_at 
-E   FROM responsible_persons]
-E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
-__________________ TestAdditionalEndpoints.test_search_people __________________
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-tests/presentation/web/test_api_additional.py:170: in test_search_people
-    response = client.get("/api/panel/search?q=Иван")
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:499: in get
-    return super().get(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1041: in get
-    return self.request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:465: in request
-    return super().request(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:814: in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:901: in send
-    response = self._send_handling_auth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:929: in _send_handling_auth
-    response = self._send_handling_redirects(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:966: in _send_handling_redirects
-    response = self._send_single_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/httpx/_client.py:1002: in _send_single_request
-    response = transport.handle_request(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:342: in handle_request
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/testclient.py:339: in handle_request
-    portal.call(self.app, scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
-    return cast(T_Retval, self.start_task_soon(func, *args).result())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:456: in result
-    return self.__get_result()
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
-    raise self._exception
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
-    retval = await retval
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/applications.py:1106: in __call__
-    await super().__call__(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/applications.py:122: in __call__
-    await self.middleware_stack(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:184: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/errors.py:162: in __call__
-    await self.app(scope, receive, _send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/cors.py:83: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:79: in __call__
-    raise exc
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py:68: in __call__
-    await self.app(scope, receive, sender)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
-    raise e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:718: in __call__
-    await route.handle(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:276: in handle
-    await self.app(scope, receive, send)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/starlette/routing.py:66: in app
-    response = await func(request)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:274: in app
-    raw_response = await run_endpoint_function(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
-    return await dependant.call(**values)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/slowapi/extension.py:734: in async_wrapper
-    response = await func(*args, **kwargs)  # type: ignore
-src/presentation/web/routes/api.py:471: in search_people
-    results = await use_case.execute(q)
-src/application/use_cases/search/search_people.py:26: in execute
-    birthdays = await self.birthday_repository.search(query)
-src/infrastructure/database/repositories/birthday_repository_impl.py:104: in search
-    result = await self.session.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:455: in execute
-    result = await greenlet_spawn(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2308: in execute
-    return self._execute_internal(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2190: in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py:293: in orm_execute_statement
-    result = conn.execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1416: in execute
-    return meth(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:516: in _execute_on_connection
-    return connection._execute_clauseelement(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1639: in _execute_clauseelement
-    ret = self._execute_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
-    return self._exec_single_context(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
-    self._handle_dbapi_exception(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2343: in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
-    self.dialect.do_execute(
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py:922: in do_execute
-    cursor.execute(statement, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:146: in execute
-    self._adapt_connection._handle_exception(error)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:298: in _handle_exception
-    raise error
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:128: in execute
-    self.await_(_cursor.execute(operation, parameters))
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
-    value = await result
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:48: in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py:40: in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:133: in _execute
-    return await future
-/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py:106: in run
-    result = function()
-E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: birthdays
-E   [SQL: SELECT birthdays.id, birthdays.full_name, birthdays.company, birthdays.position, birthdays.birth_date, birthdays.comment, birthdays.created_at, birthdays.updated_at 
-E   FROM birthdays 
-E   WHERE lower(birthdays.full_name) LIKE lower(?) OR lower(birthdays.company) LIKE lower(?) OR lower(birthdays.position) LIKE lower(?)]
-E   [parameters: ('%Иван%', '%Иван%', '%Иван%')]
-E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
-____________ TestAdditionalEndpoints.test_generate_greeting_success ____________
-tests/presentation/web/test_api_additional.py:193: in test_generate_greeting_success
-    assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.decorators:decorators.py:96 Unexpected error in generate_greeting
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
-    cursor.execute(statement, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 146, in execute
-    self._adapt_connection._handle_exception(error)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 298, in _handle_exception
-    raise error
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 128, in execute
-    self.await_(_cursor.execute(operation, parameters))
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 48, in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 40, in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 106, in run
-    result = function()
-             ^^^^^^^^^^
-sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/decorators.py", line 61, in wrapper
-    return await func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 498, in generate_greeting
-    greeting_text = await use_case.execute(
-                    ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/base_repository.py", line 81, in get_by_id
-    result = await self.session.execute(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py", line 455, in execute
-    result = await greenlet_spawn(
-             ^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
-    return self._execute_internal(
-           ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
-    result = conn.execute(
-             ^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
-    return meth(
-           ^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
-    return connection._execute_clauseelement(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
-    ret = self._execute_context(
-          ^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
-    return self._exec_single_context(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
-    self._handle_dbapi_exception(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
-    cursor.execute(statement, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 146, in execute
-    self._adapt_connection._handle_exception(error)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 298, in _handle_exception
-    raise error
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 128, in execute
-    self.await_(_cursor.execute(operation, parameters))
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 48, in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 40, in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 106, in run
-    result = function()
-             ^^^^^^^^^^
-sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: birthdays
-[SQL: SELECT birthdays.id, birthdays.full_name, birthdays.company, birthdays.position, birthdays.birth_date, birthdays.comment, birthdays.created_at, birthdays.updated_at 
-FROM birthdays 
-WHERE birthdays.id = ?]
-[parameters: (1,)]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-_______________ TestAdditionalEndpoints.test_create_card_success _______________
-tests/presentation/web/test_api_additional.py:212: in test_create_card_success
-    assert response.status_code == 200
-E   assert 500 == 200
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.decorators:decorators.py:96 Unexpected error in create_card
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
-    cursor.execute(statement, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 146, in execute
-    self._adapt_connection._handle_exception(error)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 298, in _handle_exception
-    raise error
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 128, in execute
-    self.await_(_cursor.execute(operation, parameters))
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 48, in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 40, in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 106, in run
-    result = function()
-             ^^^^^^^^^^
-sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/decorators.py", line 61, in wrapper
-    return await func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 520, in create_card
-    card_bytes = await use_case.execute(
-                 ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/create_card.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/base_repository.py", line 81, in get_by_id
-    result = await self.session.execute(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py", line 455, in execute
-    result = await greenlet_spawn(
-             ^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
-    return self._execute_internal(
-           ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
-    result = conn.execute(
-             ^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
-    return meth(
-           ^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
-    return connection._execute_clauseelement(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
-    ret = self._execute_context(
-          ^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
-    return self._exec_single_context(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
-    self._handle_dbapi_exception(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
-    cursor.execute(statement, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 146, in execute
-    self._adapt_connection._handle_exception(error)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 298, in _handle_exception
-    raise error
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 128, in execute
-    self.await_(_cursor.execute(operation, parameters))
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 48, in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 40, in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 106, in run
-    result = function()
-             ^^^^^^^^^^
-sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: birthdays
-[SQL: SELECT birthdays.id, birthdays.full_name, birthdays.company, birthdays.position, birthdays.birth_date, birthdays.comment, birthdays.created_at, birthdays.updated_at 
-FROM birthdays 
-WHERE birthdays.id = ?]
-[parameters: (1,)]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-ERROR    sqlalchemy.pool.impl.StaticPool:base.py:1010 Exception during reset or similar
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 988, in _finalize_fairy
-    fairy._reset(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1438, in _reset
-    pool._dialect.do_rollback(self)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 692, in do_rollback
-    dbapi_connection.rollback()
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 263, in rollback
-    self.await_(self._connection.rollback())
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 170, in rollback
-    await self._execute(self._conn.rollback)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-asyncio.exceptions.CancelledError
-___________ TestAdditionalEndpoints.test_generate_greeting_not_found ___________
-tests/presentation/web/test_api_additional.py:234: in test_generate_greeting_not_found
-    assert response.status_code == 404
-E   assert 500 == 404
-E    +  where 500 = <Response [500 Internal Server Error]>.status_code
------------------------------- Captured log call -------------------------------
-ERROR    src.presentation.web.decorators:decorators.py:96 Unexpected error in generate_greeting
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
-    cursor.execute(statement, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 146, in execute
-    self._adapt_connection._handle_exception(error)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 298, in _handle_exception
-    raise error
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 128, in execute
-    self.await_(_cursor.execute(operation, parameters))
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 125, in await_only
-    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 185, in greenlet_spawn
-    value = await result
-            ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 48, in execute
-    await self._execute(self._cursor.execute, sql, parameters)
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/cursor.py", line 40, in _execute
-    return await self._conn._execute(fn, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 133, in _execute
-    return await future
-           ^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/aiosqlite/core.py", line 106, in run
-    result = function()
-             ^^^^^^^^^^
-sqlite3.OperationalError: no such table: birthdays
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/decorators.py", line 61, in wrapper
-    return await func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/presentation/web/routes/api.py", line 498, in generate_greeting
-    greeting_text = await use_case.execute(
-                    ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/application/use_cases/greeting/generate_greeting.py", line 22, in execute
-    birthday = await self.birthday_repository.get_by_id(birthday_id)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tg_bot_HB/tg_bot_HB/backend/src/infrastructure/database/repositories/base_repository.py", line 81, in get_by_id
-    result = await self.session.execute(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py", line 455, in execute
-    result = await greenlet_spawn(
-             ^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.throw(*sys.exc_info())
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
-    return self._execute_internal(
-           ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
-    result = conn.execute(
-             ^^^^^^^^^^^^^
+---------- coverage: platform linux, python 3.11.14-final-0 ----------
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
+src/__init__.py                                                                0      0   100%
+src/application/__init__.py                                                    0      0   100%
+src/application/factories/__init__.py                                          0      0   100%
+src/application/factories/use_case_factory.py                                 94      1    99%   141
+src/application/ports/__init__.py                                              0      0   100%
+src/application/ports/birthday_repository.py                                   4      0   100%
+src/application/ports/card_generator.py                                        2      0   100%
+src/application/ports/holiday_repository.py                                    4      0   100%
+src/application/ports/openrouter_client.py                                     2      0   100%
+src/application/ports/panel_access_repository.py                               2      0   100%
+src/application/ports/responsible_repository.py                                4      0   100%
+src/application/ports/telegram_auth_service.py                                 2      0   100%
+src/application/use_cases/__init__.py                                          0      0   100%
+src/application/use_cases/auth/__init__.py                                     0      0   100%
+src/application/use_cases/auth/verify_telegram_auth.py                        10      0   100%
+src/application/use_cases/birthday/__init__.py                                 0      0   100%
+src/application/use_cases/birthday/create_birthday.py                          9      0   100%
+src/application/use_cases/birthday/delete_birthday.py                          9      0   100%
+src/application/use_cases/birthday/get_all_birthdays.py                        7      0   100%
+src/application/use_cases/birthday/get_birthdays_by_date.py                    8      0   100%
+src/application/use_cases/birthday/update_birthday.py                         12      0   100%
+src/application/use_cases/calendar/__init__.py                                 0      0   100%
+src/application/use_cases/calendar/get_calendar_data.py                       14      0   100%
+src/application/use_cases/greeting/__init__.py                                 0      0   100%
+src/application/use_cases/greeting/create_card.py                             12      0   100%
+src/application/use_cases/greeting/generate_greeting.py                       11      0   100%
+src/application/use_cases/holiday/__init__.py                                  0      0   100%
+src/application/use_cases/holiday/create_holiday.py                            9      0   100%
+src/application/use_cases/holiday/delete_holiday.py                            9      0   100%
+src/application/use_cases/holiday/update_holiday.py                           12      0   100%
+src/application/use_cases/panel/__init__.py                                    0      0   100%
+src/application/use_cases/panel/check_panel_access.py                          6      0   100%
+src/application/use_cases/panel/record_panel_access.py                         6      0   100%
+src/application/use_cases/responsible/__init__.py                              0      0   100%
+src/application/use_cases/responsible/assign_responsible_to_date.py           10      0   100%
+src/application/use_cases/responsible/create_responsible.py                    8      0   100%
+src/application/use_cases/responsible/delete_responsible.py                    9      0   100%
+src/application/use_cases/responsible/get_all_responsible.py                   7      0   100%
+src/application/use_cases/responsible/update_responsible.py                   11      0   100%
+src/application/use_cases/search/__init__.py                                   0      0   100%
+src/application/use_cases/search/search_people.py                             17      0   100%
+src/domain/entities/__init__.py                                                0      0   100%
+src/domain/entities/birthday.py                                               15      0   100%
+src/domain/entities/professional_holiday.py                                    8      0   100%
+src/domain/entities/responsible_person.py                                      7      0   100%
+src/domain/exceptions/__init__.py                                              5      0   100%
+src/domain/exceptions/api_exceptions.py                                       15      1    93%   29
+src/domain/exceptions/base.py                                                  2      0   100%
+src/domain/exceptions/business.py                                              3      0   100%
+src/domain/exceptions/not_found.py                                             7      0   100%
+src/domain/exceptions/validation.py                                            5      0   100%
+src/infrastructure/__init__.py                                                 0      0   100%
+src/infrastructure/config/__init__.py                                          0      0   100%
+src/infrastructure/config/constants.py                                         2      0   100%
+src/infrastructure/config/env_validator.py                                    57     57     0%   3-174
+src/infrastructure/config/openrouter_config.py                                18      0   100%
+src/infrastructure/config/rate_limits.py                                       5      0   100%
+src/infrastructure/database/__init__.py                                        0      0   100%
+src/infrastructure/database/database.py                                       12      0   100%
+src/infrastructure/database/database_factory.py                               10      0   100%
+src/infrastructure/database/models.py                                         47      0   100%
+src/infrastructure/database/repositories/__init__.py                           0      0   100%
+src/infrastructure/database/repositories/base_repository.py                   38      2    95%   115, 122
+src/infrastructure/database/repositories/birthday_repository_impl.py          47      1    98%   96
+src/infrastructure/database/repositories/holiday_repository_impl.py           31      0   100%
+src/infrastructure/database/repositories/panel_access_repository_impl.py      15      0   100%
+src/infrastructure/database/repositories/responsible_repository_impl.py       53      8    85%   89, 113-133
+src/infrastructure/database/repositories/search_validator.py                  16      4    75%   32, 39, 43, 50
+src/infrastructure/external/__init__.py                                        0      0   100%
+src/infrastructure/external/openrouter_client_impl.py                         56      2    96%   98-100
+src/infrastructure/external/telegram_auth.py                                  43      2    95%   41-42
+src/infrastructure/image/__init__.py                                           0      0   100%
+src/infrastructure/image/card_generator.py                                    79     18    77%   42-44, 102-103, 113-116, 137-139, 148-153
+src/infrastructure/services/__init__.py                                        0      0   100%
+src/infrastructure/services/notification_service_impl.py                      87      5    94%   40, 67, 92, 97, 124
+src/infrastructure/services/notifications_scheduler.py                        33      0   100%
+src/presentation/__init__.py                                                   0      0   100%
+src/presentation/telegram/__init__.py                                          0      0   100%
+src/presentation/telegram/bot.py                                              26     26     0%   1-47
+src/presentation/telegram/handlers/__init__.py                                 2      2     0%   1-10
+src/presentation/telegram/handlers/birthday_handlers.py                       62     62     0%   1-103
+src/presentation/telegram/handlers/calendar_handler.py                        72     72     0%   1-109
+src/presentation/telegram/handlers/greeting_handlers.py                       87     87     0%   1-148
+src/presentation/telegram/handlers/panel_handler.py                           17     17     0%   1-33
+src/presentation/telegram/handlers/responsible_handlers.py                    43     43     0%   1-74
+src/presentation/telegram/handlers/start_handler.py                            8      8     0%   1-13
+src/presentation/telegram/keyboards.py                                        34     34     0%   1-146
+src/presentation/telegram/middleware/__init__.py                               2      2     0%   3-5
+src/presentation/telegram/middleware/database_middleware.py                   32     32     0%   3-79
+src/presentation/web/__init__.py                                               0      0   100%
+src/presentation/web/app.py                                                   37     15    59%   30-44, 49-56
+src/presentation/web/decorators.py                                            59     32    46%   56-58, 67-97
+src/presentation/web/dependencies.py                                          17     10    41%   16-18, 31, 41-48
+src/presentation/web/routes/__init__.py                                        0      0   100%
+src/presentation/web/routes/api.py                                           224     23    90%   46, 62, 76, 90, 116, 133-140, 159-172, 207-208, 225
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                       1748    566    68%
+Coverage HTML written to dir htmlcov
+Coverage XML written to file coverage.xml
+=========================== short test summary info ============================
+FAILED tests/presentation/web/test_api_additional.py::TestAdditionalEndpoints::test_create_birthday_validation_error - assert 422 == 400
+ +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+================== 1 failed, 196 passed, 3 warnings in 16.76s ==================
 Error: Process completed with exit code 1.
