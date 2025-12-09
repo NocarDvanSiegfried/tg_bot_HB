@@ -50,12 +50,67 @@ jobs:
             echo "❌ DEPLOY_SSH_KEY secret is missing"
             exit 1
           fi
-          echo "✅ All required secrets are present"
+          # Check SSH key format
+          SSH_KEY="${{ secrets.DEPLOY_SSH_KEY }}"
+          if ! echo "$SSH_KEY" | grep -q "BEGIN.*PRIVATE KEY"; then
+            echo "❌ DEPLOY_SSH_KEY format is invalid"
+            echo "   Expected format: -----BEGIN ... PRIVATE KEY-----"
+            echo "   Make sure you copied the full private key including headers"
+            exit 1
+          fi
+          echo "✅ All required secrets are present and formatted correctly"
       
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      
+      - name: Diagnose SSH connection
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ]; then
+            echo "❌ DEPLOY_HOST or DEPLOY_USER is empty"
+            exit 1
+          fi
+          
+          echo "🔍 SSH Diagnostics:"
+          echo "  Host: $DEPLOY_HOST"
+          echo "  User: $DEPLOY_USER"
+          echo "  SSH_AUTH_SOCK: ${SSH_AUTH_SOCK:-not set}"
+          
+          # Check if ssh-agent is running
+          if [ -z "$SSH_AUTH_SOCK" ]; then
+            echo "❌ SSH_AUTH_SOCK is not set - ssh-agent may not be running"
+            exit 1
+          fi
+          
+          # List keys in ssh-agent
+          echo "  Keys in ssh-agent:"
+          ssh-add -l || echo "    ⚠️  No keys found in ssh-agent"
+          
+          # Test SSH connection with verbose output (first attempt)
+          echo ""
+          echo "🔍 Testing SSH connection (verbose mode)..."
+          if ssh -v -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" "echo 'SSH connection successful'" 2>&1 | head -20; then
+            echo "✅ SSH connection test passed"
+          else
+            echo ""
+            echo "❌ SSH connection test failed"
+            echo ""
+            echo "📋 Troubleshooting steps:"
+            echo "  1. Verify the public key is added to server:"
+            echo "     On server, check: cat ~/.ssh/authorized_keys"
+            echo "  2. Verify DEPLOY_USER has correct permissions:"
+            echo "     On server, check: ls -la ~/.ssh/"
+            echo "  3. Verify DEPLOY_SSH_KEY contains the full private key:"
+            echo "     Should start with: -----BEGIN ... PRIVATE KEY-----"
+            echo "  4. Verify DEPLOY_HOST is reachable:"
+            echo "     Test: ping $DEPLOY_HOST"
+            echo ""
+            echo "⚠️  Continuing with deployment, but SSH may fail..."
+          fi
       
       - name: Add server to known hosts
         env:
@@ -78,7 +133,7 @@ jobs:
             exit 1
           fi
           export DEPLOY_HOST DEPLOY_USER DEPLOY_PATH
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+          if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" << EOF
             cd "$DEPLOY_PATH"
             # Tag current images as previous for rollback
             docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "(backend|frontend)" | while read image; do
@@ -87,6 +142,11 @@ jobs:
               fi
             done
           EOF
+          then
+            echo "❌ Failed to save current images as previous"
+            echo "   Check SSH connection and server permissions"
+            exit 1
+          fi
       
       - name: Deploy via SSH
         env:
@@ -101,7 +161,7 @@ jobs:
             exit 1
           fi
           export DEPLOY_HOST DEPLOY_USER DEPLOY_PATH GITHUB_REF_NAME
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+          if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" << EOF
             cd "$DEPLOY_PATH"
             
             # Pull latest code
@@ -121,6 +181,11 @@ jobs:
             # Wait for services to be ready
             sleep 10
           EOF
+          then
+            echo "❌ Deployment via SSH failed"
+            echo "   Check SSH connection, server permissions, and deployment path"
+            exit 1
+          fi
       
       - name: Health check
         env:
@@ -155,11 +220,20 @@ jobs:
             exit 1
           fi
           export DEPLOY_HOST DEPLOY_USER DEPLOY_PATH
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+          if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" << EOF
             cd "$DEPLOY_PATH"
             docker compose pull backend:previous frontend:previous || true
             docker compose up -d backend frontend
           EOF
+          then
+            echo "❌ Rollback via SSH failed"
+            echo "   Manual intervention may be required"
+            echo "   Connect to server and run:"
+            echo "     cd $DEPLOY_PATH"
+            echo "     docker compose pull backend:previous frontend:previous || true"
+            echo "     docker compose up -d backend frontend"
+            exit 1
+          fi
       
       - name: Notify deployment status
         if: always()
