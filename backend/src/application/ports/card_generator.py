@@ -18,3 +18,4 @@ class CardGeneratorPort(ABC):
         pass
 
 
+
