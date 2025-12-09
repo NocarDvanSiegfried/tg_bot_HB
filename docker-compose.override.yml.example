@@ -1,0 +1,59 @@
+# Пример файла docker-compose.override.yml для локальной разработки
+# 
+# Использование:
+# 1. Скопируйте этот файл: cp docker-compose.override.yml.example docker-compose.override.yml
+# 2. Раскомментируйте нужные секции
+# 3. Запустите: docker compose up
+#
+# Этот файл позволяет переопределить настройки из docker-compose.yml
+# для работы в условиях нестабильной сети или локальной разработки
+
+version: '3.8'
+
+services:
+  # Пример: Использовать локальный PostgreSQL вместо Docker образа
+  # Раскомментируйте, если у вас установлен PostgreSQL локально
+  # postgres:
+  #   image: postgres:15  # Оставьте, если образ уже загружен
+  #   # Или полностью закомментируйте секцию postgres и используйте локальный PostgreSQL
+  #   # В этом случае обновите DATABASE_URL в .env на localhost:5432
+
+  # Пример: Использовать локальные образы без загрузки из сети
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #     # Не загружать образы из сети, использовать только локальные
+  #     pull: false
+  #   # Можно также использовать готовый образ вместо сборки:
+  #   # image: your-registry/backend:latest
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #     # Не загружать образы из сети, использовать только локальные
+  #     pull: false
+  #   # Можно также использовать готовый образ вместо сборки:
+  #   # image: your-registry/frontend:latest
+
+  # Пример: Использовать альтернативные базовые образы
+  # Если node:20-alpine не загружается, можно использовать node:20
+  # Для этого создайте frontend/Dockerfile.local с FROM node:20
+  # и используйте его:
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.local
+
+  # Пример: Отключить healthcheck для ускорения запуска
+  # postgres:
+  #   healthcheck:
+  #     disable: true
+
+  # Пример: Использовать локальные volumes для разработки
+  # backend:
+  #   volumes:
+  #     - ./backend:/app
+  #     # Добавить дополнительные volumes при необходимости
+

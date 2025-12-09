@@ -16,3 +16,4 @@ class CardGeneratorPort(ABC):
     ) -> bytes:
         """Сгенерировать открытку."""
         pass
+

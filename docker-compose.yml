@@ -1,16 +1,38 @@
+# BuildKit optimization configuration
+x-build-args: &build-args
+  BUILDKIT_INLINE_CACHE: "1"
+
 services:
   postgres:
+    # Если возникают проблемы с загрузкой образа (TLS handshake timeout), попробуйте:
+    # 
+    # Вариант 1: Использовать скрипт для загрузки образа
+    #   Linux/macOS: ./scripts/download-postgres-image.sh
+    #   Windows: .\scripts\download-postgres-image.ps1
+    #
+    # Вариант 2: Загрузить образ вручную с несколькими попытками
+    #   docker pull postgres:15
+    #   или: docker pull postgres:15-alpine (меньший размер)
+    #
+    # Вариант 3: Использовать альтернативный registry (раскомментируйте нужную строку)
+    #   image: registry-1.docker.io/library/postgres:15
+    #   image: docker.io/library/postgres:15
+    #
+    # Вариант 4: Использовать локальную установку PostgreSQL
+    #   Закомментируйте этот сервис и используйте локальный PostgreSQL (см. README.md)
+    #
+    # Вариант 5: Настроить прокси для Docker (см. docker-daemon.json.example)
     image: postgres:15
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-birthday_calendar}
+      POSTGRES_DB: ${POSTGRES_DB:-birthday_calendar_db}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-birthday_calendar_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,6 +41,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      cache_from:
+        - tg_bot_hb-backend:latest
+      args:
+        <<: *build-args
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-birthday_calendar}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
@@ -37,6 +63,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      cache_from:
+        - tg_bot_hb-frontend:latest
+      args:
+        <<: *build-args
     ports:
       - "3000:3000"
     environment:
