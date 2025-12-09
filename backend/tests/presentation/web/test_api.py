@@ -79,6 +79,7 @@ def client(mock_session, mock_factory):
     
     # Переопределяем зависимости через FastAPI dependency_overrides
     from src.presentation.web.routes.api import get_use_case_factory, get_db_session
+    from src.presentation.web.dependencies import get_readonly_use_case_factory
     from src.application.factories.use_case_factory import UseCaseFactory
     
     async def get_mock_session():
@@ -87,8 +88,13 @@ def client(mock_session, mock_factory):
     async def get_mock_factory(session: AsyncSession = Depends(get_mock_session)) -> UseCaseFactory:
         return mock_factory
     
+    async def get_mock_readonly_factory():
+        """Мок для get_readonly_use_case_factory."""
+        yield mock_factory
+    
     app.dependency_overrides[get_use_case_factory] = get_mock_factory
     app.dependency_overrides[get_db_session] = get_mock_session
+    app.dependency_overrides[get_readonly_use_case_factory] = get_mock_readonly_factory
     
     try:
         yield TestClient(app)
@@ -160,7 +166,7 @@ class TestCalendarEndpoints:
         """Тест получения календаря с невалидной датой."""
         response = client.get("/api/calendar/invalid-date")
         
-        assert response.status_code == 400
+        assert response.status_code == 422
 
 
 class TestPanelEndpoints:
