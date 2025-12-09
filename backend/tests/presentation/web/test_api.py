@@ -36,6 +36,40 @@ def mock_factory():
 
 
 @pytest.fixture
+def mock_panel_auth(mock_factory):
+    """Фикстура для мокирования require_panel_access."""
+    from src.presentation.web.routes.api import require_panel_access, verify_telegram_auth
+    
+    async def mock_verify_auth():
+        """Мок для verify_telegram_auth."""
+        return {"id": 123, "first_name": "Test", "username": "test_user"}
+    
+    async def mock_require_panel_access():
+        """Мок для require_panel_access."""
+        # Мокируем проверку доступа
+        mock_use_case = AsyncMock()
+        mock_use_case.execute = AsyncMock(return_value=True)
+        mock_factory.create_panel_access_use_case.return_value = mock_use_case
+        
+        user = await mock_verify_auth()
+        # Проверяем доступ (всегда возвращаем True для тестов)
+        has_access = await mock_use_case.execute(user["id"])
+        if not has_access:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=403, detail="Access denied")
+        return user
+    
+    app.dependency_overrides[verify_telegram_auth] = mock_verify_auth
+    app.dependency_overrides[require_panel_access] = mock_require_panel_access
+    
+    try:
+        yield
+    finally:
+        app.dependency_overrides.pop(verify_telegram_auth, None)
+        app.dependency_overrides.pop(require_panel_access, None)
+
+
+@pytest.fixture
 def client(mock_session, mock_factory):
     """Тестовый клиент FastAPI."""
     # Устанавливаем переменные окружения для тестов
@@ -161,7 +195,7 @@ class TestPanelEndpoints:
         
         assert response.status_code == 401
 
-    def test_list_birthdays(self, client, mock_factory):
+    def test_list_birthdays(self, client, mock_factory, mock_panel_auth):
         """Тест получения списка дней рождения."""
         mock_use_cases = {
             "get_all": AsyncMock()
@@ -183,7 +217,7 @@ class TestPanelEndpoints:
         assert len(response.json()) == 1
         assert response.json()[0]["id"] == 1
 
-    def test_create_birthday_success(self, client, mock_factory, mock_session):
+    def test_create_birthday_success(self, client, mock_factory, mock_session, mock_panel_auth):
         """Тест создания дня рождения."""
         mock_use_cases = {
             "create": AsyncMock()
@@ -212,7 +246,7 @@ class TestPanelEndpoints:
         assert response.status_code == 200
         assert response.json()["id"] == 1
 
-    def test_update_birthday_success(self, client, mock_factory):
+    def test_update_birthday_success(self, client, mock_factory, mock_panel_auth):
         """Тест обновления дня рождения."""
         mock_use_cases = {
             "update": AsyncMock()
@@ -238,7 +272,7 @@ class TestPanelEndpoints:
         assert response.status_code == 200
         assert response.json()["full_name"] == "Иван Иванов Обновленный"
 
-    def test_delete_birthday_success(self, client, mock_factory):
+    def test_delete_birthday_success(self, client, mock_factory, mock_panel_auth):
         """Тест удаления дня рождения."""
         mock_use_cases = {
             "delete": AsyncMock()
@@ -251,7 +285,7 @@ class TestPanelEndpoints:
         assert response.status_code == 200
         assert response.json()["status"] == "deleted"
 
-    def test_list_responsible(self, client, mock_factory):
+    def test_list_responsible(self, client, mock_factory, mock_panel_auth):
         """Тест получения списка ответственных."""
         mock_use_cases = {
             "get_all": AsyncMock()
@@ -271,7 +305,7 @@ class TestPanelEndpoints:
         assert len(response.json()) == 1
         assert response.json()[0]["id"] == 1
 
-    def test_create_responsible_success(self, client, mock_factory):
+    def test_create_responsible_success(self, client, mock_factory, mock_panel_auth):
         """Тест создания ответственного."""
         mock_use_cases = {
             "create": AsyncMock()
