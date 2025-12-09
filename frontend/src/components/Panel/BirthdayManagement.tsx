@@ -28,7 +28,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       const data = await api.getBirthdays()
       setBirthdays(data)
     } catch (error) {
-      console.error('Failed to load birthdays:', error)
+      logger.error('Failed to load birthdays:', error)
     } finally {
       setLoading(false)
     }
@@ -41,7 +41,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '' })
       loadBirthdays()
     } catch (error) {
-      console.error('Failed to create birthday:', error)
+      logger.error('Failed to create birthday:', error)
     }
   }
 
@@ -51,7 +51,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       await api.deleteBirthday(id)
       loadBirthdays()
     } catch (error) {
-      console.error('Failed to delete birthday:', error)
+      logger.error('Failed to delete birthday:', error)
     }
   }
 

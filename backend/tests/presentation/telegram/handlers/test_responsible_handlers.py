@@ -129,7 +129,7 @@ class TestResponsibleHandlers:
             # Assert
             mock_state.get_data.assert_called_once()
             mock_use_cases["create"].execute.assert_called_once()
-            mock_session.commit.assert_called_once()
+            # Управление транзакциями теперь в middleware, не проверяем commit/rollback
             mock_message.answer.assert_called()
             mock_state.clear.assert_called_once()
 
@@ -151,7 +151,7 @@ class TestResponsibleHandlers:
             await process_position(mock_message, mock_state, mock_session)
 
             # Assert
-            mock_session.rollback.assert_called_once()
+            # Управление транзакциями теперь в middleware, не проверяем rollback
             mock_message.answer.assert_called()
             assert "Ошибка" in mock_message.answer.call_args[0][0]
             mock_state.clear.assert_called_once()

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api } from '../../services/api'
+import { logger } from '../../utils/logger'
 import './SearchBar.css'
 
 interface SearchBarProps {
@@ -19,7 +20,7 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
       const data = await api.searchPeople(query)
       setResults(data)
     } catch (error) {
-      console.error('Search failed:', error)
+      logger.error('Search failed:', error)
     } finally {
       setLoading(false)
     }

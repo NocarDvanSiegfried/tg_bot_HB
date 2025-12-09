@@ -13,9 +13,10 @@ $IMAGES_CONFIG = @{
     "python:3.11-slim" = @("python:3.11-slim", "python:3.11", "python:slim")
 }
 
-$MAX_RETRIES = 3
-$RETRY_DELAY = 5
-$DOCKER_HUB_TIMEOUT = 10
+$MAX_RETRIES = 5
+$INITIAL_RETRY_DELAY = 3
+$MAX_RETRY_DELAY = 30
+$DOCKER_HUB_TIMEOUT = 15
 
 Write-Host "=== Загрузка всех необходимых Docker образов ===" -ForegroundColor Cyan
 Write-Host ""
@@ -35,7 +36,7 @@ function Test-DockerHub {
     }
 }
 
-# Функция для попытки загрузки образа
+# Функция для попытки загрузки образа с экспоненциальной задержкой
 function Download-Image {
     param(
         [string]$Image
@@ -47,11 +48,21 @@ function Download-Image {
     while ($attempt -le $MAX_RETRIES) {
         Write-Host "    Попытка $attempt из $MAX_RETRIES..." -ForegroundColor DarkGray
         
+        # Увеличиваем таймаут для Docker pull при повторных попытках
+        $pullTimeout = $DOCKER_HUB_TIMEOUT * $attempt
+        
         try {
-            $output = docker pull $Image 2>&1
-            if ($LASTEXITCODE -eq 0) {
+            $job = Start-Job -ScriptBlock { param($img) docker pull $img 2>&1 } -ArgumentList $Image
+            $result = Wait-Job -Job $job -Timeout $pullTimeout
+            $output = Receive-Job -Job $job
+            Remove-Job -Job $job
+            
+            if ($result -and $LASTEXITCODE -eq 0) {
                 Write-Host "    ✓ Образ $Image успешно загружен" -ForegroundColor Green
                 return $true
+            }
+            elseif (-not $result) {
+                Write-Host "    ✗ Таймаут при загрузке (превышен лимит $pullTimeout секунд)" -ForegroundColor Red
             }
             else {
                 Write-Host "    ✗ Ошибка: $output" -ForegroundColor Red
@@ -62,8 +73,10 @@ function Download-Image {
         }
         
         if ($attempt -lt $MAX_RETRIES) {
-            Write-Host "    Повтор через $RETRY_DELAY секунд..." -ForegroundColor Yellow
-            Start-Sleep -Seconds $RETRY_DELAY
+            # Экспоненциальная задержка: 3, 6, 12, 24, 30 секунд
+            $delay = [Math]::Min($INITIAL_RETRY_DELAY * [Math]::Pow(2, $attempt - 1), $MAX_RETRY_DELAY)
+            Write-Host "    Повтор через $delay секунд..." -ForegroundColor Yellow
+            Start-Sleep -Seconds $delay
         }
         
         $attempt++

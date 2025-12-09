@@ -17,3 +17,4 @@ class CardGeneratorPort(ABC):
         """Сгенерировать открытку."""
         pass
 
+

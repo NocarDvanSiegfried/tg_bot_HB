@@ -22,6 +22,13 @@ class OpenRouterTimeoutError(OpenRouterAPIError):
         super().__init__(f"OpenRouter API timeout: {message}")
 
 
+class OpenRouterRateLimitError(OpenRouterAPIError):
+    """Превышен лимит запросов к OpenRouter API."""
+
+    def __init__(self, message: str = "Rate limit exceeded"):
+        super().__init__(f"OpenRouter API rate limit: {message}")
+
+
 class OpenRouterInvalidResponseError(OpenRouterAPIError):
     """Невалидный ответ от OpenRouter API."""
 

@@ -6,11 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.ports.holiday_repository import HolidayRepository
 from src.domain.entities.professional_holiday import ProfessionalHoliday
 from src.infrastructure.database.models import ProfessionalHolidayModel
+from src.infrastructure.database.repositories.base_repository import BaseRepositoryImpl
 
 
-class HolidayRepositoryImpl(HolidayRepository):
+class HolidayRepositoryImpl(BaseRepositoryImpl[ProfessionalHoliday, ProfessionalHolidayModel], HolidayRepository):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, ProfessionalHolidayModel)
 
     def _to_entity(self, model: ProfessionalHolidayModel) -> ProfessionalHoliday:
         """Преобразовать модель в entity."""
@@ -21,23 +22,15 @@ class HolidayRepositoryImpl(HolidayRepository):
             date=model.holiday_date,
         )
 
-    async def create(self, holiday: ProfessionalHoliday) -> ProfessionalHoliday:
-        model = ProfessionalHolidayModel(
-            name=holiday.name,
-            description=holiday.description,
-            holiday_date=holiday.date,
+    def _to_model(self, entity: ProfessionalHoliday) -> ProfessionalHolidayModel:
+        """Преобразовать entity в модель."""
+        return ProfessionalHolidayModel(
+            id=entity.id if entity.id else None,
+            name=entity.name,
+            description=entity.description,
+            holiday_date=entity.date,
         )
-        self.session.add(model)
-        await self.session.flush()
-        await self.session.refresh(model)
-        return self._to_entity(model)
 
-    async def get_by_id(self, holiday_id: int) -> ProfessionalHoliday | None:
-        result = await self.session.execute(
-            select(ProfessionalHolidayModel).where(ProfessionalHolidayModel.id == holiday_id)
-        )
-        model = result.scalar_one_or_none()
-        return self._to_entity(model) if model else None
 
     async def get_by_date(self, check_date: date) -> list[ProfessionalHoliday]:
         result = await self.session.execute(
@@ -67,16 +60,3 @@ class HolidayRepositoryImpl(HolidayRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def delete(self, holiday_id: int) -> None:
-        result = await self.session.execute(
-            select(ProfessionalHolidayModel).where(ProfessionalHolidayModel.id == holiday_id)
-        )
-        model = result.scalar_one_or_none()
-        if model:
-            await self.session.delete(model)
-            await self.session.flush()
-
-    async def get_all(self) -> list[ProfessionalHoliday]:
-        result = await self.session.execute(select(ProfessionalHolidayModel))
-        models = result.scalars().all()
-        return [self._to_entity(model) for model in models]

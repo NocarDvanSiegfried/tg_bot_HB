@@ -13,6 +13,10 @@ class TestTelegramBot:
         """Очистить singleton перед каждым тестом."""
         database_factory._database = None
 
+    def teardown_method(self):
+        """Очистить singleton после каждого теста."""
+        database_factory._database = None
+
     @pytest.mark.asyncio
     async def test_main_with_valid_env(self):
         """Тест инициализации бота с валидными env переменными."""

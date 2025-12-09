@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
 import { api, CalendarData } from '../../services/api'
 import DateView from './DateView'
+import { logger } from '../../utils/logger'
 import './Calendar.css'
 
 export default function Calendar() {
@@ -9,6 +10,7 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(currentDate)
@@ -17,11 +19,18 @@ export default function Calendar() {
   const handleDateClick = async (date: Date) => {
     setSelectedDate(date)
     setLoading(true)
+    setError(null)
+    setCalendarData(null)
+    
     try {
       const data = await api.getCalendar(format(date, 'yyyy-MM-dd'))
       setCalendarData(data)
+      setError(null)
     } catch (error) {
-      console.error('Failed to load calendar data:', error)
+      logger.error('Failed to load calendar data:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось загрузить данные'
+      setError(errorMessage)
+      setCalendarData(null)
     } finally {
       setLoading(false)
     }
@@ -66,7 +75,12 @@ export default function Calendar() {
       </div>
 
       {selectedDate && (
-        <DateView date={selectedDate} data={calendarData} loading={loading} />
+        <DateView 
+          date={selectedDate} 
+          data={calendarData} 
+          loading={loading}
+          error={error}
+        />
       )}
     </div>
   )

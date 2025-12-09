@@ -6,6 +6,7 @@ declare global {
         expand: () => void
         initData: string
         initDataUnsafe: any
+        [key: string]: any // Для поддержки других свойств WebApp API
       }
     }
   }

@@ -6,3 +6,4 @@ class DomainException(Exception):
 
     pass
 
+

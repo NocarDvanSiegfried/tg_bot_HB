@@ -20,3 +20,4 @@ class ResponsibleNotFoundError(NotFoundError):
 
     pass
 
+

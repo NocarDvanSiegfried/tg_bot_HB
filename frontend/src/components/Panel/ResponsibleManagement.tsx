@@ -26,7 +26,7 @@ export default function ResponsibleManagement({ onBack }: ResponsibleManagementP
       const data = await api.getResponsible()
       setResponsible(data)
     } catch (error) {
-      console.error('Failed to load responsible:', error)
+      logger.error('Failed to load responsible:', error)
     } finally {
       setLoading(false)
     }
@@ -39,7 +39,7 @@ export default function ResponsibleManagement({ onBack }: ResponsibleManagementP
       setFormData({ full_name: '', company: '', position: '' })
       loadResponsible()
     } catch (error) {
-      console.error('Failed to create responsible:', error)
+      logger.error('Failed to create responsible:', error)
     }
   }
 
@@ -49,7 +49,7 @@ export default function ResponsibleManagement({ onBack }: ResponsibleManagementP
       await api.deleteResponsible(id)
       loadResponsible()
     } catch (error) {
-      console.error('Failed to delete responsible:', error)
+      logger.error('Failed to delete responsible:', error)
     }
   }
 

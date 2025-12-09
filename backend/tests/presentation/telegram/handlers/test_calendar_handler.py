@@ -54,24 +54,24 @@ class TestCalendarHandler:
         assert call_args[1]["reply_markup"] is not None
 
     @pytest.mark.asyncio
-    async def test_calendar_callback_info(self, mock_callback):
+    async def test_calendar_callback_info(self, mock_callback, mock_session):
         """Тест callback для информации о календаре."""
         mock_callback.data = "cal_info"
         
         # Act
-        await calendar_callback(mock_callback, None)
+        await calendar_callback(mock_callback, mock_session)
 
         # Assert
         mock_callback.answer.assert_called_once_with("Информация о календаре")
         mock_callback.message.edit_text.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_calendar_callback_prev(self, mock_callback):
+    async def test_calendar_callback_prev(self, mock_callback, mock_session):
         """Тест callback для предыдущего месяца."""
         mock_callback.data = "cal_prev_2024_1"
         
         # Act
-        await calendar_callback(mock_callback, None)
+        await calendar_callback(mock_callback, mock_session)
 
         # Assert
         mock_callback.message.edit_text.assert_called_once()
@@ -80,12 +80,12 @@ class TestCalendarHandler:
         mock_callback.answer.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_calendar_callback_next(self, mock_callback):
+    async def test_calendar_callback_next(self, mock_callback, mock_session):
         """Тест callback для следующего месяца."""
         mock_callback.data = "cal_next_2024_12"
         
         # Act
-        await calendar_callback(mock_callback, None)
+        await calendar_callback(mock_callback, mock_session)
 
         # Assert
         mock_callback.message.edit_text.assert_called_once()

@@ -1,9 +1,14 @@
 # Production dependencies only
 # Generated from requirements.txt - excludes test and dev tools
+#
+# ВАЖНО: При добавлении новых зависимостей в requirements.txt,
+# убедитесь, что production зависимости также добавлены сюда!
+# Проверьте, что все импорты из src/ работают с этим списком.
 
 # Web framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
+slowapi==0.1.9  # Rate limiting для защиты от DDoS
 
 # Telegram bot
 aiogram==3.23.0

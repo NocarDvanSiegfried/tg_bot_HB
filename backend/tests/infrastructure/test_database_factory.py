@@ -12,6 +12,10 @@ class TestDatabaseFactory:
         """Очистить singleton перед каждым тестом."""
         database_factory._database = None
 
+    def teardown_method(self):
+        """Очистить singleton после каждого теста."""
+        database_factory._database = None
+
     def test_singleton_pattern(self):
         """Тест singleton паттерна."""
         with patch.dict(os.environ, {"DATABASE_URL": "sqlite+aiosqlite:///:memory:"}):

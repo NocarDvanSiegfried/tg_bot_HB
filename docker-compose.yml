@@ -6,13 +6,20 @@ services:
   postgres:
     # Если возникают проблемы с загрузкой образа (TLS handshake timeout), попробуйте:
     # 
-    # Вариант 1: Использовать скрипт для загрузки образа
-    #   Linux/macOS: ./scripts/download-postgres-image.sh
-    #   Windows: .\scripts\download-postgres-image.ps1
+    # Вариант 1: Использовать скрипт для предварительной загрузки всех образов с retry
+    #   Linux/macOS: ./scripts/download-all-images.sh
+    #   Windows: .\scripts\download-all-images.ps1
+    #   Скрипт автоматически:
+    #   - Проверяет доступность Docker Hub
+    #   - Пытается загрузить образы с экспоненциальной задержкой (до 5 попыток)
+    #   - Использует альтернативные теги, если основной недоступен
+    #   - Проверяет локальные образы перед загрузкой
     #
-    # Вариант 2: Загрузить образ вручную с несколькими попытками
+    # Вариант 2: Загрузить образы вручную с несколькими попытками
     #   docker pull postgres:15
-    #   или: docker pull postgres:15-alpine (меньший размер)
+    #   docker pull node:20-alpine
+    #   docker pull python:3.11-slim
+    #   или альтернативные теги: postgres:15-alpine, node:20, python:3.11
     #
     # Вариант 3: Использовать альтернативный registry (раскомментируйте нужную строку)
     #   image: registry-1.docker.io/library/postgres:15
@@ -22,11 +29,18 @@ services:
     #   Закомментируйте этот сервис и используйте локальный PostgreSQL (см. README.md)
     #
     # Вариант 5: Настроить прокси для Docker (см. docker-daemon.json.example)
+    #   ./scripts/setup-docker-proxy.sh (Linux/macOS)
+    #   .\scripts\setup-docker-proxy.ps1 (Windows)
+    #
+    # Вариант 6: Использовать локальные образы (если они уже есть)
+    #   docker compose build --pull=never
     image: postgres:15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-birthday_calendar_db}
+      # ВАЖНО: Не используйте значения по умолчанию в production!
+      # Установите POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB в .env файле
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -41,17 +55,23 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      cache_from:
-        - tg_bot_hb-backend:latest
+      # cache_from закомментирован, так как может вызывать ошибки при отсутствии образов
+      # Раскомментируйте после первой успешной сборки для ускорения последующих сборок:
+      # cache_from:
+      #   - tg_bot_hb-backend:latest
       args:
         <<: *build-args
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-birthday_calendar}
+      # ВАЖНО: Не используйте значения по умолчанию в production!
+      # Установите POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB в .env файле
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       WEB_PORT: ${WEB_PORT:-8000}
     ports:
-      - "8000:8000"
+      # Доступен только на localhost для Nginx reverse proxy
+      # Внешний доступ через Nginx на порту 8001 (HTTPS)
+      - "127.0.0.1:8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -63,14 +83,23 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      cache_from:
-        - tg_bot_hb-frontend:latest
+      # cache_from закомментирован, так как может вызывать ошибки при отсутствии образов
+      # Раскомментируйте после первой успешной сборки для ускорения последующих сборок:
+      # cache_from:
+      #   - tg_bot_hb-frontend:latest
       args:
         <<: *build-args
     ports:
-      - "3000:3000"
+      # Доступен только на localhost для Nginx reverse proxy
+      # Внешний доступ через Nginx на порту 3001 (HTTPS)
+      - "127.0.0.1:3000:3000"
     environment:
+      # Для Mini App нужен внешний URL (не localhost или backend)
+      # В development можно использовать ngrok или другой tunnel
+      # В production используйте реальный домен
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      # Для внутренней связи между контейнерами (если нужно)
+      INTERNAL_API_URL: http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules

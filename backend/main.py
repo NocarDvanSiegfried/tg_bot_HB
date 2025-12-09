@@ -20,6 +20,7 @@ from src.presentation.telegram.handlers import (
     responsible_handlers,
     greeting_handlers,
 )
+from src.presentation.telegram.middleware.database_middleware import DatabaseMiddleware
 from src.presentation.web.app import app as web_app
 from src.infrastructure.services.notifications_scheduler import setup_notifications
 
@@ -79,6 +80,11 @@ async def start_bot():
 
     # Настройка уведомлений
     await setup_notifications(bot, db)
+
+    # Регистрация middleware для инжекции сессий БД
+    logger.info("Регистрация middleware для сессий БД...")
+    dp.message.middleware(DatabaseMiddleware())
+    dp.callback_query.middleware(DatabaseMiddleware())
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)

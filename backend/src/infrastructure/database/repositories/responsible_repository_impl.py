@@ -5,15 +5,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.responsible_repository import ResponsibleRepository
 from src.domain.entities.responsible_person import ResponsiblePerson
+from src.domain.exceptions.validation import ValidationError
 from src.infrastructure.database.models import (
     DateResponsibleAssignmentModel,
     ResponsiblePersonModel,
 )
+from src.infrastructure.database.repositories.base_repository import BaseRepositoryImpl
+from src.infrastructure.database.repositories.search_validator import (
+    validate_and_sanitize_search_query,
+)
 
 
-class ResponsibleRepositoryImpl(ResponsibleRepository):
+class ResponsibleRepositoryImpl(BaseRepositoryImpl[ResponsiblePerson, ResponsiblePersonModel], ResponsibleRepository):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, ResponsiblePersonModel)
 
     def _to_entity(self, model: ResponsiblePersonModel) -> ResponsiblePerson:
         """Преобразовать модель в entity."""
@@ -24,23 +29,14 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
             position=model.position,
         )
 
-    async def create(self, responsible: ResponsiblePerson) -> ResponsiblePerson:
-        model = ResponsiblePersonModel(
-            full_name=responsible.full_name,
-            company=responsible.company,
-            position=responsible.position,
+    def _to_model(self, entity: ResponsiblePerson) -> ResponsiblePersonModel:
+        """Преобразовать entity в модель."""
+        return ResponsiblePersonModel(
+            id=entity.id if entity.id else None,
+            full_name=entity.full_name,
+            company=entity.company,
+            position=entity.position,
         )
-        self.session.add(model)
-        await self.session.flush()
-        await self.session.refresh(model)
-        return self._to_entity(model)
-
-    async def get_by_id(self, responsible_id: int) -> ResponsiblePerson | None:
-        result = await self.session.execute(
-            select(ResponsiblePersonModel).where(ResponsiblePersonModel.id == responsible_id)
-        )
-        model = result.scalar_one_or_none()
-        return self._to_entity(model) if model else None
 
     async def get_by_date(self, check_date: date) -> ResponsiblePerson | None:
         result = await self.session.execute(
@@ -79,15 +75,6 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def delete(self, responsible_id: int) -> None:
-        result = await self.session.execute(
-            select(ResponsiblePersonModel).where(ResponsiblePersonModel.id == responsible_id)
-        )
-        model = result.scalar_one_or_none()
-        if model:
-            await self.session.delete(model)
-            await self.session.flush()
-
     async def assign_to_date(self, responsible_id: int, assignment_date: date) -> None:
         # Удаляем существующее назначение на эту дату
         result = await self.session.execute(
@@ -108,7 +95,29 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         await self.session.flush()
 
     async def search(self, query: str) -> list[ResponsiblePerson]:
-        search_pattern = f"%{query}%"
+        """
+        Поиск по ФИО, компании, должности.
+        
+        Args:
+            query: Поисковый запрос (валидируется и санитизируется)
+            
+        Returns:
+            Список найденных ответственных лиц
+            
+        Raises:
+            ValidationError: Если запрос невалиден или пуст
+        """
+        # Валидация и санитизация запроса
+        sanitized_query, is_valid = validate_and_sanitize_search_query(query)
+        if not is_valid:
+            raise ValidationError(
+                f"Invalid search query. Query must be between {1} and {200} characters "
+                "and contain only letters, numbers, spaces, and basic punctuation."
+            )
+        
+        # Используем параметризованный запрос для безопасности
+        # SQLAlchemy автоматически экранирует параметры
+        search_pattern = f"%{sanitized_query}%"
         result = await self.session.execute(
             select(ResponsiblePersonModel).where(
                 or_(
@@ -121,7 +130,3 @@ class ResponsibleRepositoryImpl(ResponsibleRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_all(self) -> list[ResponsiblePerson]:
-        result = await self.session.execute(select(ResponsiblePersonModel))
-        models = result.scalars().all()
-        return [self._to_entity(model) for model in models]

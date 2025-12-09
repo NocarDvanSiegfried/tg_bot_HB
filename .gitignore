@@ -50,4 +50,5 @@ logs/
 
 # Docker
 .dockerignore
+env.example
 

@@ -1,47 +1,91 @@
 import logging
 from datetime import date
 
-from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query, Request
+from pydantic import BaseModel, Field, field_validator
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
 from src.domain.exceptions.not_found import BirthdayNotFoundError, ResponsibleNotFoundError
 from src.domain.exceptions.validation import ValidationError
-from src.infrastructure.database.database_factory import get_database
+from src.infrastructure.config.rate_limits import (
+    ACCESS_CHECK_LIMIT,
+    HEAVY_OPERATION_LIMIT,
+    PUBLIC_ENDPOINT_LIMIT,
+    READ_LIMIT,
+    WRITE_LIMIT,
+)
+from src.presentation.web.decorators import handle_api_errors
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Инициализация rate limiter для роутера
+limiter = Limiter(key_func=get_remote_address)
+
 
 # DTOs
 class BirthdayCreate(BaseModel):
-    full_name: str
-    company: str
-    position: str
-    birth_date: date
-    comment: str | None = None
+    full_name: str = Field(..., min_length=1, max_length=200, description="Полное имя")
+    company: str = Field(..., min_length=1, max_length=200, description="Компания")
+    position: str = Field(..., min_length=1, max_length=200, description="Должность")
+    birth_date: date = Field(..., description="Дата рождения")
+    comment: str | None = Field(None, max_length=1000, description="Комментарий")
+
+    @field_validator("full_name", "company", "position")
+    @classmethod
+    def validate_not_empty(cls, v: str) -> str:
+        """Проверка, что строка не пустая после удаления пробелов."""
+        if not v or not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
 
 
 class BirthdayUpdate(BaseModel):
-    full_name: str | None = None
-    company: str | None = None
-    position: str | None = None
-    birth_date: date | None = None
-    comment: str | None = None
+    full_name: str | None = Field(None, min_length=1, max_length=200, description="Полное имя")
+    company: str | None = Field(None, min_length=1, max_length=200, description="Компания")
+    position: str | None = Field(None, min_length=1, max_length=200, description="Должность")
+    birth_date: date | None = Field(None, description="Дата рождения")
+    comment: str | None = Field(None, max_length=1000, description="Комментарий")
+
+    @field_validator("full_name", "company", "position")
+    @classmethod
+    def validate_not_empty_if_provided(cls, v: str | None) -> str | None:
+        """Проверка, что строка не пустая, если предоставлена."""
+        if v is not None and (not v or not v.strip()):
+            raise ValueError("Field cannot be empty if provided")
+        return v.strip() if v else None
 
 
 class ResponsibleCreate(BaseModel):
-    full_name: str
-    company: str
-    position: str
+    full_name: str = Field(..., min_length=1, max_length=200, description="Полное имя")
+    company: str = Field(..., min_length=1, max_length=200, description="Компания")
+    position: str = Field(..., min_length=1, max_length=200, description="Должность")
+
+    @field_validator("full_name", "company", "position")
+    @classmethod
+    def validate_not_empty(cls, v: str) -> str:
+        """Проверка, что строка не пустая после удаления пробелов."""
+        if not v or not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
 
 
 class ResponsibleUpdate(BaseModel):
-    full_name: str | None = None
-    company: str | None = None
-    position: str | None = None
+    full_name: str | None = Field(None, min_length=1, max_length=200, description="Полное имя")
+    company: str | None = Field(None, min_length=1, max_length=200, description="Компания")
+    position: str | None = Field(None, min_length=1, max_length=200, description="Должность")
+
+    @field_validator("full_name", "company", "position")
+    @classmethod
+    def validate_not_empty_if_provided(cls, v: str | None) -> str | None:
+        """Проверка, что строка не пустая, если предоставлена."""
+        if v is not None and (not v or not v.strip()):
+            raise ValueError("Field cannot be empty if provided")
+        return v.strip() if v else None
 
 
 class AssignResponsibleRequest(BaseModel):
@@ -57,26 +101,29 @@ class GenerateGreetingRequest(BaseModel):
 
 
 class CreateCardRequest(BaseModel):
-    birthday_id: int
-    greeting_text: str
-    qr_url: str | None = None
+    birthday_id: int = Field(..., gt=0, description="ID дня рождения")
+    greeting_text: str = Field(..., min_length=1, max_length=2000, description="Текст поздравления")
+    qr_url: str | None = Field(None, max_length=500, description="URL для QR-кода")
+
+    @field_validator("greeting_text")
+    @classmethod
+    def validate_greeting_text(cls, v: str) -> str:
+        """Проверка, что текст поздравления не пустой."""
+        if not v or not v.strip():
+            raise ValueError("Greeting text cannot be empty")
+        return v.strip()
 
 
 class VerifyInitDataRequest(BaseModel):
-    init_data: str
+    init_data: str = Field(..., min_length=1, max_length=5000, description="Telegram WebApp initData")
 
 
-# Dependency для получения сессии БД
-async def get_db_session() -> AsyncSession:
-    db = get_database()
-    async for session in db.get_session():
-        yield session
-
-
-# Dependency для получения фабрики use-cases
-async def get_use_case_factory(session: AsyncSession = Depends(get_db_session)) -> UseCaseFactory:
-    """Dependency для получения фабрики use-cases."""
-    return UseCaseFactory(session)
+# Импортируем dependencies из отдельного модуля
+from src.presentation.web.dependencies import (
+    get_db_session,
+    get_readonly_use_case_factory,
+    get_use_case_factory,
+)
 
 
 # Dependency для проверки авторизации через Telegram
@@ -96,12 +143,46 @@ async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-I
         raise HTTPException(status_code=401, detail="Invalid initData") from e
 
 
+# Dependency для проверки прав доступа к панели управления
+async def require_panel_access(
+    user: dict = Depends(verify_telegram_auth),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+) -> dict:
+    """
+    Dependency для проверки прав доступа к панели управления.
+    
+    Проверяет:
+    1. Авторизацию через Telegram (verify_telegram_auth)
+    2. Наличие прав доступа к панели (check_panel_access)
+    
+    Raises:
+        HTTPException 401: Если пользователь не авторизован или нет user_id
+        HTTPException 403: Если у пользователя нет доступа к панели
+    """
+    user_id = user.get("id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="User ID not found in initData")
+
+    # Проверяем доступ к панели
+    use_case = factory.create_panel_access_use_case()
+    has_access = await use_case.execute(user_id)
+    
+    if not has_access:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. You don't have permission to access the panel."
+        )
+    
+    return user
+
+
 # Auth endpoints
 @router.post("/api/auth/verify")
 async def verify_init_data(data: VerifyInitDataRequest):
     """Верифицировать initData от Telegram WebApp."""
     # Создаем use-case через фабрику (не требует session)
-    factory = UseCaseFactory(session=None)  # Auth use-case не требует БД сессии
+    # Auth use-case не требует БД сессии, поэтому передаем None
+    factory = UseCaseFactory(session=None)
     use_case = factory.create_auth_use_case()
 
     try:
@@ -116,7 +197,12 @@ async def verify_init_data(data: VerifyInitDataRequest):
 
 # Public endpoints
 @router.get("/api/calendar/{date_str}")
-async def get_calendar(date_str: str, factory: UseCaseFactory = Depends(get_use_case_factory)):
+@limiter.limit(PUBLIC_ENDPOINT_LIMIT)
+async def get_calendar(
+    request: Request,
+    date_str: str = Path(..., pattern="^\\d{4}-\\d{2}-\\d{2}$", description="Дата в формате YYYY-MM-DD"),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
     """Получить данные календаря на дату."""
     try:
         check_date = date.fromisoformat(date_str)
@@ -129,9 +215,11 @@ async def get_calendar(date_str: str, factory: UseCaseFactory = Depends(get_use_
 
 # Panel endpoints
 @router.get("/api/panel/check-access")
+@limiter.limit(ACCESS_CHECK_LIMIT)
 async def check_panel_access(
+    request: Request,
     user: dict = Depends(verify_telegram_auth),
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Проверить доступ пользователя к панели управления."""
     user_id = user.get("id")
@@ -145,7 +233,12 @@ async def check_panel_access(
 
 
 @router.get("/api/panel/birthdays")
-async def list_birthdays(factory: UseCaseFactory = Depends(get_use_case_factory)):
+@limiter.limit(READ_LIMIT)
+async def list_birthdays(
+    request: Request,
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
     """Список всех ДР."""
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["get_all"]
@@ -164,103 +257,97 @@ async def list_birthdays(factory: UseCaseFactory = Depends(get_use_case_factory)
 
 
 @router.post("/api/panel/birthdays")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def create_birthday(
+    request: Request,
     data: BirthdayCreate,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Создать ДР."""
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["create"]
 
-    try:
-        birthday = await use_case.execute(
-            full_name=data.full_name,
-            company=data.company,
-            position=data.position,
-            birth_date=data.birth_date,
-            comment=data.comment,
-        )
-        await session.commit()
-        return {
-            "id": birthday.id,
-            "full_name": birthday.full_name,
-            "company": birthday.company,
-            "position": birthday.position,
-            "birth_date": birthday.birth_date.isoformat(),
-            "comment": birthday.comment,
-        }
-    except ValidationError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except ValueError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        await session.rollback()
-        logger.error("Unexpected error in create_birthday", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    birthday = await use_case.execute(
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+        birth_date=data.birth_date,
+        comment=data.comment,
+    )
+    await session.commit()
+    return {
+        "id": birthday.id,
+        "full_name": birthday.full_name,
+        "company": birthday.company,
+        "position": birthday.position,
+        "birth_date": birthday.birth_date.isoformat(),
+        "comment": birthday.comment,
+    }
 
 
 @router.put("/api/panel/birthdays/{birthday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def update_birthday(
-    birthday_id: int,
-    data: BirthdayUpdate,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    request: Request,
+    birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
+    data: BirthdayUpdate = Body(..., description="Данные для обновления дня рождения"),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ДР."""
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["update"]
 
-    try:
-        birthday = await use_case.execute(
-            birthday_id=birthday_id,
-            full_name=data.full_name,
-            company=data.company,
-            position=data.position,
-            birth_date=data.birth_date,
-            comment=data.comment,
-        )
-        await session.commit()
-        return {
-            "id": birthday.id,
-            "full_name": birthday.full_name,
-            "company": birthday.company,
-            "position": birthday.position,
-            "birth_date": birthday.birth_date.isoformat(),
-            "comment": birthday.comment,
-        }
-    except Exception as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    birthday = await use_case.execute(
+        birthday_id=birthday_id,
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+        birth_date=data.birth_date,
+        comment=data.comment,
+    )
+    await session.commit()
+    return {
+        "id": birthday.id,
+        "full_name": birthday.full_name,
+        "company": birthday.company,
+        "position": birthday.position,
+        "birth_date": birthday.birth_date.isoformat(),
+        "comment": birthday.comment,
+    }
 
 
 @router.delete("/api/panel/birthdays/{birthday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def delete_birthday(
-    birthday_id: int,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    request: Request,
+    birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ДР."""
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["delete"]
 
-    try:
-        await use_case.execute(birthday_id)
-        await session.commit()
-        return {"status": "deleted"}
-    except BirthdayNotFoundError as e:
-        await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except Exception as e:
-        await session.rollback()
-        logger.error("Unexpected error in delete_birthday", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    await use_case.execute(birthday_id)
+    await session.commit()
+    return {"status": "deleted"}
 
 
 @router.get("/api/panel/responsible")
-async def list_responsible(factory: UseCaseFactory = Depends(get_use_case_factory)):
+@limiter.limit(READ_LIMIT)
+async def list_responsible(
+    request: Request,
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
     """Список всех ответственных."""
     responsible_use_cases = factory.create_responsible_use_cases()
     use_case = responsible_use_cases["get_all"]
@@ -277,129 +364,108 @@ async def list_responsible(factory: UseCaseFactory = Depends(get_use_case_factor
 
 
 @router.post("/api/panel/responsible")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def create_responsible(
+    request: Request,
     data: ResponsibleCreate,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Создать ответственного."""
     responsible_use_cases = factory.create_responsible_use_cases()
     use_case = responsible_use_cases["create"]
 
-    try:
-        responsible = await use_case.execute(
-            full_name=data.full_name,
-            company=data.company,
-            position=data.position,
-        )
-        await session.commit()
-        return {
-            "id": responsible.id,
-            "full_name": responsible.full_name,
-            "company": responsible.company,
-            "position": responsible.position,
-        }
-    except Exception as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    responsible = await use_case.execute(
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+    )
+    await session.commit()
+    return {
+        "id": responsible.id,
+        "full_name": responsible.full_name,
+        "company": responsible.company,
+        "position": responsible.position,
+    }
 
 
 @router.put("/api/panel/responsible/{responsible_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def update_responsible(
-    responsible_id: int,
-    data: ResponsibleUpdate,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    request: Request,
+    responsible_id: int = Path(..., gt=0, description="ID ответственного лица"),
+    data: ResponsibleUpdate = Body(..., description="Данные для обновления ответственного лица"),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ответственного."""
     responsible_use_cases = factory.create_responsible_use_cases()
     use_case = responsible_use_cases["update"]
 
-    try:
-        responsible = await use_case.execute(
-            responsible_id=responsible_id,
-            full_name=data.full_name,
-            company=data.company,
-            position=data.position,
-        )
-        await session.commit()
-        return {
-            "id": responsible.id,
-            "full_name": responsible.full_name,
-            "company": responsible.company,
-            "position": responsible.position,
-        }
-    except ResponsibleNotFoundError as e:
-        await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except ValidationError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except ValueError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        await session.rollback()
-        logger.error("Unexpected error in update_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    responsible = await use_case.execute(
+        responsible_id=responsible_id,
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+    )
+    await session.commit()
+    return {
+        "id": responsible.id,
+        "full_name": responsible.full_name,
+        "company": responsible.company,
+        "position": responsible.position,
+    }
 
 
 @router.delete("/api/panel/responsible/{responsible_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def delete_responsible(
-    responsible_id: int,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    request: Request,
+    responsible_id: int = Path(..., gt=0, description="ID ответственного лица"),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ответственного."""
     responsible_use_cases = factory.create_responsible_use_cases()
     use_case = responsible_use_cases["delete"]
 
-    try:
-        await use_case.execute(responsible_id)
-        await session.commit()
-        return {"status": "deleted"}
-    except ResponsibleNotFoundError as e:
-        await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except Exception as e:
-        await session.rollback()
-        logger.error("Unexpected error in delete_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    await use_case.execute(responsible_id)
+    await session.commit()
+    return {"status": "deleted"}
 
 
 @router.post("/api/panel/assign-responsible")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
 async def assign_responsible(
+    request: Request,
     data: AssignResponsibleRequest,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
     session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Назначить ответственного на дату."""
     responsible_use_cases = factory.create_responsible_use_cases()
     use_case = responsible_use_cases["assign_to_date"]
 
-    try:
-        await use_case.execute(data.responsible_id, data.date)
-        await session.commit()
-        return {"status": "assigned"}
-    except (BirthdayNotFoundError, ResponsibleNotFoundError) as e:
-        await session.rollback()
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except ValidationError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except ValueError as e:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        await session.rollback()
-        logger.error("Unexpected error in assign_responsible", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    await use_case.execute(data.responsible_id, data.date)
+    await session.commit()
+    return {"status": "assigned"}
 
 
 @router.get("/api/panel/search")
+@limiter.limit(READ_LIMIT)
 async def search_people(
-    q: str,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    request: Request,
+    q: str = Query(..., min_length=1, max_length=200, description="Поисковый запрос"),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Поиск людей."""
     use_case = factory.create_search_use_case()
@@ -419,57 +485,45 @@ async def search_people(
 
 
 @router.post("/api/panel/generate-greeting")
+@limiter.limit(HEAVY_OPERATION_LIMIT)
+@handle_api_errors
 async def generate_greeting(
+    request: Request,
     data: GenerateGreetingRequest,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Сгенерировать поздравление."""
     greeting_use_cases = factory.create_greeting_use_cases()
     use_case = greeting_use_cases["generate"]
 
-    try:
-        greeting_text = await use_case.execute(
-            birthday_id=data.birthday_id,
-            style=data.style,
-            length=data.length,
-            theme=data.theme,
-        )
-        return {"greeting": greeting_text}
-    except BirthdayNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        logger.error("Unexpected error in generate_greeting", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    greeting_text = await use_case.execute(
+        birthday_id=data.birthday_id,
+        style=data.style,
+        length=data.length,
+        theme=data.theme,
+    )
+    return {"greeting": greeting_text}
 
 
 @router.post("/api/panel/create-card")
+@limiter.limit(HEAVY_OPERATION_LIMIT)
+@handle_api_errors
 async def create_card(
+    request: Request,
     data: CreateCardRequest,
-    factory: UseCaseFactory = Depends(get_use_case_factory),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Создать открытку."""
     greeting_use_cases = factory.create_greeting_use_cases()
     use_case = greeting_use_cases["create_card"]
 
-    try:
-        card_bytes = await use_case.execute(
-            birthday_id=data.birthday_id,
-            greeting_text=data.greeting_text,
-            qr_url=data.qr_url,
-        )
-        from fastapi.responses import Response
+    card_bytes = await use_case.execute(
+        birthday_id=data.birthday_id,
+        greeting_text=data.greeting_text,
+        qr_url=data.qr_url,
+    )
+    from fastapi.responses import Response
 
-        return Response(content=card_bytes, media_type="image/png")
-    except BirthdayNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        logger.error("Unexpected error in create_card", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    return Response(content=card_bytes, media_type="image/png")

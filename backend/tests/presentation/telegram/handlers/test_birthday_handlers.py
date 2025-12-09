@@ -175,7 +175,7 @@ class TestBirthdayHandlers:
             # Assert
             mock_state.get_data.assert_called_once()
             mock_use_cases["create"].execute.assert_called_once()
-            mock_session.commit.assert_called_once()
+            # Управление транзакциями теперь в middleware, не проверяем commit/rollback
             mock_message.answer.assert_called()
             mock_state.clear.assert_called_once()
 
@@ -209,7 +209,7 @@ class TestBirthdayHandlers:
             mock_use_cases["create"].execute.assert_called_once()
             call_args = mock_use_cases["create"].execute.call_args
             assert call_args[1]["comment"] is None
-            mock_session.commit.assert_called_once()
+            # Управление транзакциями теперь в middleware, не проверяем commit/rollback
 
     @pytest.mark.asyncio
     async def test_process_comment_error(self, mock_message, mock_state, mock_session):
@@ -230,8 +230,7 @@ class TestBirthdayHandlers:
             await process_comment(mock_message, mock_state, mock_session)
 
             # Assert
-            # rollback вызывается в except блоке
-            mock_session.rollback.assert_called_once()
+            # Управление транзакциями теперь в middleware, не проверяем rollback
             mock_message.answer.assert_called()
             # Проверяем, что сообщение об ошибке отправлено
             answer_text = mock_message.answer.call_args[0][0]

@@ -5,12 +5,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.birthday_repository import BirthdayRepository
 from src.domain.entities.birthday import Birthday
+from src.domain.exceptions.validation import ValidationError
 from src.infrastructure.database.models import BirthdayModel
+from src.infrastructure.database.repositories.base_repository import BaseRepositoryImpl
+from src.infrastructure.database.repositories.search_validator import (
+    validate_and_sanitize_search_query,
+)
 
 
-class BirthdayRepositoryImpl(BirthdayRepository):
+class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], BirthdayRepository):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, BirthdayModel)
 
     def _to_entity(self, model: BirthdayModel) -> Birthday:
         """Преобразовать модель в entity."""
@@ -26,33 +31,13 @@ class BirthdayRepositoryImpl(BirthdayRepository):
     def _to_model(self, entity: Birthday) -> BirthdayModel:
         """Преобразовать entity в модель."""
         return BirthdayModel(
-            id=entity.id,
+            id=entity.id if entity.id else None,
             full_name=entity.full_name,
             company=entity.company,
             position=entity.position,
             birth_date=entity.birth_date,
             comment=entity.comment,
         )
-
-    async def create(self, birthday: Birthday) -> Birthday:
-        model = BirthdayModel(
-            full_name=birthday.full_name,
-            company=birthday.company,
-            position=birthday.position,
-            birth_date=birthday.birth_date,
-            comment=birthday.comment,
-        )
-        self.session.add(model)
-        await self.session.flush()
-        await self.session.refresh(model)
-        return self._to_entity(model)
-
-    async def get_by_id(self, birthday_id: int) -> Birthday | None:
-        result = await self.session.execute(
-            select(BirthdayModel).where(BirthdayModel.id == birthday_id)
-        )
-        model = result.scalar_one_or_none()
-        return self._to_entity(model) if model else None
 
     async def get_by_date(self, check_date: date) -> list[Birthday]:
         result = await self.session.execute(
@@ -92,17 +77,30 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def delete(self, birthday_id: int) -> None:
-        result = await self.session.execute(
-            select(BirthdayModel).where(BirthdayModel.id == birthday_id)
-        )
-        model = result.scalar_one_or_none()
-        if model:
-            await self.session.delete(model)
-            await self.session.flush()
-
     async def search(self, query: str) -> list[Birthday]:
-        search_pattern = f"%{query}%"
+        """
+        Поиск по ФИО, компании, должности.
+        
+        Args:
+            query: Поисковый запрос (валидируется и санитизируется)
+            
+        Returns:
+            Список найденных дней рождения
+            
+        Raises:
+            ValidationError: Если запрос невалиден или пуст
+        """
+        # Валидация и санитизация запроса
+        sanitized_query, is_valid = validate_and_sanitize_search_query(query)
+        if not is_valid:
+            raise ValidationError(
+                f"Invalid search query. Query must be between {1} and {200} characters "
+                "and contain only letters, numbers, spaces, and basic punctuation."
+            )
+        
+        # Используем параметризованный запрос для безопасности
+        # SQLAlchemy автоматически экранирует параметры
+        search_pattern = f"%{sanitized_query}%"
         result = await self.session.execute(
             select(BirthdayModel).where(
                 or_(
@@ -115,7 +113,3 @@ class BirthdayRepositoryImpl(BirthdayRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_all(self) -> list[Birthday]:
-        result = await self.session.execute(select(BirthdayModel))
-        models = result.scalars().all()
-        return [self._to_entity(model) for model in models]

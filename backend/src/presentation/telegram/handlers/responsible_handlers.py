@@ -65,10 +65,10 @@ async def process_position(message: Message, state: FSMContext, session: AsyncSe
             company=data["company"],
             position=message.text,
         )
-        await session.commit()
+        # Управление транзакциями теперь в middleware
         await message.answer(f"Ответственный добавлен! ID: {responsible.id}")
     except Exception as e:
-        await session.rollback()
+        # Управление транзакциями теперь в middleware
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()

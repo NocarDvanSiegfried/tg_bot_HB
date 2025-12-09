@@ -1,0 +1,73 @@
+# Пример конфигурации Nginx для Telegram Mini App
+# 
+# ИНСТРУКЦИИ ПО НАСТРОЙКЕ:
+#
+# 1. Скопируйте этот файл в /etc/nginx/nginx.conf (или используйте include)
+# 2. Скопируйте backend.conf и frontend.conf в /etc/nginx/conf.d/
+# 3. ЗАМЕНИТЕ пути к SSL сертификатам в backend.conf и frontend.conf:
+#    - ssl_certificate /etc/nginx/ssl/cert.pem;
+#    - ssl_certificate_key /etc/nginx/ssl/key.pem;
+# 4. ЗАМЕНИТЕ server_name _; на ваш домен в обоих конфигах
+# 5. Проверьте конфигурацию: nginx -t
+# 6. Перезагрузите Nginx: systemctl reload nginx (или service nginx reload)
+#
+# СТРУКТУРА:
+# - nginx.conf - основная конфигурация
+# - conf.d/backend.conf - конфигурация для backend (порт 8001)
+# - conf.d/frontend.conf - конфигурация для frontend (порт 3001)
+#
+# ПОРТЫ:
+# - Backend: domain.com:8001 → localhost:8000 (Docker контейнер)
+# - Frontend: domain.com:3001 → localhost:3000 (Docker контейнер)
+#
+# SSL СЕРТИФИКАТЫ:
+# Убедитесь, что ваши SSL сертификаты доступны для Nginx.
+# Обычные пути:
+# - /etc/nginx/ssl/cert.pem (или /etc/letsencrypt/live/domain.com/fullchain.pem)
+# - /etc/nginx/ssl/key.pem (или /etc/letsencrypt/live/domain.com/privkey.pem)
+#
+# ПРОВЕРКА:
+# После настройки проверьте доступность:
+# - curl https://domain.com:8001/ (backend)
+# - curl https://domain.com:3001/ (frontend)
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    client_max_body_size 20M;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml text/javascript 
+               application/json application/javascript application/xml+rss 
+               application/rss+xml font/truetype font/opentype 
+               application/vnd.ms-fontobject image/svg+xml;
+
+    # Include server configurations
+    include /etc/nginx/conf.d/*.conf;
+}
+

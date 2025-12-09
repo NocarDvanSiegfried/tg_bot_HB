@@ -24,7 +24,7 @@ class TestPanelHandler:
         """Мок сессии БД."""
         session = AsyncMock()
         session.add = MagicMock()
-        session.commit = AsyncMock()
+        session.flush = AsyncMock()  # Изменено: flush вместо commit
         return session
 
     @pytest.fixture
@@ -40,12 +40,22 @@ class TestPanelHandler:
     @pytest.mark.asyncio
     async def test_cmd_panel(self, mock_message, mock_session):
         """Тест команды /panel."""
-        # Act
-        await cmd_panel(mock_message, mock_session)
+        # Arrange - настраиваем моки для use case factory
+        from unittest.mock import patch
+        from src.application.use_cases.panel.record_panel_access import RecordPanelAccessUseCase
+        
+        mock_record_use_case = AsyncMock(spec=RecordPanelAccessUseCase)
+        mock_record_use_case.execute = AsyncMock()
+        
+        with patch('src.presentation.telegram.handlers.panel_handler.UseCaseFactory') as mock_factory:
+            mock_factory_instance = mock_factory.return_value
+            mock_factory_instance.create_record_panel_access_use_case.return_value = mock_record_use_case
+            
+            # Act
+            await cmd_panel(mock_message, mock_session)
 
         # Assert
-        mock_session.add.assert_called_once()
-        mock_session.commit.assert_called_once()
+        mock_record_use_case.execute.assert_called_once_with(mock_message.from_user.id)
         mock_message.answer.assert_called_once()
         call_args = mock_message.answer.call_args
         assert "Панель управления" in call_args[0][0]

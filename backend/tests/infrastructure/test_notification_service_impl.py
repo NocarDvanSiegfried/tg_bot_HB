@@ -1,11 +1,6 @@
-import sys
 import pytest
 from datetime import date
-from unittest.mock import AsyncMock, Mock, patch, MagicMock
-
-# Мокируем aiogram перед импортом
-sys.modules['aiogram'] = MagicMock()
-sys.modules['aiogram'].Bot = MagicMock
+from unittest.mock import AsyncMock, Mock, patch
 
 from src.infrastructure.services.notification_service_impl import NotificationServiceImpl
 from src.domain.entities.birthday import Birthday

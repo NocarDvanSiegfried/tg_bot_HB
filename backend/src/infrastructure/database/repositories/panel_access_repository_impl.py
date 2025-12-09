@@ -19,4 +19,6 @@ class PanelAccessRepositoryImpl(PanelAccessRepository):
         """Записать факт доступа пользователя к панели."""
         access = PanelAccessModel(user_id=user_id)
         self.session.add(access)
-        await self.session.commit()
+        # Используем flush вместо commit для единообразия с другими repositories
+        # Commit будет сделан в middleware или use-case, если нужно
+        await self.session.flush()

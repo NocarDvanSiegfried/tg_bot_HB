@@ -14,9 +14,10 @@ declare -A IMAGES_CONFIG=(
     ["python:3.11-slim"]="python:3.11-slim python:3.11 python:slim"
 )
 
-MAX_RETRIES=3
-RETRY_DELAY=5
-DOCKER_HUB_TIMEOUT=10
+MAX_RETRIES=5
+INITIAL_RETRY_DELAY=3
+MAX_RETRY_DELAY=30
+DOCKER_HUB_TIMEOUT=15
 
 echo "=== Загрузка всех необходимых Docker образов ==="
 echo ""
@@ -34,7 +35,7 @@ test_docker_hub() {
     fi
 }
 
-# Функция для попытки загрузки образа
+# Функция для попытки загрузки образа с экспоненциальной задержкой
 download_image() {
     local image=$1
     echo "  Загрузка: $image"
@@ -43,16 +44,29 @@ download_image() {
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "    Попытка $attempt из $MAX_RETRIES..."
         
-        if docker pull "$image" 2>/dev/null; then
+        # Увеличиваем таймаут для Docker pull при повторных попытках
+        local pull_timeout=$((DOCKER_HUB_TIMEOUT * attempt))
+        
+        if timeout $pull_timeout docker pull "$image" 2>/dev/null; then
             echo "    ✓ Образ $image успешно загружен"
             return 0
         else
-            echo "    ✗ Попытка не удалась"
+            local exit_code=$?
+            if [ $exit_code -eq 124 ]; then
+                echo "    ✗ Таймаут при загрузке (превышен лимит $pull_timeout секунд)"
+            else
+                echo "    ✗ Попытка не удалась (код ошибки: $exit_code)"
+            fi
         fi
         
         if [ $attempt -lt $MAX_RETRIES ]; then
-            echo "    Повтор через $RETRY_DELAY секунд..."
-            sleep $RETRY_DELAY
+            # Экспоненциальная задержка: 3, 6, 12, 24, 30 секунд
+            local delay=$((INITIAL_RETRY_DELAY * (2 ** (attempt - 1))))
+            if [ $delay -gt $MAX_RETRY_DELAY ]; then
+                delay=$MAX_RETRY_DELAY
+            fi
+            echo "    Повтор через $delay секунд..."
+            sleep $delay
         fi
         
         attempt=$((attempt + 1))

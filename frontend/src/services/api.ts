@@ -1,6 +1,6 @@
 import { Birthday } from '../types/birthday'
 import { Responsible } from '../types/responsible'
-import { API_BASE_URL } from '../config/api'
+import { API_BASE_URL, API_TIMEOUT_MS } from '../config/api'
 
 // Получить initData из Telegram WebApp
 function getInitData(): string | null {
@@ -23,6 +23,51 @@ function getHeaders(additionalHeaders: Record<string, string> = {}): Record<stri
   }
   
   return headers
+}
+
+// Улучшенная обработка ошибок fetch
+async function fetchWithErrorHandling(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+    
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+    
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      // Пытаемся получить детали ошибки из ответа
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      try {
+        const errorData = await response.json()
+        if (errorData.detail) {
+          errorMessage = errorData.detail
+        }
+      } catch {
+        // Игнорируем ошибку парсинга JSON
+      }
+      throw new Error(errorMessage)
+    }
+    
+    return response
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout: сервер не отвечает')
+      }
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error('Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API.')
+      }
+      throw error
+    }
+    throw new Error('Unknown error occurred')
+  }
 }
 
 export interface CalendarData {
@@ -50,127 +95,113 @@ export interface CalendarData {
 
 export const api = {
   async getCalendar(date: string): Promise<CalendarData> {
-    const response = await fetch(`${API_BASE_URL}/api/calendar/${date}`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/${date}`, {
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to fetch calendar')
     return response.json()
   },
 
   async getBirthdays(): Promise<Birthday[]> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/birthdays`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays`, {
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to fetch birthdays')
     return response.json()
   },
 
   async createBirthday(data: Omit<Birthday, 'id'>): Promise<Birthday> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/birthdays`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    if (!response.ok) throw new Error('Failed to create birthday')
     return response.json()
   },
 
   async updateBirthday(id: number, data: Partial<Birthday>): Promise<Birthday> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    if (!response.ok) throw new Error('Failed to update birthday')
     return response.json()
   },
 
   async deleteBirthday(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to delete birthday')
   },
 
   async getResponsible(): Promise<Responsible[]> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/responsible`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible`, {
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to fetch responsible')
     return response.json()
   },
 
   async createResponsible(data: Omit<Responsible, 'id'>): Promise<Responsible> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/responsible`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    if (!response.ok) throw new Error('Failed to create responsible')
     return response.json()
   },
 
   async updateResponsible(id: number, data: Partial<Responsible>): Promise<Responsible> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/responsible/${id}`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    if (!response.ok) throw new Error('Failed to update responsible')
     return response.json()
   },
 
   async deleteResponsible(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/responsible/${id}`, {
+    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to delete responsible')
   },
 
   async assignResponsible(responsibleId: number, date: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/assign-responsible`, {
+    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/assign-responsible`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ responsible_id: responsibleId, date }),
     })
-    if (!response.ok) throw new Error('Failed to assign responsible')
   },
 
   async searchPeople(query: string): Promise<Array<{ type: string; id: number; full_name: string; company: string; position: string }>> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/search?q=${encodeURIComponent(query)}`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/search?q=${encodeURIComponent(query)}`, {
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to search')
     return response.json()
   },
 
   async generateGreeting(birthdayId: number, style: string, length: string, theme?: string): Promise<{ greeting: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/generate-greeting`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/generate-greeting`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ birthday_id: birthdayId, style, length, theme }),
     })
-    if (!response.ok) throw new Error('Failed to generate greeting')
     return response.json()
   },
 
   async createCard(birthdayId: number, greetingText: string, qrUrl?: string): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/create-card`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/create-card`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ birthday_id: birthdayId, greeting_text: greetingText, qr_url: qrUrl }),
     })
-    if (!response.ok) throw new Error('Failed to create card')
     return response.blob()
   },
 
   async checkPanelAccess(): Promise<{ has_access: boolean }> {
-    const response = await fetch(`${API_BASE_URL}/api/panel/check-access`, {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/check-access`, {
       headers: getHeaders(),
     })
-    if (!response.ok) throw new Error('Failed to check panel access')
     return response.json()
   },
 }

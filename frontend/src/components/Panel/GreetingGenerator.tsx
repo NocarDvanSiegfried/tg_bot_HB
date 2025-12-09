@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api } from '../../services/api'
+import { logger } from '../../utils/logger'
 import './Panel.css'
 
 interface GreetingGeneratorProps {
@@ -28,7 +29,7 @@ export default function GreetingGenerator({ onBack }: GreetingGeneratorProps) {
       setGeneratedGreeting(result.greeting)
       setGreetingText(result.greeting)
     } catch (error) {
-      console.error('Failed to generate greeting:', error)
+      logger.error('Failed to generate greeting:', error)
     }
   }
 
@@ -42,7 +43,7 @@ export default function GreetingGenerator({ onBack }: GreetingGeneratorProps) {
       const url = URL.createObjectURL(blob)
       setCardUrl(url)
     } catch (error) {
-      console.error('Failed to create card:', error)
+      logger.error('Failed to create card:', error)
     }
   }
 

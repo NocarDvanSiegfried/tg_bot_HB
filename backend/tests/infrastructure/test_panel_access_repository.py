@@ -14,6 +14,7 @@ class TestPanelAccessRepositoryImpl:
         """Мок сессии БД."""
         session = AsyncMock(spec=AsyncSession)
         session.execute = AsyncMock()
+        session.flush = AsyncMock()  # Добавлено для flush
         return session
 
     @pytest.fixture
@@ -59,7 +60,7 @@ class TestPanelAccessRepositoryImpl:
         # Arrange
         user_id = 123
         mock_session.add = MagicMock()
-        mock_session.commit = AsyncMock()
+        mock_session.flush = AsyncMock()
 
         # Act
         await repository.record_access(user_id)
@@ -69,5 +70,5 @@ class TestPanelAccessRepositoryImpl:
         added_model = mock_session.add.call_args[0][0]
         assert isinstance(added_model, PanelAccessModel)
         assert added_model.user_id == user_id
-        mock_session.commit.assert_called_once()
+        mock_session.flush.assert_called_once()
 

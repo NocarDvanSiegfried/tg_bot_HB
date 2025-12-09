@@ -6,15 +6,36 @@ interface DateViewProps {
   date: Date
   data: CalendarData | null
   loading: boolean
+  error?: string | null
 }
 
-export default function DateView({ date, data, loading }: DateViewProps) {
+export default function DateView({ date, data, loading, error }: DateViewProps) {
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
 
+  if (error) {
+    return (
+      <div className="date-view">
+        <h3>{format(date, 'dd.MM.yyyy')}</h3>
+        <div className="error-message">
+          <p>⚠️ Ошибка загрузки данных</p>
+          <p>{error}</p>
+          <p className="error-hint">
+            Проверьте подключение к интернету и настройки API.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (!data) {
-    return <div className="date-view">Нет данных</div>
+    return (
+      <div className="date-view">
+        <h3>{format(date, 'dd.MM.yyyy')}</h3>
+        <p>Нет данных для этой даты</p>
+      </div>
+    )
   }
 
   return (

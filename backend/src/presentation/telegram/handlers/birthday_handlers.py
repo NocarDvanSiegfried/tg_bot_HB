@@ -94,10 +94,10 @@ async def process_comment(message: Message, state: FSMContext, session: AsyncSes
             birth_date=data["birth_date"],
             comment=comment,
         )
-        await session.commit()
+        # Управление транзакциями теперь в middleware
         await message.answer(f"День рождения добавлен! ID: {birthday.id}")
     except Exception as e:
-        await session.rollback()
+        # Управление транзакциями теперь в middleware
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()
