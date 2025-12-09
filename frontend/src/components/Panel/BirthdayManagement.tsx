@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
+import { logger } from '../../utils/logger'
 import './Panel.css'
 
 interface BirthdayManagementProps {

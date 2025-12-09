@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../services/api'
 import { Responsible } from '../../types/responsible'
+import { logger } from '../../utils/logger'
 import './Panel.css'
 
 interface ResponsibleManagementProps {
