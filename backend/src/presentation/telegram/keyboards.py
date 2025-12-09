@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 def is_webapp_url_configured(webapp_url: str) -> bool:
     """
     Проверяет, настроен ли URL для Mini App.
-    
+
     Args:
         webapp_url: URL из переменной окружения TELEGRAM_WEBAPP_URL
-        
+
     Returns:
         True, если URL настроен и не является placeholder значением
     """
@@ -31,7 +31,7 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
     """Главное меню - кнопка Календарь и Mini App."""
     webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
     buttons = [[KeyboardButton(text="📅 Календарь")]]
-    
+
     # Добавляем кнопку Mini App, если URL настроен
     if is_webapp_url_configured(webapp_url):
         buttons.append([KeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))])
@@ -42,7 +42,7 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
             "Кнопка Mini App не будет отображаться. "
             "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
         )
-    
+
     keyboard = ReplyKeyboardMarkup(
         keyboard=buttons,
         resize_keyboard=True,
@@ -67,7 +67,7 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
         ],
         [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
     ]
-    
+
     # Добавляем кнопку Mini App, если URL настроен
     if is_webapp_url_configured(webapp_url):
         inline_keyboard.append([
@@ -76,7 +76,7 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
                 web_app=WebAppInfo(url=webapp_url)
             )
         ])
-    
+
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard
 

@@ -10,7 +10,7 @@ from src.infrastructure.database.database_factory import get_database
 async def get_db_session() -> AsyncSession:
     """
     Dependency для получения сессии БД.
-    
+
     Сессия автоматически закрывается после завершения запроса.
     """
     db = get_database()
@@ -21,10 +21,10 @@ async def get_db_session() -> AsyncSession:
 async def get_use_case_factory(session: AsyncSession = Depends(get_db_session)) -> UseCaseFactory:
     """
     Dependency для получения фабрики use-cases.
-    
+
     Args:
         session: Сессия БД, получаемая через dependency injection.
-    
+
     Returns:
         UseCaseFactory с настроенными зависимостями
     """
@@ -34,7 +34,7 @@ async def get_use_case_factory(session: AsyncSession = Depends(get_db_session)) 
 async def get_readonly_use_case_factory() -> UseCaseFactory:
     """
     Dependency для получения фабрики use-cases для read-only операций.
-    
+
     Используется для endpoints, которые только читают данные и не требуют транзакций.
     Создает новую сессию БД для каждого запроса.
     """

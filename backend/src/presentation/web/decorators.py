@@ -1,8 +1,9 @@
 """Декораторы для обработки ошибок в API endpoints."""
 
 import logging
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Any
+from typing import Any
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,16 +26,16 @@ logger = logging.getLogger(__name__)
 def handle_api_errors(func: Callable) -> Callable:
     """
     Декоратор для централизованной обработки ошибок в API endpoints.
-    
+
     Автоматически обрабатывает:
     - NotFound ошибки (404)
     - Validation ошибки (400)
     - Business rule ошибки (400)
     - API ошибки (502, 503, 504)
     - Неожиданные ошибки (500)
-    
+
     Автоматически выполняет rollback сессии при ошибках.
-    
+
     Примечание: session должен быть передан через Depends(get_db_session) в FastAPI.
     """
     @wraps(func)
@@ -42,11 +43,11 @@ def handle_api_errors(func: Callable) -> Callable:
         # Извлекаем session из kwargs (FastAPI передает через Depends)
         # FastAPI передает зависимости через kwargs с именами параметров функции
         session: AsyncSession | None = None
-        
+
         # Ищем session в kwargs по имени параметра
         if "session" in kwargs:
             session = kwargs.get("session")
-        
+
         # Если не нашли в kwargs, проверяем позиционные аргументы
         # (на случай, если session передана напрямую)
         if session is None:
@@ -54,7 +55,7 @@ def handle_api_errors(func: Callable) -> Callable:
                 if isinstance(arg, AsyncSession):
                     session = arg
                     break
-        
+
         try:
             return await func(*args, **kwargs)
         except (BirthdayNotFoundError, ResponsibleNotFoundError) as e:
@@ -103,6 +104,6 @@ def handle_api_errors(func: Callable) -> Callable:
                 status_code=500,
                 detail="Internal server error"
             ) from e
-    
+
     return wrapper
 

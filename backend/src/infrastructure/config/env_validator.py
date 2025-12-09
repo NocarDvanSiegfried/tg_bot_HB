@@ -1,12 +1,9 @@
 """Валидация переменных окружения."""
 
-import os
-import re
 from urllib.parse import urlparse
-from typing import Optional, Tuple
 
 
-def validate_database_url(database_url: str) -> Tuple[bool, Optional[str], Optional[str]]:
+def validate_database_url(database_url: str) -> tuple[bool, str | None, str | None]:
     """
     Валидирует формат DATABASE_URL и извлекает информацию о базе данных.
 
@@ -56,7 +53,7 @@ def validate_database_url(database_url: str) -> Tuple[bool, Optional[str], Optio
     return True, database_name, None
 
 
-def get_database_name_from_url(database_url: str) -> Optional[str]:
+def get_database_name_from_url(database_url: str) -> str | None:
     """
     Извлекает имя базы данных из DATABASE_URL.
 
@@ -101,7 +98,7 @@ def mask_database_url(database_url: str) -> str:
         return database_url
 
 
-def validate_telegram_token(token: str) -> Tuple[bool, Optional[str]]:
+def validate_telegram_token(token: str) -> tuple[bool, str | None]:
     """
     Валидирует формат Telegram Bot Token.
 

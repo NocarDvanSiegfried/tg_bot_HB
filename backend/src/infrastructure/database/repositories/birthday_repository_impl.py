@@ -80,13 +80,13 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
     async def search(self, query: str) -> list[Birthday]:
         """
         Поиск по ФИО, компании, должности.
-        
+
         Args:
             query: Поисковый запрос (валидируется и санитизируется)
-            
+
         Returns:
             Список найденных дней рождения
-            
+
         Raises:
             ValidationError: Если запрос невалиден или пуст
         """
@@ -97,7 +97,7 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
                 f"Invalid search query. Query must be between {1} and {200} characters "
                 "and contain only letters, numbers, spaces, and basic punctuation."
             )
-        
+
         # Используем параметризованный запрос для безопасности
         # SQLAlchemy автоматически экранирует параметры
         search_pattern = f"%{sanitized_query}%"

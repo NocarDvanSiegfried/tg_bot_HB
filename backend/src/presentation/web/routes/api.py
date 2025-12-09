@@ -8,8 +8,6 @@ from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
-from src.domain.exceptions.not_found import BirthdayNotFoundError, ResponsibleNotFoundError
-from src.domain.exceptions.validation import ValidationError
 from src.infrastructure.config.rate_limits import (
     ACCESS_CHECK_LIMIT,
     HEAVY_OPERATION_LIMIT,
@@ -18,6 +16,11 @@ from src.infrastructure.config.rate_limits import (
     WRITE_LIMIT,
 )
 from src.presentation.web.decorators import handle_api_errors
+from src.presentation.web.dependencies import (
+    get_db_session,
+    get_readonly_use_case_factory,
+    get_use_case_factory,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -118,14 +121,6 @@ class VerifyInitDataRequest(BaseModel):
     init_data: str = Field(..., min_length=1, max_length=5000, description="Telegram WebApp initData")
 
 
-# Импортируем dependencies из отдельного модуля
-from src.presentation.web.dependencies import (
-    get_db_session,
-    get_readonly_use_case_factory,
-    get_use_case_factory,
-)
-
-
 # Dependency для проверки авторизации через Telegram
 async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-Init-Data")) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
@@ -150,11 +145,11 @@ async def require_panel_access(
 ) -> dict:
     """
     Dependency для проверки прав доступа к панели управления.
-    
+
     Проверяет:
     1. Авторизацию через Telegram (verify_telegram_auth)
     2. Наличие прав доступа к панели (check_panel_access)
-    
+
     Raises:
         HTTPException 401: Если пользователь не авторизован или нет user_id
         HTTPException 403: Если у пользователя нет доступа к панели
@@ -166,13 +161,13 @@ async def require_panel_access(
     # Проверяем доступ к панели
     use_case = factory.create_panel_access_use_case()
     has_access = await use_case.execute(user_id)
-    
+
     if not has_access:
         raise HTTPException(
             status_code=403,
             detail="Access denied. You don't have permission to access the panel."
         )
-    
+
     return user
 
 

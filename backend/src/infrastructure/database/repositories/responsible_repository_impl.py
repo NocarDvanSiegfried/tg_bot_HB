@@ -97,13 +97,13 @@ class ResponsibleRepositoryImpl(BaseRepositoryImpl[ResponsiblePerson, Responsibl
     async def search(self, query: str) -> list[ResponsiblePerson]:
         """
         Поиск по ФИО, компании, должности.
-        
+
         Args:
             query: Поисковый запрос (валидируется и санитизируется)
-            
+
         Returns:
             Список найденных ответственных лиц
-            
+
         Raises:
             ValidationError: Если запрос невалиден или пуст
         """
@@ -114,7 +114,7 @@ class ResponsibleRepositoryImpl(BaseRepositoryImpl[ResponsiblePerson, Responsibl
                 f"Invalid search query. Query must be between {1} and {200} characters "
                 "and contain only letters, numbers, spaces, and basic punctuation."
             )
-        
+
         # Используем параметризованный запрос для безопасности
         # SQLAlchemy автоматически экранирует параметры
         search_pattern = f"%{sanitized_query}%"
