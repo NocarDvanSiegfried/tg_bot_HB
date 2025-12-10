@@ -176,19 +176,77 @@ async def require_panel_access(
 @router.post("/api/auth/verify")
 async def verify_init_data(data: VerifyInitDataRequest):
     """Верифицировать initData от Telegram WebApp."""
+    # Логирование входящего запроса (без чувствительных данных)
+    init_data_length = len(data.init_data)
+    init_data_preview = (
+        data.init_data[:50] + "..." if len(data.init_data) > 50 else data.init_data
+    )
+    logger.info(
+        f"POST /api/auth/verify: Received init_data request (length={init_data_length}, "
+        f"preview={init_data_preview})"
+    )
+
     # Создаем use-case через фабрику (не требует session)
     # Auth use-case не требует БД сессии, поэтому передаем None
-    factory = UseCaseFactory(session=None)
-    use_case = factory.create_auth_use_case()
+    try:
+        factory = UseCaseFactory(session=None)
+        logger.debug("Created UseCaseFactory for auth verification")
+    except Exception as e:
+        logger.error(f"Failed to create UseCaseFactory: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail="Internal server error: failed to initialize auth service"
+        ) from e
 
     try:
+        use_case = factory.create_auth_use_case()
+        logger.debug("Created VerifyTelegramAuthUseCase")
+    except ValueError as e:
+        logger.error(f"Failed to create auth use case: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail="Internal server error: failed to create auth use case"
+        ) from e
+
+    # Валидация формата init_data перед обработкой
+    if not data.init_data or not data.init_data.strip():
+        logger.warning("Empty or whitespace-only init_data received")
+        raise HTTPException(status_code=400, detail="Invalid initData format: empty or whitespace")
+
+    if "=" not in data.init_data:
+        logger.warning(f"Invalid init_data format: missing '=' separator (preview: {init_data_preview})")
+        raise HTTPException(
+            status_code=400, detail="Invalid initData format: expected query string format"
+        )
+
+    try:
+        logger.debug("Starting init_data verification")
         user_data = await use_case.execute(data.init_data)
+        logger.info(f"Successfully verified init_data, user_id: {user_data.get('id', 'unknown')}")
         return {
             "valid": True,
             "user": user_data,
         }
     except ValueError as e:
-        raise HTTPException(status_code=401, detail="Invalid initData") from e
+        error_msg = str(e)
+        logger.warning(
+            f"InitData verification failed: {error_msg} (init_data_length={init_data_length}, "
+            f"preview={init_data_preview})"
+        )
+        # Определяем тип ошибки для более детального сообщения
+        if "Invalid initData" in error_msg or "signature" in error_msg.lower():
+            detail = "Invalid initData signature: verification failed"
+        elif "format" in error_msg.lower() or "parse" in error_msg.lower():
+            detail = "Invalid initData format: unable to parse"
+        else:
+            detail = f"Invalid initData: {error_msg}"
+        raise HTTPException(status_code=401, detail=detail) from e
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during init_data verification: {type(e).__name__}: {e}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500, detail="Internal server error during verification"
+        ) from e
 
 
 # Public endpoints

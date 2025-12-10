@@ -1,9 +1,12 @@
 import hashlib
 import hmac
 import json
+import logging
 import urllib.parse
 
 from src.application.ports.telegram_auth_service import TelegramAuthService
+
+logger = logging.getLogger(__name__)
 
 
 class TelegramAuthServiceImpl(TelegramAuthService):
@@ -18,6 +21,7 @@ class TelegramAuthServiceImpl(TelegramAuthService):
             # Извлекаем hash
             received_hash = parsed_data.get("hash", [None])[0]
             if not received_hash:
+                logger.debug("verify_init_data: hash field missing in init_data")
                 return False
 
             # Удаляем hash из данных и формируем строку для проверки
@@ -37,8 +41,21 @@ class TelegramAuthServiceImpl(TelegramAuthService):
             ).hexdigest()
 
             # Сравниваем
-            return calculated_hash == received_hash
-        except Exception:
+            is_valid = calculated_hash == received_hash
+            if not is_valid:
+                logger.debug(
+                    f"verify_init_data: signature mismatch (calculated_hash={calculated_hash[:16]}..., "
+                    f"received_hash={received_hash[:16]}...)"
+                )
+            return is_valid
+        except (ValueError, KeyError, IndexError, TypeError) as e:
+            logger.warning(f"verify_init_data: parsing error - {type(e).__name__}: {e}")
+            return False
+        except UnicodeEncodeError as e:
+            logger.warning(f"verify_init_data: encoding error - {e}")
+            return False
+        except Exception as e:
+            logger.error(f"verify_init_data: unexpected error - {type(e).__name__}: {e}", exc_info=True)
             return False
 
     def parse_init_data(self, init_data: str) -> dict | None:
@@ -48,10 +65,21 @@ class TelegramAuthServiceImpl(TelegramAuthService):
             user_data = {}
 
             if "user" in parsed:
-                user_data = json.loads(parsed["user"][0])
+                try:
+                    user_data = json.loads(parsed["user"][0])
+                    logger.debug(f"parse_init_data: successfully parsed user data (user_id={user_data.get('id', 'unknown')})")
+                except json.JSONDecodeError as e:
+                    logger.warning(f"parse_init_data: JSON decode error in user field - {e}")
+                    return None
+            else:
+                logger.debug("parse_init_data: 'user' field missing in parsed data")
 
-            return user_data
-        except Exception:
+            return user_data if user_data else None
+        except (ValueError, KeyError, IndexError, TypeError) as e:
+            logger.warning(f"parse_init_data: parsing error - {type(e).__name__}: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"parse_init_data: unexpected error - {type(e).__name__}: {e}", exc_info=True)
             return None
 
 
