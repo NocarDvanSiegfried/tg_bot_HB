@@ -24,6 +24,10 @@ from src.presentation.telegram.middleware.database_middleware import DatabaseMid
 from src.presentation.web.app import app as web_app
 from src.infrastructure.services.notifications_scheduler import setup_notifications
 
+# Экспорт app для совместимости с прямым запуском uvicorn
+# Позволяет запускать как через `python main.py`, так и через `uvicorn backend.main:app`
+app = web_app
+
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
