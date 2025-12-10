@@ -8,6 +8,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from src.infrastructure.config.env_validator import (
     get_database_name_from_url,
     mask_database_url,
+    validate_database_env_sync,
     validate_database_url,
     validate_telegram_token,
 )
@@ -131,7 +132,35 @@ async def start_web():
 
 async def main():
     """Главная функция запуска."""
-    # Валидация DATABASE_URL при старте приложения
+    # Шаг 1: Проверка синхронизации переменных окружения
+    logger.info("Проверка синхронизации переменных окружения PostgreSQL...")
+    is_sync, messages = validate_database_env_sync()
+    if not is_sync:
+        errors = [msg for msg in messages if "не установлен" in msg.lower() or "несовпадение" in msg.lower()]
+        warnings = [msg for msg in messages if msg not in errors]
+        
+        if errors:
+            logger.error("Критические ошибки синхронизации переменных окружения:")
+            for error in errors:
+                logger.error(f"  - {error}")
+            raise ValueError(
+                "Ошибки синхронизации переменных окружения PostgreSQL. "
+                "Проверьте, что POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB установлены "
+                "и совпадают с значениями в DATABASE_URL. См. env.example для примеров."
+            )
+        
+        if warnings:
+            logger.warning("Предупреждения при проверке переменных окружения:")
+            for warning in warnings:
+                logger.warning(f"  - {warning}")
+    else:
+        logger.info("✅ Все переменные окружения синхронизированы")
+        if messages:
+            logger.warning("Предупреждения:")
+            for msg in messages:
+                logger.warning(f"  - {msg}")
+
+    # Шаг 2: Валидация DATABASE_URL при старте приложения
     database_url = os.getenv("DATABASE_URL")
     if database_url:
         is_valid, db_name, error_message = validate_database_url(database_url)
