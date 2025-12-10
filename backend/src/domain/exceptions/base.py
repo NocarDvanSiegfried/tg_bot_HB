@@ -5,3 +5,7 @@ class DomainException(Exception):
     """Базовое исключение для всех доменных ошибок."""
 
     pass
+
+
+
+
