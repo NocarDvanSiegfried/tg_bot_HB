@@ -61,10 +61,21 @@ services:
       #   - tg_bot_hb-backend:latest
       args:
         <<: *build-args
+    # Явное указание .env файла для надежной загрузки переменных окружения
+    # Docker Compose автоматически загружает .env, но явное указание гарантирует корректную работу
+    env_file:
+      - .env
     environment:
       # ВАЖНО: Не используйте значения по умолчанию в production!
       # Установите POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB в .env файле
+      # 
+      # Базовые переменные PostgreSQL (пробрасываются напрямую для validate_database_env_sync)
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Составной URL подключения (формируется из базовых переменных выше)
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Другие переменные окружения
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       WEB_PORT: ${WEB_PORT:-8000}
