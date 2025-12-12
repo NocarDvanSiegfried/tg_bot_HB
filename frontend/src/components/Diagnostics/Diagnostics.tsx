@@ -8,29 +8,50 @@ const STORAGE_KEY_HIDDEN = 'diagnostics_hidden'
 
 // Функция для нормализации сообщений об ошибках API
 function normalizeApiError(error: unknown): string {
-  if (!(error instanceof Error)) {
-    return 'Неизвестная ошибка'
+  // Обрабатываем разные типы ошибок
+  if (error instanceof TypeError) {
+    const message = error.message.toLowerCase()
+    if (message.includes('failed to fetch') || message.includes('networkerror')) {
+      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+    }
   }
 
-  const message = error.message.toLowerCase()
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase()
+    const name = error.name.toLowerCase()
 
-  if (message.includes('failed to fetch') || message.includes('networkerror')) {
-    return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+    // Проверяем имя ошибки
+    if (name === 'aborterror' || message.includes('timeout') || message.includes('aborted')) {
+      return 'Превышено время ожидания ответа от API.'
+    }
+
+    // Проверяем сообщение об ошибке
+    if (message.includes('failed to fetch') || message.includes('networkerror')) {
+      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+    }
+
+    if (message.includes('cors') || message.includes('cross-origin')) {
+      return 'Ошибка CORS. Проверьте настройки сервера.'
+    }
+
+    if (message.includes('network request failed')) {
+      return 'Ошибка сети. Проверьте подключение к интернету.'
+    }
+
+    // Возвращаем оригинальное сообщение, если не удалось нормализовать
+    return error.message || 'Неизвестная ошибка'
   }
 
-  if (error.name === 'AbortError' || message.includes('timeout')) {
-    return 'Превышено время ожидания ответа от API.'
+  // Если это строка
+  if (typeof error === 'string') {
+    const message = error.toLowerCase()
+    if (message.includes('failed to fetch') || message.includes('networkerror')) {
+      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+    }
+    return error
   }
 
-  if (message.includes('cors') || message.includes('cross-origin')) {
-    return 'Ошибка CORS. Проверьте настройки сервера.'
-  }
-
-  if (message.includes('network request failed')) {
-    return 'Ошибка сети. Проверьте подключение к интернету.'
-  }
-
-  return error.message || 'Неизвестная ошибка'
+  return 'Неизвестная ошибка'
 }
 
 export default function Diagnostics() {
@@ -43,9 +64,17 @@ export default function Diagnostics() {
     if (urlParams.get('diagnostics') === 'false') {
       return true
     }
-    // Проверяем localStorage
-    const saved = localStorage.getItem(STORAGE_KEY_COLLAPSED)
-    return saved ? saved === 'true' : true // По умолчанию свернута
+    // Проверяем localStorage, но по умолчанию всегда свернута
+    // Это позволяет сбросить состояние при обновлении кода
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_COLLAPSED)
+      // Если значение явно установлено, используем его
+      // Иначе по умолчанию свернута
+      return saved !== null ? saved === 'true' : true
+    } catch {
+      // Если localStorage недоступен, по умолчанию свернута
+      return true
+    }
   })
   const [isHidden, setIsHidden] = useState(() => {
     // Проверяем параметр URL
@@ -82,7 +111,9 @@ export default function Diagnostics() {
         }
       } catch (error) {
         setApiStatus('offline')
-        setApiError(normalizeApiError(error))
+        // Нормализуем ошибку для более понятного сообщения
+        const normalizedError = normalizeApiError(error)
+        setApiError(normalizedError)
       }
     }
 
