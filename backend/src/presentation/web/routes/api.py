@@ -8,6 +8,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
+from src.domain.exceptions.not_found import BirthdayNotFoundError
 from src.infrastructure.config.rate_limits import (
     ACCESS_CHECK_LIMIT,
     HEAVY_OPERATION_LIMIT,
@@ -267,6 +268,53 @@ async def get_calendar(
 
     use_case = factory.create_calendar_use_case()
     return await use_case.execute(check_date)
+
+
+@router.get("/api/calendar/month/{year}/{month}")
+@limiter.limit(PUBLIC_ENDPOINT_LIMIT)
+@handle_api_errors
+async def get_calendar_month(
+    request: Request,
+    year: int = Path(..., ge=1900, le=2100, description="Год"),
+    month: int = Path(..., ge=1, le=12, description="Месяц (1-12)"),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
+    """Получить дни рождения за указанный месяц."""
+    try:
+        from calendar import monthrange
+        start_date = date(year, month, 1)
+        last_day = monthrange(year, month)[1]
+        end_date = date(year, month, last_day)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date: {e}") from e
+
+    logger.info(f"[API] Loading birthdays for month {year}-{month:02d}, range: {start_date} to {end_date}")
+
+    birthday_repo = factory.birthday_repository
+    birthdays = await birthday_repo.get_by_date_range(start_date, end_date)
+
+    logger.info(f"[API] Found {len(birthdays)} birthdays in range {start_date} to {end_date}")
+
+    # Группируем дни рождения по датам для удобства использования на фронтенде
+    birthdays_by_date: dict[str, list[dict]] = {}
+    for b in birthdays:
+        date_key = b.birth_date.isoformat()
+        if date_key not in birthdays_by_date:
+            birthdays_by_date[date_key] = []
+        birthdays_by_date[date_key].append({
+            "id": b.id,
+            "full_name": b.full_name,
+            "company": b.company,
+            "position": b.position,
+        })
+
+    logger.info(f"[API] Grouped birthdays into {len(birthdays_by_date)} dates: {list(birthdays_by_date.keys())}")
+
+    return {
+        "year": year,
+        "month": month,
+        "birthdays_by_date": birthdays_by_date,
+    }
 
 
 # Panel endpoints
@@ -550,16 +598,38 @@ async def generate_greeting(
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Сгенерировать поздравление."""
+    logger.info(
+        f"[API] Generate greeting request: birthday_id={data.birthday_id}, "
+        f"style={data.style}, length={data.length}, theme={data.theme}, "
+        f"user_id={user.get('id', 'unknown')}"
+    )
+    
     greeting_use_cases = factory.create_greeting_use_cases()
     use_case = greeting_use_cases["generate"]
 
-    greeting_text = await use_case.execute(
-        birthday_id=data.birthday_id,
-        style=data.style,
-        length=data.length,
-        theme=data.theme,
-    )
-    return {"greeting": greeting_text}
+    try:
+        greeting_text = await use_case.execute(
+            birthday_id=data.birthday_id,
+            style=data.style,
+            length=data.length,
+            theme=data.theme,
+        )
+        logger.info(
+            f"[API] Greeting generated successfully for birthday_id={data.birthday_id}, "
+            f"length={len(greeting_text)} characters"
+        )
+        return {"greeting": greeting_text}
+    except BirthdayNotFoundError as e:
+        logger.warning(
+            f"[API] Birthday not found: birthday_id={data.birthday_id}, error={e}"
+        )
+        raise
+    except Exception as e:
+        logger.error(
+            f"[API] Error generating greeting for birthday_id={data.birthday_id}: {type(e).__name__}: {e}",
+            exc_info=True,
+        )
+        raise
 
 
 @router.post("/api/panel/create-card")
@@ -572,14 +642,125 @@ async def create_card(
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Создать открытку."""
+    logger.info(
+        f"[API] Create card request: birthday_id={data.birthday_id}, "
+        f"greeting_length={len(data.greeting_text)}, has_qr={bool(data.qr_url)}, "
+        f"user_id={user.get('id', 'unknown')}"
+    )
+    
     greeting_use_cases = factory.create_greeting_use_cases()
     use_case = greeting_use_cases["create_card"]
 
-    card_bytes = await use_case.execute(
-        birthday_id=data.birthday_id,
-        greeting_text=data.greeting_text,
-        qr_url=data.qr_url,
-    )
-    from fastapi.responses import Response
+    try:
+        card_bytes = await use_case.execute(
+            birthday_id=data.birthday_id,
+            greeting_text=data.greeting_text,
+            qr_url=data.qr_url,
+        )
+        logger.info(
+            f"[API] Card created successfully for birthday_id={data.birthday_id}, "
+            f"size={len(card_bytes)} bytes"
+        )
+        from fastapi.responses import Response
+        return Response(content=card_bytes, media_type="image/png")
+    except BirthdayNotFoundError as e:
+        logger.warning(
+            f"[API] Birthday not found for card creation: birthday_id={data.birthday_id}, error={e}"
+        )
+        raise
+    except Exception as e:
+        logger.error(
+            f"[API] Error creating card for birthday_id={data.birthday_id}: {type(e).__name__}: {e}",
+            exc_info=True,
+        )
+        raise
 
-    return Response(content=card_bytes, media_type="image/png")
+
+# Diagnostic endpoints
+@router.get("/api/panel/diagnostic/birthday/{birthday_id}")
+@limiter.limit(READ_LIMIT)
+@handle_api_errors
+async def check_birthday_exists(
+    request: Request,
+    birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
+    """Проверить существование дня рождения по ID."""
+    logger.info(f"[API] Checking birthday existence: birthday_id={birthday_id}")
+    
+    birthday_repo = factory.birthday_repository
+    birthday = await birthday_repo.get_by_id(birthday_id)
+    
+    if birthday:
+        logger.info(
+            f"[API] Birthday found: id={birthday.id}, name={birthday.full_name}, "
+            f"company={birthday.company}, position={birthday.position}"
+        )
+        return {
+            "exists": True,
+            "id": birthday.id,
+            "full_name": birthday.full_name,
+            "company": birthday.company,
+            "position": birthday.position,
+            "birth_date": birthday.birth_date.isoformat(),
+        }
+    else:
+        logger.warning(f"[API] Birthday not found: birthday_id={birthday_id}")
+        return {
+            "exists": False,
+            "id": birthday_id,
+            "message": f"Birthday with id {birthday_id} not found",
+        }
+
+
+@router.get("/api/panel/diagnostic/openrouter-config")
+@limiter.limit(READ_LIMIT)
+@handle_api_errors
+async def check_openrouter_config(
+    request: Request,
+    user: dict = Depends(require_panel_access),
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
+    """Проверить конфигурацию OpenRouter (без sensitive данных)."""
+    logger.info("[API] Checking OpenRouter configuration")
+    
+    try:
+        openrouter_client = factory.openrouter_client
+        config = openrouter_client.config
+        
+        # Маскируем API ключ для безопасности
+        api_key_masked = (
+            f"{config.api_key[:8]}...{config.api_key[-4:]}" if len(config.api_key) > 12
+            else "***"
+        )
+        
+        logger.info(
+            f"[API] OpenRouter config check: base_url={config.base_url}, "
+            f"model={config.model}, timeout={config.timeout}s, "
+            f"max_retries={config.max_retries}, api_key_present={'yes' if config.api_key else 'no'}"
+        )
+        
+        return {
+            "configured": True,
+            "base_url": config.base_url,
+            "model": config.model,
+            "timeout": config.timeout,
+            "max_retries": config.max_retries,
+            "temperature": config.temperature,
+            "max_tokens": config.max_tokens,
+            "api_key_masked": api_key_masked,
+            "api_key_length": len(config.api_key) if config.api_key else 0,
+        }
+    except ValueError as e:
+        logger.error(f"[API] OpenRouter configuration error: {e}")
+        return {
+            "configured": False,
+            "error": str(e),
+        }
+    except Exception as e:
+        logger.error(f"[API] Unexpected error checking OpenRouter config: {type(e).__name__}: {e}", exc_info=True)
+        return {
+            "configured": False,
+            "error": f"Unexpected error: {type(e).__name__}",
+        }
