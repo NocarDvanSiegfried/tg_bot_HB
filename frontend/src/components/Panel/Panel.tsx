@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BirthdayManagement from './BirthdayManagement'
 import ResponsibleManagement from './ResponsibleManagement'
 import GreetingGenerator from './GreetingGenerator'
@@ -8,11 +9,11 @@ type PanelView = 'main' | 'birthdays' | 'responsible' | 'greetings'
 
 export default function Panel() {
   const [currentView, setCurrentView] = useState<PanelView>('main')
+  const navigate = useNavigate()
 
   const handleBackToCalendar = () => {
-    // Перезагружаем страницу чтобы вернуться к календарю
-    // Это сбросит состояние и покажет календарь
-    window.location.reload()
+    // Переходим на календарь через роутинг
+    navigate('/')
   }
 
   return (
