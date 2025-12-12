@@ -16,6 +16,15 @@ export const logger = {
   },
 
   /**
+   * Логирует информационное сообщение (только в development режиме).
+   */
+  info: (...args: any[]): void => {
+    if (import.meta.env.DEV) {
+      console.info(...args)
+    }
+  },
+
+  /**
    * Логирует предупреждение (только в development режиме).
    */
   warn: (...args: any[]): void => {
