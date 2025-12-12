@@ -134,6 +134,13 @@ export default function Diagnostics() {
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
   const [apiError, setApiError] = useState<string | null>(null)
   const [apiErrorInfo, setApiErrorInfo] = useState<ApiErrorInfo | null>(null)
+  const [currentOrigin, setCurrentOrigin] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.origin
+    }
+    return 'unknown'
+  })
+  const [corsBlocked, setCorsBlocked] = useState<boolean | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Проверяем параметр URL
     const urlParams = new URLSearchParams(window.location.search)
@@ -163,12 +170,77 @@ export default function Diagnostics() {
     return saved ? saved === 'true' : false
   })
 
+  // Функция для проверки CORS через OPTIONS запрос
+  const checkCors = async (): Promise<boolean> => {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 секунды для CORS проверки
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/`, {
+          method: 'OPTIONS',
+          headers: {
+            'Origin': currentOrigin,
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'Content-Type',
+          },
+          signal: controller.signal,
+        })
+
+        clearTimeout(timeoutId)
+        
+        // Если OPTIONS запрос прошел, проверяем CORS заголовки
+        const allowOrigin = response.headers.get('Access-Control-Allow-Origin')
+        const allowMethods = response.headers.get('Access-Control-Allow-Methods')
+        
+        // CORS настроен правильно, если:
+        // 1. Есть заголовок Access-Control-Allow-Origin со значением "*" или наш origin
+        // 2. Или есть заголовок Access-Control-Allow-Methods (значит сервер обрабатывает preflight)
+        const hasCorsHeaders = 
+          (allowOrigin !== null && (allowOrigin === '*' || allowOrigin === currentOrigin)) ||
+          allowMethods !== null
+
+        return hasCorsHeaders
+      } catch (error) {
+        clearTimeout(timeoutId)
+        
+        // Если OPTIONS запрос блокируется с "Failed to fetch", это CORS ошибка
+        if (error instanceof TypeError || (error instanceof Error && error.message.includes('Failed to fetch'))) {
+          return false // CORS блокирует
+        }
+        // Другие ошибки - не можем определить
+        return true // Предполагаем, что CORS настроен
+      }
+    } catch (error) {
+      // Если не удалось проверить, предполагаем что это может быть CORS
+      return false
+    }
+  }
+
   useEffect(() => {
     // Проверяем доступность API с детальной диагностикой
     const checkApi = async () => {
       setApiStatus('checking')
       setApiError(null)
       setApiErrorInfo(null)
+      setCorsBlocked(null)
+
+      // Сначала проверяем CORS
+      const corsCheck = await checkCors()
+      setCorsBlocked(!corsCheck)
+
+      // Если CORS блокирует, сразу помечаем как CORS ошибку
+      if (!corsCheck) {
+        const corsErrorInfo: ApiErrorInfo = {
+          type: 'CORS',
+          message: 'Ошибка CORS: запрос заблокирован политикой CORS.',
+          details: `Origin "${currentOrigin}" не разрешен сервером. Добавьте этот origin в ALLOWED_ORIGINS на сервере.`,
+        }
+        setApiStatus('offline')
+        setApiError(corsErrorInfo.message)
+        setApiErrorInfo(corsErrorInfo)
+        return
+      }
 
       // Пробуем несколько endpoints для проверки
       const endpoints = ['/health', '/']
@@ -232,7 +304,20 @@ export default function Diagnostics() {
         setApiErrorInfo(errorInfo)
       } else if (lastError) {
         // Обрабатываем ошибку с детальной информацией
-        const errorInfo = normalizeApiError(lastError)
+        // Если CORS проверка прошла, но GET не проходит, это не CORS
+        let errorInfo = normalizeApiError(lastError)
+        
+        // Если CORS проверка показала, что CORS настроен, но все равно ошибка "Failed to fetch",
+        // это может быть реальная сетевая проблема, а не CORS
+        // corsCheck доступен из замыкания функции checkApi
+        if (corsCheck && errorInfo.type === 'Network') {
+          // Оставляем как Network ошибку, но добавляем информацию о том, что CORS настроен
+          errorInfo = {
+            ...errorInfo,
+            details: `${errorInfo.details || ''} CORS настроен правильно, проблема в другом.`,
+          }
+        }
+        
         setApiStatus('offline')
         setApiError(errorInfo.message)
         setApiErrorInfo(errorInfo)
@@ -354,6 +439,17 @@ export default function Diagnostics() {
                 <strong>URL:</strong> <code>{API_BASE_URL}</code>
               </li>
               <li>
+                <strong>Текущий Origin:</strong> <code>{currentOrigin}</code>
+              </li>
+              {corsBlocked !== null && (
+                <li>
+                  <strong>CORS:</strong>{' '}
+                  <span className={corsBlocked ? 'status-error' : 'status-ok'}>
+                    {corsBlocked ? '❌ Заблокирован' : '✅ Разрешен'}
+                  </span>
+                </li>
+              )}
+              <li>
                 <strong>Статус:</strong>{' '}
                 <span
                   className={
@@ -428,13 +524,31 @@ export default function Diagnostics() {
                             <strong>Проблема CORS:</strong> Запрос заблокирован политикой CORS.
                           </li>
                           <li>
-                            <strong>Решение:</strong> Проверьте настройки ALLOWED_ORIGINS на сервере. Убедитесь, что
-                            origin фронтенда (например, https://micro-tab.ru:8001) добавлен в разрешенные origins в
-                            переменной окружения ALLOWED_ORIGINS.
+                            <strong>Текущий Origin:</strong> <code>{currentOrigin}</code>
+                          </li>
+                          <li>
+                            <strong>Решение:</strong> Добавьте следующий origin в переменную окружения ALLOWED_ORIGINS на
+                            сервере:
+                            <ul>
+                              <li>
+                                <code>ALLOWED_ORIGINS={currentOrigin}</code>
+                              </li>
+                              <li>
+                                Или если уже есть другие origins:{' '}
+                                <code>ALLOWED_ORIGINS=origin1,{currentOrigin},origin2</code>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Где настроить:</strong>
+                            <ul>
+                              <li>В файле <code>.env</code> на сервере добавьте или обновите: <code>ALLOWED_ORIGINS={currentOrigin}</code></li>
+                              <li>Перезапустите backend: <code>docker compose restart backend</code></li>
+                            </ul>
                           </li>
                           <li>
                             <strong>Проверка:</strong> Откройте консоль браузера (F12) и проверьте ошибки CORS в
-                            Network tab.
+                            Network tab. Должна быть ошибка типа "CORS policy" или "Access-Control-Allow-Origin".
                           </li>
                         </>
                       )}
