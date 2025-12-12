@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
 import { api, CalendarData } from '../../services/api'
 import DateView from './DateView'
@@ -11,23 +11,48 @@ export default function Calendar() {
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [renderError, setRenderError] = useState<string | null>(null)
 
-  const monthStart = startOfMonth(currentDate)
-  const monthEnd = endOfMonth(currentDate)
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd })
+  // Логирование для отладки
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      logger.info('[Calendar] Component mounted')
+    }
+  }, [])
+
+  // Безопасное вычисление дней месяца с обработкой ошибок
+  const getDays = (): Date[] => {
+    try {
+      const monthStart = startOfMonth(currentDate)
+      const monthEnd = endOfMonth(currentDate)
+      return eachDayOfInterval({ start: monthStart, end: monthEnd })
+    } catch (err) {
+      logger.error('[Calendar] Error calculating month days:', err)
+      setRenderError('Ошибка при отображении календаря. Попробуйте обновить страницу.')
+      // Используем текущую дату как fallback
+      return [new Date()]
+    }
+  }
+
+  const days = getDays()
 
   const handleDateClick = async (date: Date) => {
-    setSelectedDate(date)
-    setLoading(true)
-    setError(null)
-    setCalendarData(null)
-    
     try {
-      const data = await api.getCalendar(format(date, 'yyyy-MM-dd'))
+      setSelectedDate(date)
+      setLoading(true)
+      setError(null)
+      setCalendarData(null)
+      
+      const dateString = format(date, 'yyyy-MM-dd')
+      if (import.meta.env.DEV) {
+        logger.info('[Calendar] Loading data for date:', dateString)
+      }
+      
+      const data = await api.getCalendar(dateString)
       setCalendarData(data)
       setError(null)
     } catch (error) {
-      logger.error('Failed to load calendar data:', error)
+      logger.error('[Calendar] Failed to load calendar data:', error)
       const errorMessage = error instanceof Error ? error.message : 'Не удалось загрузить данные'
       setError(errorMessage)
       setCalendarData(null)
@@ -48,6 +73,34 @@ export default function Calendar() {
     setCalendarData(null)
   }
 
+  // Если есть ошибка рендеринга, показываем сообщение
+  if (renderError) {
+    return (
+      <div className="calendar-container">
+        <div className="error-message" style={{ padding: '20px', textAlign: 'center' }}>
+          <p>⚠️ {renderError}</p>
+          <button
+            onClick={() => {
+              setRenderError(null)
+              setCurrentDate(new Date())
+            }}
+            style={{
+              marginTop: '10px',
+              padding: '10px 20px',
+              background: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            Обновить календарь
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="calendar-container">
       <div className="calendar-header">
@@ -63,15 +116,21 @@ export default function Calendar() {
           </div>
         ))}
 
-        {days.map((day) => (
-          <button
-            key={day.toISOString()}
-            className={`calendar-day ${selectedDate && isSameDay(day, selectedDate) ? 'selected' : ''}`}
-            onClick={() => handleDateClick(day)}
-          >
-            {format(day, 'd')}
-          </button>
-        ))}
+        {days.length > 0 ? (
+          days.map((day) => (
+            <button
+              key={day.toISOString()}
+              className={`calendar-day ${selectedDate && isSameDay(day, selectedDate) ? 'selected' : ''}`}
+              onClick={() => handleDateClick(day)}
+            >
+              {format(day, 'd')}
+            </button>
+          ))
+        ) : (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px' }}>
+            <p>Не удалось загрузить календарь</p>
+          </div>
+        )}
       </div>
 
       {selectedDate && (
