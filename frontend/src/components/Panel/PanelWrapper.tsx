@@ -11,14 +11,41 @@ export default function PanelWrapper() {
   const [isCheckingAccess, setIsCheckingAccess] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [accessError, setAccessError] = useState<string | null>(null)
+  const [waitingForInitData, setWaitingForInitData] = useState(true)
 
   useEffect(() => {
-    // Если нет initData, редиректим на календарь
-    if (!initData) {
-      if (import.meta.env.DEV) {
-        logger.info('[PanelWrapper] initData отсутствует, редирект на календарь')
-      }
-      navigate('/')
+    // Если initData появился, прекращаем ожидание
+    if (initData && waitingForInitData) {
+      setWaitingForInitData(false)
+      return
+    }
+
+    // Ждем появления initData до 5 секунд
+    if (!initData && waitingForInitData) {
+      const timeoutId = setTimeout(() => {
+        // Проверяем еще раз, может initData появился за это время
+        if (!initData) {
+          if (import.meta.env.DEV) {
+            logger.info('[PanelWrapper] initData не появился через 5 секунд, редирект на календарь')
+          }
+          setWaitingForInitData(false)
+          setIsCheckingAccess(false)
+          setAccessError(
+            'Не удалось получить данные авторизации. Убедитесь, что приложение открыто через Telegram Mini App.'
+          )
+          // Редиректим на календарь через 3 секунды
+          setTimeout(() => {
+            navigate('/')
+          }, 3000)
+        }
+      }, 5000)
+
+      return () => clearTimeout(timeoutId)
+    }
+
+    // Ждем пока isReady станет true
+    if (!isReady) {
+      setIsCheckingAccess(true)
       return
     }
 
@@ -63,14 +90,18 @@ export default function PanelWrapper() {
           setIsCheckingAccess(false)
         })
     }
-  }, [initData, isReady, navigate])
+  }, [initData, isReady, navigate, waitingForInitData])
 
   // Показываем индикатор загрузки
-  if (isCheckingAccess) {
+  if (isCheckingAccess || waitingForInitData) {
     return (
       <div className="app-loading">
         <div className="loading-spinner">⏳</div>
-        <p>Проверка доступа к панели...</p>
+        <p>
+          {waitingForInitData
+            ? 'Ожидание инициализации Telegram WebApp...'
+            : 'Проверка доступа к панели...'}
+        </p>
       </div>
     )
   }
