@@ -17,3 +17,60 @@ body {
   min-height: 100vh;
 }
 
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.app-loading p {
+  font-size: 16px;
+  color: #666;
+  margin-top: 10px;
+}
+
+.app-error-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 193, 7, 0.95);
+  color: #856404;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  z-index: 1000;
+  text-align: center;
+}
+
+.app-error-message p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+

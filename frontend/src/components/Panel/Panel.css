@@ -11,9 +11,55 @@
 }
 
 .panel-main h2 {
+  margin-bottom: 10px;
+}
+
+.panel-description {
+  color: #666;
+  font-size: 14px;
   margin-bottom: 20px;
 }
 
+.panel-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-button {
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: left;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.panel-button:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.panel-button:active {
+  transform: translateY(0);
+}
+
+.panel-button-secondary {
+  margin-top: 10px;
+  background-color: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  text-align: center;
+}
+
+.panel-button-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+/* Обратная совместимость со старыми стилями */
 .panel-main button {
   padding: 15px;
   font-size: 16px;

@@ -9,14 +9,34 @@ type PanelView = 'main' | 'birthdays' | 'responsible' | 'greetings'
 export default function Panel() {
   const [currentView, setCurrentView] = useState<PanelView>('main')
 
+  const handleBackToCalendar = () => {
+    // Перезагружаем страницу чтобы вернуться к календарю
+    // Это сбросит состояние и покажет календарь
+    window.location.reload()
+  }
+
   return (
     <div className="panel-container">
       {currentView === 'main' && (
         <div className="panel-main">
           <h2>Панель управления</h2>
-          <button onClick={() => setCurrentView('birthdays')}>🎂 Управление ДР</button>
-          <button onClick={() => setCurrentView('responsible')}>👤 Управление ответственными</button>
-          <button onClick={() => setCurrentView('greetings')}>🎉 Генерация поздравлений</button>
+          <p className="panel-description">
+            Управляйте днями рождения, ответственными и генерируйте поздравления
+          </p>
+          <div className="panel-buttons">
+            <button onClick={() => setCurrentView('birthdays')} className="panel-button">
+              🎂 Управление ДР
+            </button>
+            <button onClick={() => setCurrentView('responsible')} className="panel-button">
+              👤 Управление ответственными
+            </button>
+            <button onClick={() => setCurrentView('greetings')} className="panel-button">
+              🎉 Генерация поздравлений
+            </button>
+            <button onClick={handleBackToCalendar} className="panel-button panel-button-secondary">
+              📅 Вернуться к календарю
+            </button>
+          </div>
         </div>
       )}
 
