@@ -72,3 +72,13 @@ app.include_router(router)
 @app.get("/")
 async def root():
     return {"message": "Telegram Birthday Calendar API"}
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint для проверки доступности API."""
+    return {
+        "status": "ok",
+        "service": "Telegram Birthday Calendar API",
+        "message": "API is running",
+    }

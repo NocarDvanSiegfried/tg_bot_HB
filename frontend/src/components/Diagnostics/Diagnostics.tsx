@@ -6,13 +6,45 @@ import './Diagnostics.css'
 const STORAGE_KEY_COLLAPSED = 'diagnostics_collapsed'
 const STORAGE_KEY_HIDDEN = 'diagnostics_hidden'
 
-// Функция для нормализации сообщений об ошибках API
-function normalizeApiError(error: unknown): string {
+// Типы ошибок API
+type ApiErrorType = 'CORS' | 'SSL' | 'Network' | 'Timeout' | 'HTTP' | 'Unknown'
+
+interface ApiErrorInfo {
+  type: ApiErrorType
+  message: string
+  details?: string
+  httpStatus?: number
+  httpStatusText?: string
+}
+
+// Функция для нормализации сообщений об ошибках API с детальной информацией
+function normalizeApiError(error: unknown, response?: Response): ApiErrorInfo {
+  // Если есть HTTP ответ, но статус не OK
+  if (response && !response.ok) {
+    return {
+      type: 'HTTP',
+      message: `HTTP ${response.status}: ${response.statusText}`,
+      httpStatus: response.status,
+      httpStatusText: response.statusText,
+      details: `Сервер ответил с ошибкой ${response.status}. Проверьте логи сервера.`,
+    }
+  }
+
   // Обрабатываем разные типы ошибок
   if (error instanceof TypeError) {
     const message = error.message.toLowerCase()
+
+    // CORS ошибки обычно проявляются как TypeError с "Failed to fetch"
+    // но мы не можем точно определить CORS без дополнительной информации
     if (message.includes('failed to fetch') || message.includes('networkerror')) {
-      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+      // Проверяем, может ли это быть CORS ошибка
+      // CORS ошибки обычно не дают детальной информации в браузере
+      return {
+        type: 'Network',
+        message: 'Не удалось подключиться к API. Проверьте URL и доступность сервера.',
+        details:
+          'Возможные причины: сервер недоступен, проблема с сетью, или CORS блокирует запрос. Проверьте настройки ALLOWED_ORIGINS на сервере.',
+      }
     }
   }
 
@@ -22,42 +54,86 @@ function normalizeApiError(error: unknown): string {
 
     // Проверяем имя ошибки
     if (name === 'aborterror' || message.includes('timeout') || message.includes('aborted')) {
-      return 'Превышено время ожидания ответа от API.'
+      return {
+        type: 'Timeout',
+        message: 'Превышено время ожидания ответа от API.',
+        details: 'Сервер не отвечает в течение 5 секунд. Проверьте, что backend запущен и доступен.',
+      }
     }
 
     // Проверяем сообщение об ошибке
     if (message.includes('failed to fetch') || message.includes('networkerror')) {
-      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+      return {
+        type: 'Network',
+        message: 'Не удалось подключиться к API. Проверьте URL и доступность сервера.',
+        details:
+          'Возможные причины: сервер недоступен, проблема с сетью, или CORS блокирует запрос. Проверьте настройки ALLOWED_ORIGINS на сервере.',
+      }
     }
 
     if (message.includes('cors') || message.includes('cross-origin')) {
-      return 'Ошибка CORS. Проверьте настройки сервера.'
+      return {
+        type: 'CORS',
+        message: 'Ошибка CORS: запрос заблокирован политикой CORS.',
+        details:
+          'Проверьте настройки ALLOWED_ORIGINS на сервере. Убедитесь, что origin фронтенда добавлен в разрешенные origins.',
+      }
+    }
+
+    if (message.includes('ssl') || message.includes('certificate') || message.includes('tls')) {
+      return {
+        type: 'SSL',
+        message: 'Ошибка SSL: проблема с сертификатом или безопасным соединением.',
+        details: 'Проверьте SSL сертификат на сервере. Убедитесь, что сертификат валиден и не истек.',
+      }
     }
 
     if (message.includes('network request failed')) {
-      return 'Ошибка сети. Проверьте подключение к интернету.'
+      return {
+        type: 'Network',
+        message: 'Ошибка сети. Проверьте подключение к интернету.',
+        details: 'Проверьте подключение к интернету и доступность сервера.',
+      }
     }
 
     // Возвращаем оригинальное сообщение, если не удалось нормализовать
-    return error.message || 'Неизвестная ошибка'
+    return {
+      type: 'Unknown',
+      message: error.message || 'Неизвестная ошибка',
+      details: 'Не удалось определить тип ошибки. Проверьте консоль браузера для деталей.',
+    }
   }
 
   // Если это строка
   if (typeof error === 'string') {
     const message = error.toLowerCase()
     if (message.includes('failed to fetch') || message.includes('networkerror')) {
-      return 'Не удалось подключиться к API. Проверьте URL и доступность сервера.'
+      return {
+        type: 'Network',
+        message: 'Не удалось подключиться к API. Проверьте URL и доступность сервера.',
+        details:
+          'Возможные причины: сервер недоступен, проблема с сетью, или CORS блокирует запрос.',
+      }
     }
-    return error
+    return {
+      type: 'Unknown',
+      message: error,
+      details: 'Ошибка в строковом формате.',
+    }
   }
 
-  return 'Неизвестная ошибка'
+  return {
+    type: 'Unknown',
+    message: 'Неизвестная ошибка',
+    details: 'Не удалось определить тип ошибки.',
+  }
 }
 
 export default function Diagnostics() {
   const { webApp, initData, isReady } = useTelegram()
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
   const [apiError, setApiError] = useState<string | null>(null)
+  const [apiErrorInfo, setApiErrorInfo] = useState<ApiErrorInfo | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Проверяем параметр URL
     const urlParams = new URLSearchParams(window.location.search)
@@ -88,32 +164,99 @@ export default function Diagnostics() {
   })
 
   useEffect(() => {
-    // Проверяем доступность API
+    // Проверяем доступность API с детальной диагностикой
     const checkApi = async () => {
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 секунд таймаут
+      setApiStatus('checking')
+      setApiError(null)
+      setApiErrorInfo(null)
 
-        const response = await fetch(`${API_BASE_URL}/`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-        })
+      // Пробуем несколько endpoints для проверки
+      const endpoints = ['/health', '/']
+      let lastError: unknown = null
+      let lastResponse: Response | undefined = undefined
 
-        clearTimeout(timeoutId)
+      for (const endpoint of endpoints) {
+        try {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 секунд таймаут
 
-        if (response.ok) {
-          setApiStatus('online')
-          setApiError(null)
-        } else {
-          setApiStatus('offline')
-          setApiError(`HTTP ${response.status}: ${response.statusText}`)
+          let response: Response | undefined
+
+          try {
+            response = await fetch(`${API_BASE_URL}${endpoint}`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              signal: controller.signal,
+            })
+
+            clearTimeout(timeoutId)
+          } catch (fetchError) {
+            clearTimeout(timeoutId)
+            // Если это AbortError, значит таймаут
+            if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+              const errorInfo = normalizeApiError(fetchError)
+              setApiStatus('offline')
+              setApiError(errorInfo.message)
+              setApiErrorInfo(errorInfo)
+              return
+            }
+            // Сохраняем ошибку и пробуем следующий endpoint
+            lastError = fetchError
+            continue
+          }
+
+          if (response.ok) {
+            setApiStatus('online')
+            setApiError(null)
+            setApiErrorInfo(null)
+            return // Успешно подключились
+          } else {
+            // Сервер ответил, но с ошибкой
+            lastResponse = response
+            // Пробуем следующий endpoint
+            continue
+          }
+        } catch (error) {
+          // Сохраняем ошибку и пробуем следующий endpoint
+          lastError = error
+          continue
         }
-      } catch (error) {
+      }
+
+      // Если все endpoints не сработали, показываем последнюю ошибку
+      if (lastResponse) {
+        // Сервер ответил, но с ошибкой
+        const errorInfo = normalizeApiError(null, lastResponse)
         setApiStatus('offline')
-        // Нормализуем ошибку для более понятного сообщения
-        const normalizedError = normalizeApiError(error)
-        setApiError(normalizedError)
+        setApiError(errorInfo.message)
+        setApiErrorInfo(errorInfo)
+      } else if (lastError) {
+        // Обрабатываем ошибку с детальной информацией
+        const errorInfo = normalizeApiError(lastError)
+        setApiStatus('offline')
+        setApiError(errorInfo.message)
+        setApiErrorInfo(errorInfo)
+
+        // Логируем детали в консоль для отладки
+        if (import.meta.env.DEV) {
+          console.error('[Diagnostics] API Error Details:', {
+            type: errorInfo.type,
+            message: errorInfo.message,
+            details: errorInfo.details,
+            originalError: lastError,
+            url: API_BASE_URL,
+          })
+        }
+      } else {
+        // Неожиданная ситуация
+        const errorInfo: ApiErrorInfo = {
+          type: 'Unknown',
+          message: 'Не удалось проверить доступность API',
+          details: 'Все попытки подключения не удались.',
+        }
+        setApiStatus('offline')
+        setApiError(errorInfo.message)
+        setApiErrorInfo(errorInfo)
       }
     }
 
@@ -227,9 +370,34 @@ export default function Diagnostics() {
                 </span>
               </li>
               {apiError && (
-                <li>
-                  <strong>Ошибка:</strong> <span className="status-error">{apiError}</span>
-                </li>
+                <>
+                  <li>
+                    <strong>Ошибка:</strong> <span className="status-error">{apiError}</span>
+                  </li>
+                  {apiErrorInfo && (
+                    <>
+                      {apiErrorInfo.type && (
+                        <li>
+                          <strong>Тип ошибки:</strong>{' '}
+                          <span className="status-error">{apiErrorInfo.type}</span>
+                        </li>
+                      )}
+                      {apiErrorInfo.httpStatus && (
+                        <li>
+                          <strong>HTTP статус:</strong>{' '}
+                          <span className="status-error">
+                            {apiErrorInfo.httpStatus} {apiErrorInfo.httpStatusText || ''}
+                          </span>
+                        </li>
+                      )}
+                      {apiErrorInfo.details && (
+                        <li>
+                          <strong>Детали:</strong> <span className="status-warning">{apiErrorInfo.details}</span>
+                        </li>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </ul>
           </div>
@@ -251,15 +419,128 @@ export default function Diagnostics() {
               )}
               {apiStatus === 'offline' && (
                 <li>
-                  ❌ API недоступен. Проверьте:
-                  <ul>
-                    <li>Запущен ли backend сервер</li>
-                    <li>Правильно ли настроен VITE_API_URL</li>
-                    <li>
-                      Доступен ли API из браузера (для Mini App нужен внешний URL, не localhost)
-                    </li>
-                    <li>Для разработки используйте ngrok или другой tunnel</li>
-                  </ul>
+                  ❌ API недоступен.
+                  {apiErrorInfo && (
+                    <ul>
+                      {apiErrorInfo.type === 'CORS' && (
+                        <>
+                          <li>
+                            <strong>Проблема CORS:</strong> Запрос заблокирован политикой CORS.
+                          </li>
+                          <li>
+                            <strong>Решение:</strong> Проверьте настройки ALLOWED_ORIGINS на сервере. Убедитесь, что
+                            origin фронтенда (например, https://micro-tab.ru:8001) добавлен в разрешенные origins в
+                            переменной окружения ALLOWED_ORIGINS.
+                          </li>
+                          <li>
+                            <strong>Проверка:</strong> Откройте консоль браузера (F12) и проверьте ошибки CORS в
+                            Network tab.
+                          </li>
+                        </>
+                      )}
+                      {apiErrorInfo.type === 'SSL' && (
+                        <>
+                          <li>
+                            <strong>Проблема SSL:</strong> Ошибка с сертификатом или безопасным соединением.
+                          </li>
+                          <li>
+                            <strong>Решение:</strong> Проверьте SSL сертификат на сервере. Убедитесь, что сертификат
+                            валиден и не истек.
+                          </li>
+                          <li>
+                            <strong>Проверка:</strong> Откройте https://api.micro-tab.ru:9443 в браузере и проверьте
+                            сертификат.
+                          </li>
+                        </>
+                      )}
+                      {apiErrorInfo.type === 'Network' && (
+                        <>
+                          <li>
+                            <strong>Проблема сети:</strong> Не удалось подключиться к серверу.
+                          </li>
+                          <li>
+                            <strong>Проверьте:</strong>
+                            <ul>
+                              <li>Запущен ли backend сервер (docker compose ps)</li>
+                              <li>Правильно ли настроен VITE_API_URL</li>
+                              <li>Доступен ли API из браузера (откройте URL в новой вкладке)</li>
+                              <li>Работает ли Nginx (sudo systemctl status nginx)</li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Возможная причина CORS:</strong> Если сервер доступен через браузер, но запрос
+                            не проходит, это может быть проблема CORS. Проверьте ALLOWED_ORIGINS.
+                          </li>
+                        </>
+                      )}
+                      {apiErrorInfo.type === 'Timeout' && (
+                        <>
+                          <li>
+                            <strong>Проблема таймаута:</strong> Сервер не отвечает в течение 5 секунд.
+                          </li>
+                          <li>
+                            <strong>Проверьте:</strong>
+                            <ul>
+                              <li>Запущен ли backend сервер</li>
+                              <li>Не перегружен ли сервер</li>
+                              <li>Работает ли Nginx и проксирует ли запросы</li>
+                            </ul>
+                          </li>
+                        </>
+                      )}
+                      {apiErrorInfo.type === 'HTTP' && apiErrorInfo.httpStatus && (
+                        <>
+                          <li>
+                            <strong>HTTP ошибка:</strong> Сервер ответил с кодом {apiErrorInfo.httpStatus}
+                            {apiErrorInfo.httpStatusText && ` (${apiErrorInfo.httpStatusText})`}
+                          </li>
+                          <li>
+                            <strong>Проверьте:</strong>
+                            <ul>
+                              <li>Логи backend сервера (docker compose logs backend)</li>
+                              <li>Логи Nginx (sudo tail -f /var/log/nginx/backend_error.log)</li>
+                              <li>Конфигурацию Nginx</li>
+                            </ul>
+                          </li>
+                        </>
+                      )}
+                      {apiErrorInfo.type === 'Unknown' && (
+                        <>
+                          <li>
+                            <strong>Неизвестная ошибка:</strong> Не удалось определить тип ошибки.
+                          </li>
+                          <li>
+                            <strong>Проверьте:</strong>
+                            <ul>
+                              <li>Консоль браузера (F12) для деталей ошибки</li>
+                              <li>Запущен ли backend сервер</li>
+                              <li>Правильно ли настроен VITE_API_URL</li>
+                            </ul>
+                          </li>
+                        </>
+                      )}
+                      {!apiErrorInfo.type && (
+                        <>
+                          <li>Запущен ли backend сервер</li>
+                          <li>Правильно ли настроен VITE_API_URL</li>
+                          <li>
+                            Доступен ли API из браузера (для Mini App нужен внешний URL, не localhost)
+                          </li>
+                          <li>Для разработки используйте ngrok или другой tunnel</li>
+                        </>
+                      )}
+                    </ul>
+                  )}
+                  {!apiErrorInfo && (
+                    <ul>
+                      <li>Запущен ли backend сервер</li>
+                      <li>Правильно ли настроен VITE_API_URL</li>
+                      <li>
+                        Доступен ли API из браузера (для Mini App нужен внешний URL, не localhost)
+                      </li>
+                      <li>Для разработки используйте ngrok или другой tunnel</li>
+                    </ul>
+                  )}
                 </li>
               )}
               {API_BASE_URL.includes('localhost') && (
