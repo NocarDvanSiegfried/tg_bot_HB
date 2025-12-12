@@ -39,6 +39,9 @@ export default function DateView({ date, data, loading, error }: DateViewProps) 
   }
 
   if (!data) {
+    if (import.meta.env.DEV) {
+      logger.info('[DateView] No data for date:', format(date, 'yyyy-MM-dd'))
+    }
     return (
       <div className="date-view">
         <h3>{formatDateWithWeekday(date)}</h3>
@@ -47,13 +50,18 @@ export default function DateView({ date, data, loading, error }: DateViewProps) 
     )
   }
 
-  // Логирование для отладки праздников
+  // Логирование для отладки
   if (import.meta.env.DEV) {
     logger.info('[DateView] Data loaded:', {
       date: format(date, 'yyyy-MM-dd'),
       birthdaysCount: data.birthdays.length,
       holidaysCount: data.holidays.length,
       hasResponsible: !!data.responsible,
+      birthdays: data.birthdays.map(b => ({
+        id: b.id,
+        name: b.full_name,
+        company: b.company,
+      })),
     })
   }
 
@@ -61,20 +69,22 @@ export default function DateView({ date, data, loading, error }: DateViewProps) 
     <div className="date-view">
       <h3>{formatDateWithWeekday(date)}</h3>
 
-      {/* Секция дней рождения - показываем только если есть */}
-      {data.birthdays.length > 0 && (
-        <div className="date-section">
-          <h4>🎂 Дни рождения</h4>
-          {data.birthdays.map((bd) => (
+      {/* Секция дней рождения - показываем всегда */}
+      <div className="date-section">
+        <h4>🎂 Дни рождения</h4>
+        {data.birthdays.length > 0 ? (
+          data.birthdays.map((bd) => (
             <div key={bd.id} className="birthday-item">
               <p><strong>{bd.full_name}</strong></p>
               <p>{bd.company}, {bd.position}</p>
               <p>Исполняется {bd.age} лет</p>
               {bd.comment && <p className="comment">Комментарий: {bd.comment}</p>}
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        ) : (
+          <p style={{ color: '#666', fontStyle: 'italic' }}>Нет дней рождения на эту дату</p>
+        )}
+      </div>
 
       {/* Секция профессиональных праздников - показываем всегда */}
       <div className="date-section">

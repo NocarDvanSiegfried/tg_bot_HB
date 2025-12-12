@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns'
 import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'
@@ -34,6 +34,15 @@ export default function Calendar() {
           logger.info('[Calendar] Loading birthdays for month:', { year, month })
         }
         const data = await api.getCalendarMonth(year, month)
+        if (import.meta.env.DEV) {
+          logger.info('[Calendar] Month birthdays loaded:', {
+            year: data.year,
+            month: data.month,
+            datesCount: Object.keys(data.birthdays_by_date).length,
+            totalBirthdays: Object.values(data.birthdays_by_date).reduce((sum, arr) => sum + arr.length, 0),
+            dates: Object.keys(data.birthdays_by_date),
+          })
+        }
         setMonthBirthdays(data)
       } catch (error) {
         logger.error('[Calendar] Failed to load month birthdays:', error)
@@ -67,8 +76,16 @@ export default function Calendar() {
   const hasBirthday = (day: Date): boolean => {
     if (!monthBirthdays) return false
     const dateKey = format(day, 'yyyy-MM-dd')
-    return dateKey in monthBirthdays.birthdays_by_date && 
-           monthBirthdays.birthdays_by_date[dateKey].length > 0
+    const hasBD = dateKey in monthBirthdays.birthdays_by_date && 
+                  monthBirthdays.birthdays_by_date[dateKey].length > 0
+    if (import.meta.env.DEV && hasBD) {
+      logger.info('[Calendar] Day has birthday:', {
+        date: dateKey,
+        count: monthBirthdays.birthdays_by_date[dateKey].length,
+        names: monthBirthdays.birthdays_by_date[dateKey].map(b => b.full_name),
+      })
+    }
+    return hasBD
   }
 
   // Улучшенное сравнение дат для выделения (без учета времени)
@@ -76,6 +93,11 @@ export default function Calendar() {
     if (!selectedDate) return false
     // Используем сравнение только по дате, без времени
     return format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+  }
+
+  // Проверка является ли день сегодняшним
+  const isTodayDay = (day: Date): boolean => {
+    return isToday(day)
   }
 
   const handleDateClick = async (date: Date) => {
@@ -162,9 +184,11 @@ export default function Calendar() {
           days.map((day) => {
             const dayHasBirthday = hasBirthday(day)
             const dayIsSelected = isSelected(day)
+            const dayIsToday = isTodayDay(day)
             const dayClasses = [
               'calendar-day',
               dayIsSelected ? 'selected' : '',
+              dayIsToday ? 'today' : '',
               dayHasBirthday ? 'has-birthday' : '',
             ].filter(Boolean).join(' ')
 
@@ -173,7 +197,7 @@ export default function Calendar() {
                 key={day.toISOString()}
                 className={dayClasses}
                 onClick={() => handleDateClick(day)}
-                title={dayHasBirthday ? 'Есть дни рождения' : ''}
+                title={dayHasBirthday ? 'Есть дни рождения' : dayIsToday ? 'Сегодня' : ''}
               >
                 <span className="day-number">{format(day, 'd')}</span>
                 {dayHasBirthday && <span className="birthday-indicator">🎂</span>}

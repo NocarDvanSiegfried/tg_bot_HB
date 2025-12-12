@@ -87,6 +87,26 @@
   border-color: #004085;
 }
 
+.calendar-day.today {
+  border-color: #28a745;
+  border-width: 3px;
+  font-weight: bold;
+}
+
+.calendar-day.today:not(.selected) {
+  background: linear-gradient(to bottom, #d4edda 0%, #ffffff 100%);
+}
+
+.calendar-day.today.has-birthday:not(.selected) {
+  background: linear-gradient(to bottom, #fff3cd 0%, #d4edda 50%, #ffffff 100%);
+  border-color: #ffc107;
+}
+
+.calendar-day.today.selected {
+  border-color: #0056b3;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4), 0 0 0 2px rgba(40, 167, 69, 0.3);
+}
+
 .calendar-day .day-number {
   font-size: 16px;
   line-height: 1.2;
