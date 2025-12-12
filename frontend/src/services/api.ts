@@ -93,9 +93,27 @@ export interface CalendarData {
   } | null
 }
 
+export interface MonthBirthdays {
+  year: number
+  month: number
+  birthdays_by_date: Record<string, Array<{
+    id: number
+    full_name: string
+    company: string
+    position: string
+  }>>
+}
+
 export const api = {
   async getCalendar(date: string): Promise<CalendarData> {
     const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/${date}`, {
+      headers: getHeaders(),
+    })
+    return response.json()
+  },
+
+  async getCalendarMonth(year: number, month: number): Promise<MonthBirthdays> {
+    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/month/${year}/${month}`, {
       headers: getHeaders(),
     })
     return response.json()

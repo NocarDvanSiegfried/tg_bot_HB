@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
-import { api, CalendarData } from '../../services/api'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns'
+import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'
 import './Calendar.css'
@@ -12,6 +12,8 @@ export default function Calendar() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [renderError, setRenderError] = useState<string | null>(null)
+  const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
+  const [loadingMonth, setLoadingMonth] = useState(false)
 
   // Логирование для отладки
   useEffect(() => {
@@ -19,6 +21,31 @@ export default function Calendar() {
       logger.info('[Calendar] Component mounted')
     }
   }, [])
+
+  // Загрузка дней рождения за месяц
+  useEffect(() => {
+    const loadMonthBirthdays = async () => {
+      const year = currentDate.getFullYear()
+      const month = currentDate.getMonth() + 1 // date-fns использует 0-11, API ожидает 1-12
+      
+      setLoadingMonth(true)
+      try {
+        if (import.meta.env.DEV) {
+          logger.info('[Calendar] Loading birthdays for month:', { year, month })
+        }
+        const data = await api.getCalendarMonth(year, month)
+        setMonthBirthdays(data)
+      } catch (error) {
+        logger.error('[Calendar] Failed to load month birthdays:', error)
+        // Не показываем ошибку пользователю, просто не загружаем индикаторы
+        setMonthBirthdays(null)
+      } finally {
+        setLoadingMonth(false)
+      }
+    }
+
+    loadMonthBirthdays()
+  }, [currentDate])
 
   // Безопасное вычисление дней месяца с обработкой ошибок
   const getDays = (): Date[] => {
@@ -35,6 +62,21 @@ export default function Calendar() {
   }
 
   const days = getDays()
+
+  // Проверка, есть ли ДР в определенный день
+  const hasBirthday = (day: Date): boolean => {
+    if (!monthBirthdays) return false
+    const dateKey = format(day, 'yyyy-MM-dd')
+    return dateKey in monthBirthdays.birthdays_by_date && 
+           monthBirthdays.birthdays_by_date[dateKey].length > 0
+  }
+
+  // Улучшенное сравнение дат для выделения (без учета времени)
+  const isSelected = (day: Date): boolean => {
+    if (!selectedDate) return false
+    // Используем сравнение только по дате, без времени
+    return format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+  }
 
   const handleDateClick = async (date: Date) => {
     try {
@@ -117,15 +159,27 @@ export default function Calendar() {
         ))}
 
         {days.length > 0 ? (
-          days.map((day) => (
-            <button
-              key={day.toISOString()}
-              className={`calendar-day ${selectedDate && isSameDay(day, selectedDate) ? 'selected' : ''}`}
-              onClick={() => handleDateClick(day)}
-            >
-              {format(day, 'd')}
-            </button>
-          ))
+          days.map((day) => {
+            const dayHasBirthday = hasBirthday(day)
+            const dayIsSelected = isSelected(day)
+            const dayClasses = [
+              'calendar-day',
+              dayIsSelected ? 'selected' : '',
+              dayHasBirthday ? 'has-birthday' : '',
+            ].filter(Boolean).join(' ')
+
+            return (
+              <button
+                key={day.toISOString()}
+                className={dayClasses}
+                onClick={() => handleDateClick(day)}
+                title={dayHasBirthday ? 'Есть дни рождения' : ''}
+              >
+                <span className="day-number">{format(day, 'd')}</span>
+                {dayHasBirthday && <span className="birthday-indicator">🎂</span>}
+              </button>
+            )
+          })
         ) : (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px' }}>
             <p>Не удалось загрузить календарь</p>
