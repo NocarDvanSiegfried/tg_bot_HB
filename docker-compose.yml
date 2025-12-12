@@ -82,7 +82,7 @@ services:
     ports:
       # Доступен только на localhost для Nginx reverse proxy
       # Внешний доступ через Nginx на порту 8001 (HTTPS)
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,7 +103,7 @@ services:
     ports:
       # Доступен только на localhost для Nginx reverse proxy
       # Внешний доступ через Nginx на порту 3001 (HTTPS)
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     environment:
       # Для Mini App нужен внешний URL (не localhost или backend)
       # В development можно использовать ngrok или другой tunnel
