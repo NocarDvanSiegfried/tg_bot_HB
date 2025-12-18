@@ -26,6 +26,16 @@ class BirthdayRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_day_and_month(self, day: int, month: int) -> list[Birthday]:
+        """Получить дни рождения в указанный день и месяц (любой год)."""
+        pass
+
+    @abstractmethod
+    async def get_by_month(self, month: int) -> list[Birthday]:
+        """Получить дни рождения в указанном месяце (любой год)."""
+        pass
+
+    @abstractmethod
     async def update(self, birthday: Birthday) -> Birthday:
         """Обновить день рождения."""
         pass

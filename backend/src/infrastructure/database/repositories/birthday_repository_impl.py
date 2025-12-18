@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import or_, select
+from sqlalchemy import extract, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.birthday_repository import BirthdayRepository
@@ -51,6 +51,27 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
             select(BirthdayModel).where(
                 BirthdayModel.birth_date >= start_date,
                 BirthdayModel.birth_date <= end_date,
+            )
+        )
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
+    async def get_by_day_and_month(self, day: int, month: int) -> list[Birthday]:
+        """Получить дни рождения в указанный день и месяц (любой год)."""
+        result = await self.session.execute(
+            select(BirthdayModel).where(
+                extract("day", BirthdayModel.birth_date) == day,
+                extract("month", BirthdayModel.birth_date) == month,
+            )
+        )
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
+    async def get_by_month(self, month: int) -> list[Birthday]:
+        """Получить дни рождения в указанном месяце (любой год)."""
+        result = await self.session.execute(
+            select(BirthdayModel).where(
+                extract("month", BirthdayModel.birth_date) == month,
             )
         )
         models = result.scalars().all()

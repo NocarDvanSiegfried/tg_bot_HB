@@ -280,25 +280,19 @@ async def get_calendar_month(
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Получить дни рождения за указанный месяц."""
-    try:
-        from calendar import monthrange
-        start_date = date(year, month, 1)
-        last_day = monthrange(year, month)[1]
-        end_date = date(year, month, last_day)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid date: {e}") from e
+    logger.info(f"[API] Loading birthdays for month {year}-{month:02d}")
 
-    logger.info(f"[API] Loading birthdays for month {year}-{month:02d}, range: {start_date} to {end_date}")
+    birthday_repo = factory.birthday_repo
+    # Получаем все дни рождения в указанном месяце (любой год)
+    birthdays = await birthday_repo.get_by_month(month)
 
-    birthday_repo = factory.birthday_repository
-    birthdays = await birthday_repo.get_by_date_range(start_date, end_date)
+    logger.info(f"[API] Found {len(birthdays)} birthdays in month {month}")
 
-    logger.info(f"[API] Found {len(birthdays)} birthdays in range {start_date} to {end_date}")
-
-    # Группируем дни рождения по датам для удобства использования на фронтенде
+    # Группируем дни рождения по датам с годом из запроса для правильного отображения
     birthdays_by_date: dict[str, list[dict]] = {}
     for b in birthdays:
-        date_key = b.birth_date.isoformat()
+        # Используем день и месяц из birth_date, но год из запроса
+        date_key = f"{year}-{b.birth_date.month:02d}-{b.birth_date.day:02d}"
         if date_key not in birthdays_by_date:
             birthdays_by_date[date_key] = []
         birthdays_by_date[date_key].append({

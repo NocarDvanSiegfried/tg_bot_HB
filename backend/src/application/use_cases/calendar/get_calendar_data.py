@@ -21,7 +21,10 @@ class GetCalendarDataUseCase:
         check_date: date,
     ) -> dict:
         """Получить данные календаря на указанную дату."""
-        birthdays = await self.birthday_repository.get_by_date(check_date)
+        # Используем поиск по дню и месяцу, игнорируя год
+        birthdays = await self.birthday_repository.get_by_day_and_month(
+            check_date.day, check_date.month
+        )
         holidays = await self.holiday_repository.get_by_date(check_date)
         responsible = await self.responsible_repository.get_by_date(check_date)
 
