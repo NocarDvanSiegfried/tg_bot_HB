@@ -69,44 +69,87 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const validateEditForm = (): boolean => {
+    logger.info('[BirthdayManagement] Starting validation...')
+    logger.info('[BirthdayManagement] editFormData:', editFormData)
+    
+    // Проверка формата birth_date
+    if (editFormData.birth_date) {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+      if (!dateRegex.test(editFormData.birth_date)) {
+        const errorMsg = 'Неверный формат даты. Используйте формат YYYY-MM-DD'
+        setError(errorMsg)
+        logger.error('[BirthdayManagement] Invalid birth_date format:', editFormData.birth_date)
+        return false
+      }
+    }
+    
+    // Проверка обязательных полей
     if (!editFormData.full_name?.trim()) {
       setError('ФИО не может быть пустым')
+      logger.warn('[BirthdayManagement] Validation failed: full_name is empty')
       return false
     }
     if (!editFormData.company?.trim()) {
       setError('Компания не может быть пустой')
+      logger.warn('[BirthdayManagement] Validation failed: company is empty')
       return false
     }
     if (!editFormData.position?.trim()) {
       setError('Должность не может быть пустой')
+      logger.warn('[BirthdayManagement] Validation failed: position is empty')
       return false
     }
     if (!editFormData.birth_date) {
       setError('Дата рождения обязательна')
+      logger.warn('[BirthdayManagement] Validation failed: birth_date is missing')
       return false
     }
+    
+    logger.info('[BirthdayManagement] Validation passed')
     return true
   }
 
   const handleUpdate = async (id: number) => {
+    logger.info(`[BirthdayManagement] handleUpdate called for id=${id}`)
+    logger.info(`[BirthdayManagement] editFormData:`, editFormData)
+    
     try {
       setError(null)
       
+      // Проверка авторизации перед отправкой
+      const initData = typeof window !== 'undefined' && window.Telegram?.WebApp?.initData
+      if (!initData) {
+        const errorMsg = 'Ошибка авторизации. Обновите страницу.'
+        setError(errorMsg)
+        logger.error('[BirthdayManagement] Missing initData - cannot proceed with update')
+        return
+      }
+      logger.info('[BirthdayManagement] Authorization check passed')
+      
       // Валидация обязательных полей
       if (!validateEditForm()) {
-        logger.warn('Validation failed in handleUpdate, not sending request')
+        logger.warn('[BirthdayManagement] Validation failed - not sending request')
         return
       }
       
-      // Преобразование пустой строки comment в undefined
-      const dataToSend = {
+      // Нормализация данных перед отправкой
+      const normalizedData = {
         ...editFormData,
+        birth_date: editFormData.birth_date || undefined,
         comment: editFormData.comment?.trim() || undefined
       }
       
-      logger.info(`[BirthdayManagement] Updating birthday ${id} with data:`, dataToSend)
+      // Проверка формата birth_date перед отправкой
+      if (normalizedData.birth_date && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedData.birth_date)) {
+        const errorMsg = 'Неверный формат даты рождения'
+        setError(errorMsg)
+        logger.error('[BirthdayManagement] Invalid birth_date format before sending:', normalizedData.birth_date)
+        return
+      }
       
-      const result = await api.updateBirthday(id, dataToSend)
+      logger.info('[BirthdayManagement] Sending data:', normalizedData)
+      
+      const result = await api.updateBirthday(id, normalizedData)
       
       logger.info(`[BirthdayManagement] Birthday ${id} updated successfully:`, result)
       
@@ -141,12 +184,26 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const handleDelete = async (id: number) => {
+    logger.info(`[BirthdayManagement] handleDelete called for id=${id}`)
+    
     if (!confirm('Удалить день рождения?')) {
       logger.info(`[BirthdayManagement] Delete cancelled for birthday ${id}`)
       return
     }
+    
     try {
       setError(null)
+      
+      // Проверка авторизации перед отправкой
+      const initData = typeof window !== 'undefined' && window.Telegram?.WebApp?.initData
+      if (!initData) {
+        const errorMsg = 'Ошибка авторизации. Обновите страницу.'
+        setError(errorMsg)
+        logger.error('[BirthdayManagement] Missing initData - cannot proceed with delete')
+        return
+      }
+      logger.info('[BirthdayManagement] Authorization check passed')
+      
       logger.info(`[BirthdayManagement] Deleting birthday ${id}`)
       
       await api.deleteBirthday(id)

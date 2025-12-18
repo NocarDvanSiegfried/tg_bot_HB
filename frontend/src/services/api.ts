@@ -54,13 +54,24 @@ async function fetchWithErrorHandling(
       try {
         errorData = await response.json()
         if (errorData.detail) {
-          errorMessage = errorData.detail
+          // Если detail - строка, используем её
+          if (typeof errorData.detail === 'string') {
+            errorMessage = errorData.detail
+          } else if (Array.isArray(errorData.detail)) {
+            // Если detail - массив (ошибки валидации FastAPI)
+            const validationErrors = errorData.detail.map((e: any) => {
+              const field = e.loc ? e.loc.join('.') : 'unknown'
+              return `${field}: ${e.msg || e.message || 'validation error'}`
+            }).join(', ')
+            errorMessage = `Ошибка валидации: ${validationErrors}`
+          }
         } else if (errorData.errors) {
-          // Обработка ошибок валидации Pydantic
-          const validationErrors = errorData.errors.map((e: any) => 
-            `${e.loc.join('.')}: ${e.msg}`
-          ).join(', ')
-          errorMessage = `Validation error: ${validationErrors}`
+          // Обработка ошибок валидации Pydantic (формат с errors)
+          const validationErrors = errorData.errors.map((e: any) => {
+            const field = e.loc ? e.loc.join('.') : 'unknown'
+            return `${field}: ${e.msg || e.message || 'validation error'}`
+          }).join(', ')
+          errorMessage = `Ошибка валидации: ${validationErrors}`
         }
         logger.error(`[API] Error response for ${method} ${url}:`, errorData)
       } catch {
@@ -79,6 +90,10 @@ async function fetchWithErrorHandling(
       }
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         throw new Error('Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API.')
+      }
+      // Обработка ошибок CORS
+      if (error.message.includes('CORS') || error.message.includes('Cross-Origin')) {
+        throw new Error('Ошибка CORS: проверьте настройки сервера')
       }
       throw error
     }
