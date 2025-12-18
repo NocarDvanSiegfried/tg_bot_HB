@@ -1,11 +1,14 @@
 """Базовый класс для репозиториев с общими методами."""
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
+
+logger = logging.getLogger(__name__)
 
 # Type variables для generic repository
 TEntity = TypeVar("TEntity")
@@ -135,10 +138,17 @@ class BaseRepositoryImpl(ABC, Generic[TEntity, TModel]):
         Args:
             entity_id: ID записи для удаления
         """
-        result = await self.session.execute(
-            select(self.model_class).where(self.model_class.id == entity_id)
-        )
-        model = result.scalar_one_or_none()
-        if model:
-            await self.session.delete(model)
-            await self.session.flush()
+        try:
+            result = await self.session.execute(
+                select(self.model_class).where(self.model_class.id == entity_id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                await self.session.delete(model)
+                await self.session.flush()
+                logger.info(f"{self.model_class.__name__} deleted: ID={entity_id}")
+            else:
+                logger.warning(f"Attempted to delete non-existent {self.model_class.__name__} with id {entity_id}")
+        except Exception as e:
+            logger.error(f"Error deleting {self.model_class.__name__} with id {entity_id}: {type(e).__name__}: {e}")
+            raise

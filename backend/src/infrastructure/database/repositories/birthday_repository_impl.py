@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 from sqlalchemy import extract, or_, select
@@ -11,6 +12,8 @@ from src.infrastructure.database.repositories.base_repository import BaseReposit
 from src.infrastructure.database.repositories.search_validator import (
     validate_and_sanitize_search_query,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], BirthdayRepository):
@@ -81,22 +84,28 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
         if not birthday.id:
             raise ValueError("Birthday ID is required for update")
 
-        result = await self.session.execute(
-            select(BirthdayModel).where(BirthdayModel.id == birthday.id)
-        )
-        model = result.scalar_one_or_none()
-        if not model:
-            raise ValueError(f"Birthday with id {birthday.id} not found")
+        try:
+            result = await self.session.execute(
+                select(BirthdayModel).where(BirthdayModel.id == birthday.id)
+            )
+            model = result.scalar_one_or_none()
+            if not model:
+                logger.warning(f"Attempted to update non-existent birthday with id {birthday.id}")
+                raise ValueError(f"Birthday with id {birthday.id} not found")
 
-        model.full_name = birthday.full_name
-        model.company = birthday.company
-        model.position = birthday.position
-        model.birth_date = birthday.birth_date
-        model.comment = birthday.comment
+            model.full_name = birthday.full_name
+            model.company = birthday.company
+            model.position = birthday.position
+            model.birth_date = birthday.birth_date
+            model.comment = birthday.comment
 
-        await self.session.flush()
-        await self.session.refresh(model)
-        return self._to_entity(model)
+            await self.session.flush()
+            await self.session.refresh(model)
+            logger.info(f"Birthday updated: ID={birthday.id}, ФИО={birthday.full_name}")
+            return self._to_entity(model)
+        except Exception as e:
+            logger.error(f"Error updating birthday with id {birthday.id}: {type(e).__name__}: {e}")
+            raise
 
     async def search(self, query: str) -> list[Birthday]:
         """
