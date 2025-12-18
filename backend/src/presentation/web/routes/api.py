@@ -398,18 +398,28 @@ async def update_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ДР."""
+    logger.info(f"[API] Updating birthday {birthday_id} with data: full_name={data.full_name}, company={data.company}, position={data.position}")
+    
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["update"]
 
-    birthday = await use_case.execute(
-        birthday_id=birthday_id,
-        full_name=data.full_name,
-        company=data.company,
-        position=data.position,
-        birth_date=data.birth_date,
-        comment=data.comment,
-    )
-    await session.commit()
+    try:
+        birthday = await use_case.execute(
+            birthday_id=birthday_id,
+            full_name=data.full_name,
+            company=data.company,
+            position=data.position,
+            birth_date=data.birth_date,
+            comment=data.comment,
+        )
+        await session.commit()
+        logger.info(f"[API] Birthday {birthday_id} updated successfully")
+    except ValueError as e:
+        logger.warning(f"[API] Validation error updating birthday {birthday_id}: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"[API] Error updating birthday {birthday_id}: {type(e).__name__}: {e}")
+        raise
     return {
         "id": birthday.id,
         "full_name": birthday.full_name,
@@ -431,11 +441,21 @@ async def delete_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ДР."""
+    logger.info(f"[API] Deleting birthday {birthday_id}")
+    
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["delete"]
 
-    await use_case.execute(birthday_id)
-    await session.commit()
+    try:
+        await use_case.execute(birthday_id)
+        await session.commit()
+        logger.info(f"[API] Birthday {birthday_id} deleted successfully")
+    except ValueError as e:
+        logger.warning(f"[API] Error deleting birthday {birthday_id}: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"[API] Error deleting birthday {birthday_id}: {type(e).__name__}: {e}")
+        raise
     return {"status": "deleted"}
 
 

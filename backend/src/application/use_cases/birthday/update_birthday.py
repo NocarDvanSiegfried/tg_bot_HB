@@ -22,12 +22,20 @@ class UpdateBirthdayUseCase:
         if not existing:
             raise ValueError(f"Birthday with id {birthday_id} not found")
 
+        # Обработка comment: если пустая строка, использовать None; если None, сохранить существующий
+        comment_value = existing.comment
+        if comment is not None:
+            if comment.strip():  # Если не пустая после trim
+                comment_value = comment.strip()
+            else:  # Если пустая строка
+                comment_value = None  # Использовать None вместо пустой строки
+
         updated = Birthday(
             id=birthday_id,
             full_name=full_name if full_name is not None else existing.full_name,
             company=company if company is not None else existing.company,
             position=position if position is not None else existing.position,
             birth_date=birth_date if birth_date is not None else existing.birth_date,
-            comment=comment if comment is not None else existing.comment,
+            comment=comment_value,
         )
         return await self.birthday_repository.update(updated)

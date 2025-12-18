@@ -68,16 +68,63 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     }
   }
 
+  const validateEditForm = (): boolean => {
+    if (!editFormData.full_name?.trim()) {
+      setError('ФИО не может быть пустым')
+      return false
+    }
+    if (!editFormData.company?.trim()) {
+      setError('Компания не может быть пустой')
+      return false
+    }
+    if (!editFormData.position?.trim()) {
+      setError('Должность не может быть пустой')
+      return false
+    }
+    if (!editFormData.birth_date) {
+      setError('Дата рождения обязательна')
+      return false
+    }
+    return true
+  }
+
   const handleUpdate = async (id: number) => {
     try {
       setError(null)
-      await api.updateBirthday(id, editFormData)
+      
+      // Валидация обязательных полей
+      if (!validateEditForm()) {
+        return
+      }
+      
+      // Преобразование пустой строки comment в undefined
+      const dataToSend = {
+        ...editFormData,
+        comment: editFormData.comment?.trim() || undefined
+      }
+      
+      await api.updateBirthday(id, dataToSend)
       setEditingId(null)
       setEditFormData({})
       loadBirthdays()
     } catch (error) {
       logger.error('Failed to update birthday:', error)
-      setError(error instanceof Error ? error.message : 'Не удалось обновить день рождения')
+      let errorMessage = 'Не удалось обновить день рождения'
+      if (error instanceof Error) {
+        // Пытаемся извлечь детальное сообщение из ответа
+        if (error.message.includes('Field cannot be empty')) {
+          errorMessage = 'Обязательные поля не могут быть пустыми'
+        } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          errorMessage = 'Ошибка авторизации. Обновите страницу.'
+        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+          errorMessage = 'У вас нет доступа к этой операции'
+        } else if (error.message.includes('not found')) {
+          errorMessage = 'День рождения не найден'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      setError(errorMessage)
     }
   }
 
@@ -95,7 +142,19 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       loadBirthdays()
     } catch (error) {
       logger.error('Failed to delete birthday:', error)
-      setError(error instanceof Error ? error.message : 'Не удалось удалить день рождения')
+      let errorMessage = 'Не удалось удалить день рождения'
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          errorMessage = 'Ошибка авторизации. Обновите страницу.'
+        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+          errorMessage = 'У вас нет доступа к этой операции'
+        } else if (error.message.includes('not found')) {
+          errorMessage = 'День рождения не найден'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      setError(errorMessage)
     }
   }
 
