@@ -54,17 +54,46 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const handleEdit = (id: number) => {
+    logger.info(`[BirthdayManagement] handleEdit called for id=${id}`)
     const birthday = birthdays.find(b => b.id === id)
     if (birthday) {
+      logger.info(`[BirthdayManagement] Found birthday to edit:`, birthday)
+      
+      // Нормализация birth_date для input type="date" (формат YYYY-MM-DD)
+      let normalizedBirthDate = birthday.birth_date
+      if (normalizedBirthDate) {
+        // Если дата в формате ISO (с временем), извлечь только дату
+        if (normalizedBirthDate.includes('T')) {
+          normalizedBirthDate = normalizedBirthDate.split('T')[0]
+        }
+        // Если дата в другом формате, попытаться преобразовать
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedBirthDate)) {
+          logger.warn(`[BirthdayManagement] Invalid birth_date format: ${normalizedBirthDate}, attempting to fix`)
+          // Попытка исправить формат
+          try {
+            const date = new Date(normalizedBirthDate)
+            if (!isNaN(date.getTime())) {
+              normalizedBirthDate = date.toISOString().split('T')[0]
+            }
+          } catch (e) {
+            logger.error(`[BirthdayManagement] Could not normalize birth_date: ${e}`)
+          }
+        }
+      }
+      
       setEditingId(id)
       setEditFormData({
         full_name: birthday.full_name,
         company: birthday.company,
         position: birthday.position,
-        birth_date: birthday.birth_date,
+        birth_date: normalizedBirthDate,
         comment: birthday.comment || '',
       })
       setError(null)
+      logger.info(`[BirthdayManagement] Edit form initialized for id=${id}`)
+    } else {
+      logger.error(`[BirthdayManagement] Birthday with id=${id} not found`)
+      setError(`День рождения с ID ${id} не найден`)
     }
   }
 
@@ -174,6 +203,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         }
       }
       setError(errorMessage)
+      throw error // Пробросить ошибку дальше для обработки в onSubmit
     }
   }
 
@@ -285,9 +315,29 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
               {editingId === bd.id ? (
                 <div style={{ width: '100%' }}>
                   <form
-                    onSubmit={(e) => {
+                    noValidate
+                    onSubmit={async (e) => {
                       e.preventDefault()
-                      handleUpdate(bd.id!)
+                      logger.info(`[BirthdayManagement] Form submitted for birthday id=${bd.id}`)
+                      
+                      const form = e.currentTarget
+                      if (!form.checkValidity()) {
+                        logger.warn('[BirthdayManagement] Form validation failed (HTML5)')
+                        form.reportValidity()
+                        return
+                      }
+                      
+                      if (!bd.id) {
+                        logger.error('[BirthdayManagement] Cannot update: birthday id is missing')
+                        setError('Ошибка: ID дня рождения не найден')
+                        return
+                      }
+                      
+                      try {
+                        await handleUpdate(bd.id)
+                      } catch (error) {
+                        logger.error('[BirthdayManagement] Error in form onSubmit:', error)
+                      }
                     }}
                     style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
                   >
@@ -336,10 +386,20 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     <br />
                     {bd.birth_date} {bd.comment && `(${bd.comment})`}
                   </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => handleEdit(bd.id!)}>Редактировать</button>
-                    <button onClick={() => handleDelete(bd.id!)}>Удалить</button>
-                  </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button onClick={() => handleEdit(bd.id!)}>Редактировать</button>
+                      <button 
+                        onClick={async () => {
+                          try {
+                            await handleDelete(bd.id!)
+                          } catch (error) {
+                            logger.error('[BirthdayManagement] Error in delete button onClick:', error)
+                          }
+                        }}
+                      >
+                        Удалить
+                      </button>
+                    </div>
                 </>
               )}
             </li>

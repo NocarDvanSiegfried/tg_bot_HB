@@ -167,19 +167,46 @@ export const api = {
   },
 
   async updateBirthday(id: number, data: Partial<Birthday>): Promise<Birthday> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(data),
+    logger.info(`[API] updateBirthday called with id=${id}, data:`, data)
+    const headers = getHeaders()
+    headers['Content-Type'] = 'application/json'
+    logger.info(`[API] updateBirthday headers:`, { 
+      'Content-Type': headers['Content-Type'],
+      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
     })
-    return response.json()
+    
+    try {
+      const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(data),
+      })
+      logger.info(`[API] updateBirthday response received, status: ${response.status}`)
+      return response.json()
+    } catch (error) {
+      logger.error(`[API] updateBirthday error:`, error)
+      throw error
+    }
   },
 
   async deleteBirthday(id: number): Promise<void> {
-    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
-      method: 'DELETE',
-      headers: getHeaders(),
+    logger.info(`[API] deleteBirthday called with id=${id}`)
+    const headers = getHeaders()
+    logger.info(`[API] deleteBirthday headers:`, { 
+      'Content-Type': headers['Content-Type'],
+      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
     })
+    
+    try {
+      const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+        method: 'DELETE',
+        headers: headers,
+      })
+      logger.info(`[API] deleteBirthday response received, status: ${response.status}`)
+    } catch (error) {
+      logger.error(`[API] deleteBirthday error:`, error)
+      throw error
+    }
   },
 
   async getResponsible(): Promise<Responsible[]> {
