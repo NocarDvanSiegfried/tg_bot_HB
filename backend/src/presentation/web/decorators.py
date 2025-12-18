@@ -5,7 +5,8 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.exceptions.api_exceptions import (

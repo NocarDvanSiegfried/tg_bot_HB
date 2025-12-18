@@ -1,6 +1,7 @@
 import { Birthday } from '../types/birthday'
 import { Responsible } from '../types/responsible'
 import { API_BASE_URL, API_TIMEOUT_MS } from '../config/api'
+import { logger } from '../utils/logger'
 
 // Получить initData из Telegram WebApp
 function getInitData(): string | null {
@@ -30,6 +31,9 @@ async function fetchWithErrorHandling(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
+  const method = options.method || 'GET'
+  logger.info(`[API] ${method} ${url}`, options.body ? { body: options.body } : {})
+  
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
@@ -41,22 +45,34 @@ async function fetchWithErrorHandling(
     
     clearTimeout(timeoutId)
     
+    logger.info(`[API] Response ${response.status} for ${method} ${url}`)
+    
     if (!response.ok) {
       // Пытаемся получить детали ошибки из ответа
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      let errorData: any = null
       try {
-        const errorData = await response.json()
+        errorData = await response.json()
         if (errorData.detail) {
           errorMessage = errorData.detail
+        } else if (errorData.errors) {
+          // Обработка ошибок валидации Pydantic
+          const validationErrors = errorData.errors.map((e: any) => 
+            `${e.loc.join('.')}: ${e.msg}`
+          ).join(', ')
+          errorMessage = `Validation error: ${validationErrors}`
         }
+        logger.error(`[API] Error response for ${method} ${url}:`, errorData)
       } catch {
         // Игнорируем ошибку парсинга JSON
+        logger.error(`[API] Error response for ${method} ${url}: ${response.status} ${response.statusText}`)
       }
       throw new Error(errorMessage)
     }
     
     return response
   } catch (error) {
+    logger.error(`[API] Error in ${method} ${url}:`, error)
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout: сервер не отвечает')

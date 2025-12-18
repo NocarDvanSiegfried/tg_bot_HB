@@ -94,6 +94,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       
       // Валидация обязательных полей
       if (!validateEditForm()) {
+        logger.warn('Validation failed in handleUpdate, not sending request')
         return
       }
       
@@ -103,16 +104,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         comment: editFormData.comment?.trim() || undefined
       }
       
-      await api.updateBirthday(id, dataToSend)
+      logger.info(`[BirthdayManagement] Updating birthday ${id} with data:`, dataToSend)
+      
+      const result = await api.updateBirthday(id, dataToSend)
+      
+      logger.info(`[BirthdayManagement] Birthday ${id} updated successfully:`, result)
+      
       setEditingId(null)
       setEditFormData({})
       loadBirthdays()
     } catch (error) {
-      logger.error('Failed to update birthday:', error)
+      logger.error(`[BirthdayManagement] Failed to update birthday ${id}:`, error)
       let errorMessage = 'Не удалось обновить день рождения'
       if (error instanceof Error) {
         // Пытаемся извлечь детальное сообщение из ответа
-        if (error.message.includes('Field cannot be empty')) {
+        if (error.message.includes('Field cannot be empty') || error.message.includes('Validation error')) {
           errorMessage = 'Обязательные поля не могут быть пустыми'
         } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
           errorMessage = 'Ошибка авторизации. Обновите страницу.'
@@ -135,13 +141,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Удалить день рождения?')) return
+    if (!confirm('Удалить день рождения?')) {
+      logger.info(`[BirthdayManagement] Delete cancelled for birthday ${id}`)
+      return
+    }
     try {
       setError(null)
+      logger.info(`[BirthdayManagement] Deleting birthday ${id}`)
+      
       await api.deleteBirthday(id)
+      
+      logger.info(`[BirthdayManagement] Birthday ${id} deleted successfully`)
+      
       loadBirthdays()
     } catch (error) {
-      logger.error('Failed to delete birthday:', error)
+      logger.error(`[BirthdayManagement] Failed to delete birthday ${id}:`, error)
       let errorMessage = 'Не удалось удалить день рождения'
       if (error instanceof Error) {
         if (error.message.includes('401') || error.message.includes('Unauthorized')) {

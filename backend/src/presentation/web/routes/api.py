@@ -128,6 +128,7 @@ class VerifyInitDataRequest(BaseModel):
 async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-Init-Data")) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
     if not x_init_data:
+        logger.warning("[AUTH] Missing initData header")
         raise HTTPException(status_code=401, detail="Missing initData")
 
     # Создаем use-case через фабрику (не требует session)
@@ -136,8 +137,10 @@ async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-I
 
     try:
         user_data = await use_case.execute(x_init_data)
+        logger.info(f"[AUTH] User authenticated: user_id={user_data.get('id')}")
         return user_data
     except ValueError as e:
+        logger.warning(f"[AUTH] Invalid initData: {e}")
         raise HTTPException(status_code=401, detail="Invalid initData") from e
 
 
@@ -159,6 +162,7 @@ async def require_panel_access(
     """
     user_id = user.get("id")
     if not user_id:
+        logger.warning("[AUTH] User ID not found in initData")
         raise HTTPException(status_code=401, detail="User ID not found in initData")
 
     # Проверяем доступ к панели
@@ -166,10 +170,12 @@ async def require_panel_access(
     has_access = await use_case.execute(user_id)
 
     if not has_access:
+        logger.warning(f"[AUTH] Access denied for user_id={user_id}")
         raise HTTPException(
             status_code=403, detail="Access denied. You don't have permission to access the panel."
         )
 
+    logger.info(f"[AUTH] Panel access granted for user_id={user_id}")
     return user
 
 
