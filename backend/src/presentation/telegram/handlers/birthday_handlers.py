@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from aiogram import Router
@@ -8,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
 from src.presentation.telegram.keyboards import get_birthday_management_keyboard
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -94,10 +97,12 @@ async def process_comment(message: Message, state: FSMContext, session: AsyncSes
             birth_date=data["birth_date"],
             comment=comment,
         )
-        # Управление транзакциями теперь в middleware
+        await session.commit()
+        logger.info(f"День рождения создан: ID={birthday.id}, ФИО={birthday.full_name}")
         await message.answer(f"День рождения добавлен! ID: {birthday.id}")
     except Exception as e:
-        # Управление транзакциями теперь в middleware
+        await session.rollback()
+        logger.error(f"Ошибка при создании дня рождения: {type(e).__name__}: {e}")
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()

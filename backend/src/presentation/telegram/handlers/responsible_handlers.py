@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -6,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
 from src.presentation.telegram.keyboards import get_responsible_management_keyboard
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -65,10 +69,12 @@ async def process_position(message: Message, state: FSMContext, session: AsyncSe
             company=data["company"],
             position=message.text,
         )
-        # Управление транзакциями теперь в middleware
+        await session.commit()
+        logger.info(f"Ответственный создан: ID={responsible.id}, ФИО={responsible.full_name}")
         await message.answer(f"Ответственный добавлен! ID: {responsible.id}")
     except Exception as e:
-        # Управление транзакциями теперь в middleware
+        await session.rollback()
+        logger.error(f"Ошибка при создании ответственного: {type(e).__name__}: {e}")
         await message.answer(f"Ошибка: {str(e)}")
 
     await state.clear()

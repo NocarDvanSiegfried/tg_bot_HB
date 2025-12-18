@@ -23,6 +23,19 @@ from pathlib import Path
 backend_root = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_root))
 
+# Загружаем переменные окружения из .env файла
+from dotenv import load_dotenv
+
+# Загружаем .env из корня проекта (на уровень выше backend)
+project_root = backend_root.parent
+env_path = project_root / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
+    print(f"✅ Загружен .env файл: {env_path}")
+else:
+    print(f"⚠️  .env файл не найден: {env_path}")
+    print("   Переменные окружения будут загружены из системных переменных")
+
 from src.infrastructure.config.env_validator import (
     get_database_name_from_url,
     mask_database_url,
@@ -80,12 +93,13 @@ async def check_database_connection():
     # Шаг 3: Попытка подключения
     print("Шаг 3: Попытка подключения к PostgreSQL...")
     try:
+        from sqlalchemy import text
         from sqlalchemy.ext.asyncio import create_async_engine
 
         engine = create_async_engine(database_url, echo=False)
         async with engine.begin() as conn:
             # Простой запрос для проверки подключения
-            result = await conn.execute("SELECT version();")
+            result = await conn.execute(text("SELECT version();"))
             version = result.scalar()
             print(f"✅ Подключение успешно!")
             print(f"   Версия PostgreSQL: {version.split(',')[0]}")
@@ -135,11 +149,12 @@ async def check_database_connection():
     # Шаг 4: Проверка существования базы данных
     print("Шаг 4: Проверка существования базы данных...")
     try:
+        from sqlalchemy import text
         from sqlalchemy.ext.asyncio import create_async_engine
 
         engine = create_async_engine(database_url, echo=False)
         async with engine.begin() as conn:
-            result = await conn.execute("SELECT current_database();")
+            result = await conn.execute(text("SELECT current_database();"))
             current_db = result.scalar()
             if current_db == db_name:
                 print(f"✅ База данных '{db_name}' существует и доступна")
