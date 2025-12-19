@@ -48,6 +48,11 @@ async function fetchWithErrorHandling(
     logger.info(`[API] Response ${response.status} for ${method} ${url}`)
     
     if (!response.ok) {
+      // Детальная обработка ошибок
+      if (response.status === 0) {
+        throw new Error('CORS error: запрос заблокирован браузером')
+      }
+      
       // Пытаемся получить детали ошибки из ответа
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`
       let errorData: any = null
@@ -89,6 +94,7 @@ async function fetchWithErrorHandling(
         throw new Error('Request timeout: сервер не отвечает')
       }
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        logger.error(`[API] Network error - возможно CORS или сеть: ${error.message}`)
         throw new Error('Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API.')
       }
       // Обработка ошибок CORS

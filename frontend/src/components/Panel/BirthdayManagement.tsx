@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
 import { logger } from '../../utils/logger'
+import { API_BASE_URL } from '../../config/api'
 import './Panel.css'
 
 interface BirthdayManagementProps {
@@ -176,6 +177,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         return
       }
       
+      // Перед отправкой проверить, что все готово
+      logger.info(`[BirthdayManagement] Ready to send PUT request for id=${id}`)
+      logger.info(`[BirthdayManagement] URL: ${API_BASE_URL}/api/panel/birthdays/${id}`)
       logger.info('[BirthdayManagement] Sending data:', normalizedData)
       
       const result = await api.updateBirthday(id, normalizedData)
@@ -186,23 +190,28 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       setEditFormData({})
       loadBirthdays()
     } catch (error) {
-      logger.error(`[BirthdayManagement] Failed to update birthday ${id}:`, error)
-      let errorMessage = 'Не удалось обновить день рождения'
-      if (error instanceof Error) {
-        // Пытаемся извлечь детальное сообщение из ответа
-        if (error.message.includes('Field cannot be empty') || error.message.includes('Validation error')) {
-          errorMessage = 'Обязательные поля не могут быть пустыми'
-        } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-          errorMessage = 'Ошибка авторизации. Обновите страницу.'
-        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
-          errorMessage = 'У вас нет доступа к этой операции'
-        } else if (error.message.includes('not found')) {
-          errorMessage = 'День рождения не найден'
-        } else {
-          errorMessage = error.message
+      logger.error(`[BirthdayManagement] PUT request failed:`, error)
+      // Проверить тип ошибки
+      if (error instanceof TypeError) {
+        setError('Ошибка сети. Проверьте подключение к интернету.')
+      } else {
+        let errorMessage = 'Не удалось обновить день рождения'
+        if (error instanceof Error) {
+          // Пытаемся извлечь детальное сообщение из ответа
+          if (error.message.includes('Field cannot be empty') || error.message.includes('Validation error')) {
+            errorMessage = 'Обязательные поля не могут быть пустыми'
+          } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+            errorMessage = 'Ошибка авторизации. Обновите страницу.'
+          } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+            errorMessage = 'У вас нет доступа к этой операции'
+          } else if (error.message.includes('not found')) {
+            errorMessage = 'День рождения не найден'
+          } else {
+            errorMessage = error.message
+          }
         }
+        setError(errorMessage)
       }
-      setError(errorMessage)
       throw error // Пробросить ошибку дальше для обработки в onSubmit
     }
   }

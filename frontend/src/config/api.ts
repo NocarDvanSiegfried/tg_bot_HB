@@ -37,3 +37,11 @@ if (typeof window !== 'undefined' && window.Telegram?.WebApp && isLocalhost) {
 
 export const API_BASE_URL = apiUrl
 
+// Проверка конфигурации API_BASE_URL
+if (!API_BASE_URL) {
+  console.error('[API] API_BASE_URL is not defined!')
+  throw new Error('API_BASE_URL is not configured')
+}
+
+console.log(`[API] Using API_BASE_URL: ${API_BASE_URL}`)
+

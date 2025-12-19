@@ -1,7 +1,7 @@
 import logging
 from datetime import date
 
-from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query, Request
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query, Request, Response
 from pydantic import BaseModel, Field, field_validator
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -127,8 +127,9 @@ class VerifyInitDataRequest(BaseModel):
 # Dependency для проверки авторизации через Telegram
 async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-Init-Data")) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
+    logger.info(f"[AUTH] verify_telegram_auth called, X-Init-Data present: {x_init_data is not None}")
     if not x_init_data:
-        logger.warning("[AUTH] Missing initData header")
+        logger.warning("[AUTH] Missing X-Init-Data header")
         raise HTTPException(status_code=401, detail="Missing initData")
 
     # Создаем use-case через фабрику (не требует session)
@@ -392,6 +393,22 @@ async def create_birthday(
     }
 
 
+@router.options("/api/panel/birthdays/{birthday_id}")
+async def options_birthday(request: Request, birthday_id: int = Path(..., gt=0)):
+    """Обработка preflight запросов для PUT/DELETE."""
+    logger.info(f"[OPTIONS] Preflight request for /api/panel/birthdays/{birthday_id}")
+    origin = request.headers.get("origin", "*")
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": "PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, X-Init-Data",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
+
+
 @router.put("/api/panel/birthdays/{birthday_id}")
 @limiter.limit(WRITE_LIMIT)
 @handle_api_errors
@@ -404,6 +421,7 @@ async def update_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ДР."""
+    logger.info(f"[API] PUT /api/panel/birthdays/{birthday_id} - Request received")
     logger.info(f"[API] Updating birthday {birthday_id} with data: full_name={data.full_name}, company={data.company}, position={data.position}")
     
     use_cases = factory.create_birthday_use_cases()
@@ -447,6 +465,7 @@ async def delete_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ДР."""
+    logger.info(f"[API] DELETE /api/panel/birthdays/{birthday_id} - Request received")
     logger.info(f"[API] Deleting birthday {birthday_id}")
     
     use_cases = factory.create_birthday_use_cases()
@@ -784,3 +803,54 @@ async def check_openrouter_config(
             "configured": False,
             "error": f"Unexpected error: {type(e).__name__}",
         }
+
+
+# Тестовые endpoints для проверки PUT/DELETE
+@router.put("/api/test/put")
+@router.delete("/api/test/delete")
+async def test_put_delete(request: Request):
+    """Тестовый endpoint для проверки PUT/DELETE."""
+    logger.info(f"[TEST] {request.method} /api/test/{request.method.lower()} - OK")
+    return {"status": "ok", "method": request.method}
+
+
+# Диагностический endpoint для проверки CORS
+@router.get("/api/debug/cors")
+async def debug_cors(request: Request):
+    """Диагностический endpoint для проверки CORS."""
+    import os
+    from src.infrastructure.config.constants import TELEGRAM_ORIGINS
+    
+    # Получаем allowed_origins так же, как в app.py
+    allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+    is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
+    
+    if is_production:
+        if not allowed_origins_env:
+            allowed_origins = TELEGRAM_ORIGINS.copy()
+        elif "," in allowed_origins_env:
+            allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
+            for tg_origin in TELEGRAM_ORIGINS:
+                if tg_origin not in allowed_origins:
+                    allowed_origins.append(tg_origin)
+        else:
+            allowed_origins = [allowed_origins_env.strip()]
+            allowed_origins.extend(TELEGRAM_ORIGINS)
+    else:
+        if allowed_origins_env and allowed_origins_env != "*":
+            if "," in allowed_origins_env:
+                allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
+            else:
+                allowed_origins = [allowed_origins_env.strip()]
+            for tg_origin in TELEGRAM_ORIGINS:
+                if tg_origin not in allowed_origins:
+                    allowed_origins.append(tg_origin)
+        else:
+            allowed_origins = ["*"]
+    
+    return {
+        "origin": request.headers.get("origin"),
+        "method": request.method,
+        "headers": dict(request.headers),
+        "cors_allowed_origins": allowed_origins,
+    }

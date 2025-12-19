@@ -71,6 +71,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Экспортируем allowed_origins для использования в других модулях
+__all__ = ["app", "allowed_origins"]
+
 
 # Middleware для логирования всех запросов
 @app.middleware("http")
@@ -80,8 +83,12 @@ async def log_requests(request: Request, call_next):
     path = request.url.path
     query_params = str(request.query_params) if request.query_params else ""
     
-    # Логируем запрос
+    # Логируем все запросы, включая OPTIONS
     logger.info(f"[REQUEST] {method} {path}{'?' + query_params if query_params else ''}")
+    
+    # Для OPTIONS запросов логируем заголовки
+    if method == "OPTIONS":
+        logger.debug(f"[OPTIONS] Headers: {dict(request.headers)}")
     
     # Логируем заголовки (без чувствительных данных)
     headers_to_log = {}
