@@ -149,6 +149,23 @@ async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-I
         raise HTTPException(status_code=401, detail="Invalid initData") from e
 
 
+# Вспомогательная функция для проверки доступа к панели с переданной сессией
+async def _check_panel_access(session: AsyncSession, user_id: int) -> bool:
+    """
+    Проверить доступ пользователя к панели управления с использованием переданной сессии.
+    
+    Args:
+        session: Сессия БД для использования
+        user_id: ID пользователя для проверки
+        
+    Returns:
+        True, если у пользователя есть доступ, False в противном случае
+    """
+    factory = UseCaseFactory(session=session)
+    use_case = factory.create_panel_access_use_case()
+    return await use_case.execute(user_id)
+
+
 # Dependency для проверки прав доступа к панели управления
 async def require_panel_access(
     user: dict = Depends(verify_telegram_auth),
@@ -409,8 +426,6 @@ async def update_birthday(
     birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
     data: BirthdayUpdate = Body(..., description="Данные для обновления дня рождения"),
     session: AsyncSession = Depends(get_db_session),
-    user: dict = Depends(require_panel_access),
-    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ДР."""
     # Логирование в самом начале endpoint'а до всех проверок
@@ -420,6 +435,41 @@ async def update_birthday(
     logger.info(f"[API] Request headers: {dict(request.headers)}")
     logger.info(f"[API] Updating birthday {birthday_id} with data: full_name={data.full_name}, company={data.company}, position={data.position}")
     
+    # Получаем сессию первым делом, затем создаём factory с этой сессией
+    # Проверяем авторизацию через Telegram
+    x_init_data = request.headers.get("X-Init-Data")
+    if not x_init_data:
+        logger.warning("[API] Missing X-Init-Data header")
+        raise HTTPException(status_code=401, detail="Missing initData")
+    
+    # Верифицируем пользователя
+    auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
+    auth_use_case = auth_factory.create_auth_use_case()
+    try:
+        user = await auth_use_case.execute(x_init_data)
+    except ValueError as e:
+        logger.warning(f"[API] Invalid initData: {e}")
+        raise HTTPException(status_code=401, detail="Invalid initData") from e
+    
+    user_id = user.get("id")
+    if not user_id:
+        logger.warning("[API] User ID not found in initData")
+        raise HTTPException(status_code=401, detail="User ID not found in initData")
+    
+    # Создаём factory с переданной сессией для проверки доступа и операций
+    factory = UseCaseFactory(session=session)
+    
+    # Проверяем доступ к панели используя ту же сессию
+    has_access = await _check_panel_access(session, user_id)
+    if not has_access:
+        logger.warning(f"[API] Access denied for user_id={user_id}")
+        raise HTTPException(
+            status_code=403, detail="Access denied. You don't have permission to access the panel."
+        )
+    
+    logger.info(f"[API] Panel access granted for user_id={user_id}")
+    
+    # Выполняем операцию обновления
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["update"]
 
@@ -435,9 +485,11 @@ async def update_birthday(
         await session.commit()
         logger.info(f"[API] Birthday {birthday_id} updated successfully")
     except ValueError as e:
+        await session.rollback()
         logger.warning(f"[API] Validation error updating birthday {birthday_id}: {e}")
         raise
     except Exception as e:
+        await session.rollback()
         logger.error(f"[API] Error updating birthday {birthday_id}: {type(e).__name__}: {e}")
         raise
     return {
@@ -457,8 +509,6 @@ async def delete_birthday(
     request: Request,
     birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
     session: AsyncSession = Depends(get_db_session),
-    user: dict = Depends(require_panel_access),
-    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ДР."""
     # Логирование в самом начале endpoint'а до всех проверок
@@ -468,6 +518,41 @@ async def delete_birthday(
     logger.info(f"[API] Request headers: {dict(request.headers)}")
     logger.info(f"[API] Deleting birthday {birthday_id}")
     
+    # Получаем сессию первым делом, затем создаём factory с этой сессией
+    # Проверяем авторизацию через Telegram
+    x_init_data = request.headers.get("X-Init-Data")
+    if not x_init_data:
+        logger.warning("[API] Missing X-Init-Data header")
+        raise HTTPException(status_code=401, detail="Missing initData")
+    
+    # Верифицируем пользователя
+    auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
+    auth_use_case = auth_factory.create_auth_use_case()
+    try:
+        user = await auth_use_case.execute(x_init_data)
+    except ValueError as e:
+        logger.warning(f"[API] Invalid initData: {e}")
+        raise HTTPException(status_code=401, detail="Invalid initData") from e
+    
+    user_id = user.get("id")
+    if not user_id:
+        logger.warning("[API] User ID not found in initData")
+        raise HTTPException(status_code=401, detail="User ID not found in initData")
+    
+    # Создаём factory с переданной сессией для проверки доступа и операций
+    factory = UseCaseFactory(session=session)
+    
+    # Проверяем доступ к панели используя ту же сессию
+    has_access = await _check_panel_access(session, user_id)
+    if not has_access:
+        logger.warning(f"[API] Access denied for user_id={user_id}")
+        raise HTTPException(
+            status_code=403, detail="Access denied. You don't have permission to access the panel."
+        )
+    
+    logger.info(f"[API] Panel access granted for user_id={user_id}")
+    
+    # Выполняем операцию удаления
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["delete"]
 
@@ -476,9 +561,11 @@ async def delete_birthday(
         await session.commit()
         logger.info(f"[API] Birthday {birthday_id} deleted successfully")
     except ValueError as e:
+        await session.rollback()
         logger.warning(f"[API] Error deleting birthday {birthday_id}: {e}")
         raise
     except Exception as e:
+        await session.rollback()
         logger.error(f"[API] Error deleting birthday {birthday_id}: {type(e).__name__}: {e}")
         raise
     return {"status": "deleted"}

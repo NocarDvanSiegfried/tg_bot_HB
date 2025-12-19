@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
 import { logger } from '../../utils/logger'
@@ -22,9 +22,14 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     birth_date: '',
     comment: '',
   })
+  const isMountedRef = useRef(true)
 
   useEffect(() => {
+    isMountedRef.current = true
     loadBirthdays()
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
 
   const loadBirthdays = async () => {
@@ -32,12 +37,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     try {
       setError(null)
       const data = await api.getBirthdays()
-      setBirthdays(data)
+      // Проверяем, что компонент всё ещё смонтирован перед обновлением состояния
+      if (isMountedRef.current) {
+        setBirthdays(data)
+      }
     } catch (error) {
       logger.error('Failed to load birthdays:', error)
-      setError(error instanceof Error ? error.message : 'Не удалось загрузить дни рождения')
+      // Проверяем, что компонент всё ещё смонтирован перед обновлением состояния
+      if (isMountedRef.current) {
+        setError(error instanceof Error ? error.message : 'Не удалось загрузить дни рождения')
+      }
     } finally {
-      setLoading(false)
+      // Проверяем, что компонент всё ещё смонтирован перед обновлением состояния
+      if (isMountedRef.current) {
+        setLoading(false)
+      }
     }
   }
 
@@ -216,7 +230,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         errorMessage = error.message || errorMessage
       }
       setError(errorMessage)
-      throw error // Пробросить ошибку дальше для обработки в onSubmit
+      // Ошибка уже обработана и отображена, не пробрасываем дальше
     }
   }
 
@@ -314,8 +328,8 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         <p>Загрузка...</p>
       ) : (
         <ul className="panel-list">
-          {birthdays.map((bd) => (
-            <li key={bd.id} className="panel-list-item">
+          {birthdays.map((bd, index) => (
+            <li key={bd.id ?? `birthday-${index}`} className="panel-list-item">
               {editingId === bd.id ? (
                 <div style={{ width: '100%' }}>
                   <form
@@ -330,11 +344,8 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         return
                       }
                       
-                      try {
-                        await handleUpdate(bd.id)
-                      } catch (error) {
-                        logger.error('[BirthdayManagement] Error in form onSubmit:', error)
-                      }
+                      // handleUpdate уже обрабатывает ошибки и отображает их через setError
+                      await handleUpdate(bd.id)
                     }}
                     style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
                   >
