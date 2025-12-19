@@ -175,6 +175,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         return
       }
       
+      // Дополнительная проверка наличия всех обязательных полей перед отправкой
+      if (!normalizedData.full_name || !normalizedData.company || !normalizedData.position || !normalizedData.birth_date) {
+        const missingFields = []
+        if (!normalizedData.full_name) missingFields.push('ФИО')
+        if (!normalizedData.company) missingFields.push('Компания')
+        if (!normalizedData.position) missingFields.push('Должность')
+        if (!normalizedData.birth_date) missingFields.push('Дата рождения')
+        
+        const errorMsg = `Отсутствуют обязательные поля: ${missingFields.join(', ')}`
+        setError(errorMsg)
+        logger.warn(`[BirthdayManagement] Missing required fields before sending: ${missingFields.join(', ')}`)
+        logger.warn(`[BirthdayManagement] normalizedData:`, JSON.stringify(normalizedData))
+        return
+      }
+      
       logger.info(`[BirthdayManagement] ===== READY TO SEND PUT REQUEST =====`)
       logger.info(`[BirthdayManagement] URL: ${API_BASE_URL}/api/panel/birthdays/${id}`)
       logger.info(`[BirthdayManagement] Method: PUT`)
@@ -328,27 +343,23 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       placeholder="ФИО"
                       value={editFormData.full_name || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, full_name: e.target.value })}
-                      required
                     />
                     <input
                       type="text"
                       placeholder="Компания"
                       value={editFormData.company || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, company: e.target.value })}
-                      required
                     />
                     <input
                       type="text"
                       placeholder="Должность"
                       value={editFormData.position || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
-                      required
                     />
                     <input
                       type="date"
                       value={editFormData.birth_date || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, birth_date: e.target.value })}
-                      required
                     />
                     <textarea
                       placeholder="Комментарий (необязательно)"
@@ -369,11 +380,16 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     {bd.birth_date} {bd.comment && `(${bd.comment})`}
                   </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <button onClick={() => handleEdit(bd.id!)}>Редактировать</button>
+                      <button onClick={() => bd.id && handleEdit(bd.id)}>Редактировать</button>
                       <button 
                         onClick={async () => {
+                          if (!bd.id) {
+                            logger.error('[BirthdayManagement] Cannot delete: birthday id is missing')
+                            setError('Ошибка: ID дня рождения не найден')
+                            return
+                          }
                           try {
-                            await handleDelete(bd.id!)
+                            await handleDelete(bd.id)
                           } catch (error) {
                             logger.error('[BirthdayManagement] Error in delete button onClick:', error)
                           }
