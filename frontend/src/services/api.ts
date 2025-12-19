@@ -60,11 +60,14 @@ async function fetchWithErrorHandling(
         throw new Error('CORS error: запрос заблокирован браузером')
       }
       
+      // Клонируем response перед чтением, чтобы не повредить оригинальный объект
+      const responseClone = response.clone()
+      
       // Пытаемся получить детали ошибки из ответа
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`
       let errorData: any = null
       try {
-        errorData = await response.json()
+        errorData = await responseClone.json()
         if (errorData.detail) {
           // Если detail - строка, используем её
           if (typeof errorData.detail === 'string') {
@@ -198,6 +201,21 @@ export const api = {
         body: JSON.stringify(data),
       })
       logger.info(`[API] updateBirthday response received, status: ${response.status}`)
+      
+      // Проверка на наличие тела ответа перед чтением
+      // Статусы 204 No Content и 205 Reset Content не имеют тела
+      if (response.status === 204 || response.status === 205) {
+        logger.warn(`[API] updateBirthday received ${response.status} status with no body`)
+        throw new Error('Сервер вернул ответ без данных')
+      }
+      
+      // Проверка Content-Length header
+      const contentLength = response.headers.get('Content-Length')
+      if (contentLength === '0') {
+        logger.warn(`[API] updateBirthday received response with Content-Length: 0`)
+        throw new Error('Сервер вернул пустой ответ')
+      }
+      
       return response.json()
     } catch (error) {
       logger.error(`[API] updateBirthday error:`, error)
@@ -219,6 +237,24 @@ export const api = {
         headers: headers,
       })
       logger.info(`[API] deleteBirthday response received, status: ${response.status}`)
+      
+      // DELETE запросы могут возвращать 204 No Content или 205 Reset Content без тела
+      // Не пытаемся читать тело ответа для этих статусов
+      if (response.status === 204 || response.status === 205) {
+        logger.info(`[API] deleteBirthday received ${response.status} status (no body expected)`)
+        return
+      }
+      
+      // Если статус не 204/205, но тело может быть пустым, проверяем Content-Length
+      const contentLength = response.headers.get('Content-Length')
+      if (contentLength === '0') {
+        logger.info(`[API] deleteBirthday received response with Content-Length: 0`)
+        return
+      }
+      
+      // Если есть тело ответа, пытаемся его прочитать (опционально, для логирования)
+      // Но для DELETE обычно не требуется читать тело
+      logger.info(`[API] deleteBirthday completed successfully`)
     } catch (error) {
       logger.error(`[API] deleteBirthday error:`, error)
       throw error

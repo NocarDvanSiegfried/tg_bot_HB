@@ -182,11 +182,33 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       }
       
       // Проверка формата birth_date перед отправкой
-      if (normalizedData.birth_date && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedData.birth_date)) {
-        const errorMsg = 'Неверный формат даты рождения'
-        setError(errorMsg)
-        logger.error('[BirthdayManagement] Invalid birth_date format before sending:', normalizedData.birth_date)
-        return
+      if (normalizedData.birth_date) {
+        // Проверяем формат YYYY-MM-DD через регулярное выражение
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedData.birth_date)) {
+          const errorMsg = 'Неверный формат даты рождения. Используйте формат YYYY-MM-DD'
+          setError(errorMsg)
+          logger.error('[BirthdayManagement] Invalid birth_date format before sending:', normalizedData.birth_date)
+          return
+        }
+        
+        // Парсим дату и проверяем, что она валидна
+        const dateObj = new Date(normalizedData.birth_date + 'T00:00:00')
+        if (isNaN(dateObj.getTime())) {
+          const errorMsg = 'Неверная дата рождения. Проверьте правильность введённой даты'
+          setError(errorMsg)
+          logger.error('[BirthdayManagement] Invalid birth_date (NaN) before sending:', normalizedData.birth_date)
+          return
+        }
+        
+        // Проверяем, что дата не в будущем (опционально, но логично для дня рождения)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        if (dateObj > today) {
+          const errorMsg = 'Дата рождения не может быть в будущем'
+          setError(errorMsg)
+          logger.error('[BirthdayManagement] Birth date is in the future:', normalizedData.birth_date)
+          return
+        }
       }
       
       // Дополнительная проверка наличия всех обязательных полей перед отправкой
@@ -377,6 +399,20 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       value={editFormData.comment || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, comment: e.target.value })}
                     />
+                    {error && (
+                      <div style={{ 
+                        color: 'red', 
+                        backgroundColor: '#ffebee', 
+                        padding: '10px', 
+                        borderRadius: '4px',
+                        border: '1px solid #f44336',
+                        marginTop: '5px',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                      }}>
+                        {error}
+                      </div>
+                    )}
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button type="submit">Сохранить</button>
                       <button type="button" onClick={handleCancelEdit}>Отмена</button>
@@ -393,17 +429,14 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button onClick={() => bd.id && handleEdit(bd.id)}>Редактировать</button>
                       <button 
-                        onClick={async () => {
+                        onClick={() => {
                           if (!bd.id) {
                             logger.error('[BirthdayManagement] Cannot delete: birthday id is missing')
                             setError('Ошибка: ID дня рождения не найден')
                             return
                           }
-                          try {
-                            await handleDelete(bd.id)
-                          } catch (error) {
-                            logger.error('[BirthdayManagement] Error in delete button onClick:', error)
-                          }
+                          // handleDelete уже обрабатывает ошибки и отображает их через setError
+                          handleDelete(bd.id)
                         }}
                       >
                         Удалить
