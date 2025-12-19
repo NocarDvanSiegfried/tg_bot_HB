@@ -236,9 +236,12 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       
       logger.info(`[BirthdayManagement] Birthday ${id} updated successfully:`, result)
       
+      logger.info(`[BirthdayManagement] [STATE UPDATE] Clearing edit form and reloading birthdays`)
       setEditingId(null)
       setEditFormData({})
-      loadBirthdays()
+      logger.info(`[BirthdayManagement] [STATE UPDATE] Calling loadBirthdays() to refresh list`)
+      await loadBirthdays()
+      logger.info(`[BirthdayManagement] [STATE UPDATE] State updated successfully after update`)
     } catch (error) {
       logger.error(`[BirthdayManagement] PUT request failed:`, error)
       logger.error(`[BirthdayManagement] Error details:`, {
@@ -282,7 +285,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       
       logger.info(`[BirthdayManagement] Birthday ${id} deleted successfully`)
       
-      loadBirthdays()
+      logger.info(`[BirthdayManagement] [STATE UPDATE] Calling loadBirthdays() to refresh list after delete`)
+      await loadBirthdays()
+      logger.info(`[BirthdayManagement] [STATE UPDATE] State updated successfully after delete`)
     } catch (error) {
       logger.error(`[BirthdayManagement] DELETE request failed:`, error)
       logger.error(`[BirthdayManagement] Error details:`, {

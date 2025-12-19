@@ -428,52 +428,70 @@ async def update_birthday(
     session: AsyncSession = Depends(get_db_session),
 ):
     """Обновить ДР."""
-    # Логирование в самом начале endpoint'а до всех проверок
-    logger.info(f"[API] ===== PUT /api/panel/birthdays/{birthday_id} - Request received =====")
+    # Логирование в самом начале endpoint'а ДО декоратора и всех проверок
+    logger.info(f"[API] ===== PUT /api/panel/birthdays/{birthday_id} - ENTRY POINT =====")
     logger.info(f"[API] Request method: {request.method}")
     logger.info(f"[API] Request path: {request.url.path}")
     logger.info(f"[API] Request headers: {dict(request.headers)}")
-    logger.info(f"[API] Updating birthday {birthday_id} with data: full_name={data.full_name}, company={data.company}, position={data.position}")
+    logger.info(f"[API] Session ID: {id(session)}")
+    
+    # Логирование после получения данных из Pydantic
+    logger.info(f"[API] [STEP 1] Pydantic validation passed")
+    logger.info(f"[API] [STEP 1] Received data: birthday_id={birthday_id}, full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}")
     
     # Получаем сессию первым делом, затем создаём factory с этой сессией
     # Проверяем авторизацию через Telegram
+    logger.info(f"[API] [STEP 2] Starting Telegram authentication")
     x_init_data = request.headers.get("X-Init-Data")
     if not x_init_data:
-        logger.warning("[API] Missing X-Init-Data header")
+        logger.warning("[API] [STEP 2] Missing X-Init-Data header")
         raise HTTPException(status_code=401, detail="Missing initData")
+    
+    logger.info(f"[API] [STEP 2] X-Init-Data header present: {x_init_data[:20]}...")
     
     # Верифицируем пользователя
     auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
     auth_use_case = auth_factory.create_auth_use_case()
     try:
+        logger.info(f"[API] [STEP 2] Executing auth use case")
         user = await auth_use_case.execute(x_init_data)
+        logger.info(f"[API] [STEP 2] Authentication successful, user: {user}")
     except ValueError as e:
-        logger.warning(f"[API] Invalid initData: {e}")
+        logger.warning(f"[API] [STEP 2] Invalid initData: {e}")
         raise HTTPException(status_code=401, detail="Invalid initData") from e
     
     user_id = user.get("id")
     if not user_id:
-        logger.warning("[API] User ID not found in initData")
+        logger.warning("[API] [STEP 2] User ID not found in initData")
         raise HTTPException(status_code=401, detail="User ID not found in initData")
     
+    logger.info(f"[API] [STEP 2] Authentication completed, user_id={user_id}")
+    
     # Создаём factory с переданной сессией для проверки доступа и операций
+    logger.info(f"[API] [STEP 3] Creating UseCaseFactory with session")
     factory = UseCaseFactory(session=session)
+    logger.info(f"[API] [STEP 3] UseCaseFactory created")
     
     # Проверяем доступ к панели используя ту же сессию
+    logger.info(f"[API] [STEP 3] Checking panel access for user_id={user_id}")
     has_access = await _check_panel_access(session, user_id)
     if not has_access:
-        logger.warning(f"[API] Access denied for user_id={user_id}")
+        logger.warning(f"[API] [STEP 3] Access denied for user_id={user_id}")
         raise HTTPException(
             status_code=403, detail="Access denied. You don't have permission to access the panel."
         )
     
-    logger.info(f"[API] Panel access granted for user_id={user_id}")
+    logger.info(f"[API] [STEP 3] Panel access granted for user_id={user_id}")
     
     # Выполняем операцию обновления
+    logger.info(f"[API] [STEP 4] Creating birthday use cases")
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["update"]
+    logger.info(f"[API] [STEP 4] Update use case created")
 
     try:
+        logger.info(f"[API] [STEP 4] Executing update use case for birthday_id={birthday_id}")
+        logger.info(f"[API] [STEP 4] Update data: full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}")
         birthday = await use_case.execute(
             birthday_id=birthday_id,
             full_name=data.full_name,
@@ -482,16 +500,28 @@ async def update_birthday(
             birth_date=data.birth_date,
             comment=data.comment,
         )
+        logger.info(f"[API] [STEP 4] Use case executed successfully, birthday: id={birthday.id}, full_name={birthday.full_name}")
+        
+        logger.info(f"[API] [STEP 5] Starting commit for birthday_id={birthday_id}")
         await session.commit()
-        logger.info(f"[API] Birthday {birthday_id} updated successfully")
+        logger.info(f"[API] [STEP 5] Commit completed successfully for birthday_id={birthday_id}")
+        logger.info(f"[API] [STEP 5] Transaction committed, changes should be persisted in database")
+        
+        logger.info(f"[API] ===== PUT /api/panel/birthdays/{birthday_id} - SUCCESS =====")
     except ValueError as e:
+        logger.warning(f"[API] [STEP 4/5] Validation error updating birthday {birthday_id}: {e}")
+        logger.info(f"[API] [STEP 5] Starting rollback due to ValueError")
         await session.rollback()
-        logger.warning(f"[API] Validation error updating birthday {birthday_id}: {e}")
+        logger.info(f"[API] [STEP 5] Rollback completed")
         raise
     except Exception as e:
+        logger.error(f"[API] [STEP 4/5] Error updating birthday {birthday_id}: {type(e).__name__}: {e}", exc_info=True)
+        logger.info(f"[API] [STEP 5] Starting rollback due to Exception")
         await session.rollback()
-        logger.error(f"[API] Error updating birthday {birthday_id}: {type(e).__name__}: {e}")
+        logger.info(f"[API] [STEP 5] Rollback completed")
         raise
+    
+    logger.info(f"[API] [STEP 6] Preparing response for birthday_id={birthday_id}")
     return {
         "id": birthday.id,
         "full_name": birthday.full_name,
@@ -511,63 +541,92 @@ async def delete_birthday(
     session: AsyncSession = Depends(get_db_session),
 ):
     """Удалить ДР."""
-    # Логирование в самом начале endpoint'а до всех проверок
-    logger.info(f"[API] ===== DELETE /api/panel/birthdays/{birthday_id} - Request received =====")
+    # Логирование в самом начале endpoint'а ДО декоратора и всех проверок
+    logger.info(f"[API] ===== DELETE /api/panel/birthdays/{birthday_id} - ENTRY POINT =====")
     logger.info(f"[API] Request method: {request.method}")
     logger.info(f"[API] Request path: {request.url.path}")
     logger.info(f"[API] Request headers: {dict(request.headers)}")
-    logger.info(f"[API] Deleting birthday {birthday_id}")
+    logger.info(f"[API] Session ID: {id(session)}")
+    
+    # Логирование после получения данных из Path
+    logger.info(f"[API] [STEP 1] Path validation passed")
+    logger.info(f"[API] [STEP 1] Received birthday_id: {birthday_id}")
     
     # Получаем сессию первым делом, затем создаём factory с этой сессией
     # Проверяем авторизацию через Telegram
+    logger.info(f"[API] [STEP 2] Starting Telegram authentication")
     x_init_data = request.headers.get("X-Init-Data")
     if not x_init_data:
-        logger.warning("[API] Missing X-Init-Data header")
+        logger.warning("[API] [STEP 2] Missing X-Init-Data header")
         raise HTTPException(status_code=401, detail="Missing initData")
+    
+    logger.info(f"[API] [STEP 2] X-Init-Data header present: {x_init_data[:20]}...")
     
     # Верифицируем пользователя
     auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
     auth_use_case = auth_factory.create_auth_use_case()
     try:
+        logger.info(f"[API] [STEP 2] Executing auth use case")
         user = await auth_use_case.execute(x_init_data)
+        logger.info(f"[API] [STEP 2] Authentication successful, user: {user}")
     except ValueError as e:
-        logger.warning(f"[API] Invalid initData: {e}")
+        logger.warning(f"[API] [STEP 2] Invalid initData: {e}")
         raise HTTPException(status_code=401, detail="Invalid initData") from e
     
     user_id = user.get("id")
     if not user_id:
-        logger.warning("[API] User ID not found in initData")
+        logger.warning("[API] [STEP 2] User ID not found in initData")
         raise HTTPException(status_code=401, detail="User ID not found in initData")
     
+    logger.info(f"[API] [STEP 2] Authentication completed, user_id={user_id}")
+    
     # Создаём factory с переданной сессией для проверки доступа и операций
+    logger.info(f"[API] [STEP 3] Creating UseCaseFactory with session")
     factory = UseCaseFactory(session=session)
+    logger.info(f"[API] [STEP 3] UseCaseFactory created")
     
     # Проверяем доступ к панели используя ту же сессию
+    logger.info(f"[API] [STEP 3] Checking panel access for user_id={user_id}")
     has_access = await _check_panel_access(session, user_id)
     if not has_access:
-        logger.warning(f"[API] Access denied for user_id={user_id}")
+        logger.warning(f"[API] [STEP 3] Access denied for user_id={user_id}")
         raise HTTPException(
             status_code=403, detail="Access denied. You don't have permission to access the panel."
         )
     
-    logger.info(f"[API] Panel access granted for user_id={user_id}")
+    logger.info(f"[API] [STEP 3] Panel access granted for user_id={user_id}")
     
     # Выполняем операцию удаления
+    logger.info(f"[API] [STEP 4] Creating birthday use cases")
     use_cases = factory.create_birthday_use_cases()
     use_case = use_cases["delete"]
+    logger.info(f"[API] [STEP 4] Delete use case created")
 
     try:
+        logger.info(f"[API] [STEP 4] Executing delete use case for birthday_id={birthday_id}")
         await use_case.execute(birthday_id)
+        logger.info(f"[API] [STEP 4] Use case executed successfully for birthday_id={birthday_id}")
+        
+        logger.info(f"[API] [STEP 5] Starting commit for birthday_id={birthday_id}")
         await session.commit()
-        logger.info(f"[API] Birthday {birthday_id} deleted successfully")
+        logger.info(f"[API] [STEP 5] Commit completed successfully for birthday_id={birthday_id}")
+        logger.info(f"[API] [STEP 5] Transaction committed, deletion should be persisted in database")
+        
+        logger.info(f"[API] ===== DELETE /api/panel/birthdays/{birthday_id} - SUCCESS =====")
     except ValueError as e:
+        logger.warning(f"[API] [STEP 4/5] Validation error deleting birthday {birthday_id}: {e}")
+        logger.info(f"[API] [STEP 5] Starting rollback due to ValueError")
         await session.rollback()
-        logger.warning(f"[API] Error deleting birthday {birthday_id}: {e}")
+        logger.info(f"[API] [STEP 5] Rollback completed")
         raise
     except Exception as e:
+        logger.error(f"[API] [STEP 4/5] Error deleting birthday {birthday_id}: {type(e).__name__}: {e}", exc_info=True)
+        logger.info(f"[API] [STEP 5] Starting rollback due to Exception")
         await session.rollback()
-        logger.error(f"[API] Error deleting birthday {birthday_id}: {type(e).__name__}: {e}")
+        logger.info(f"[API] [STEP 5] Rollback completed")
         raise
+    
+    logger.info(f"[API] [STEP 6] Preparing response for birthday_id={birthday_id}")
     return {"status": "deleted"}
 
 
@@ -897,8 +956,36 @@ async def check_openrouter_config(
 @router.delete("/api/test/delete")
 async def test_put_delete(request: Request):
     """Тестовый endpoint для проверки PUT/DELETE."""
-    logger.info(f"[TEST] {request.method} /api/test/{request.method.lower()} - OK")
-    return {"status": "ok", "method": request.method}
+    logger.info(f"[TEST] ===== {request.method} /api/test/{request.method.lower()} - ENTRY POINT =====")
+    logger.info(f"[TEST] Request method: {request.method}")
+    logger.info(f"[TEST] Request path: {request.url.path}")
+    logger.info(f"[TEST] Request headers: {dict(request.headers)}")
+    logger.info(f"[TEST] Query params: {dict(request.query_params)}")
+    
+    # Пытаемся прочитать тело запроса, если есть
+    try:
+        body = await request.body()
+        if body:
+            logger.info(f"[TEST] Request body length: {len(body)} bytes")
+            try:
+                import json
+                body_json = json.loads(body)
+                logger.info(f"[TEST] Request body (JSON): {body_json}")
+            except:
+                logger.info(f"[TEST] Request body (raw): {body[:200]}...")
+        else:
+            logger.info(f"[TEST] Request body: empty")
+    except Exception as e:
+        logger.warning(f"[TEST] Error reading request body: {e}")
+    
+    logger.info(f"[TEST] ===== {request.method} /api/test/{request.method.lower()} - SUCCESS =====")
+    return {
+        "status": "ok",
+        "method": request.method,
+        "path": request.url.path,
+        "message": "Request reached server successfully",
+        "headers_received": list(request.headers.keys())
+    }
 
 # Простые тестовые endpoints без зависимостей
 @router.put("/api/test/put-simple")

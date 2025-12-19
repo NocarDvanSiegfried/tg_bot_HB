@@ -127,9 +127,23 @@ async def log_requests(request: Request, call_next):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Обработка ошибок валидации Pydantic."""
     logger.error(
-        f"[VALIDATION ERROR] {request.method} {request.url.path}: {exc.errors()}"
+        f"[VALIDATION ERROR] ===== {request.method} {request.url.path} - Pydantic Validation Failed ====="
     )
-    logger.debug(f"[VALIDATION ERROR] Body: {exc.body if hasattr(exc, 'body') else 'N/A'}")
+    logger.error(f"[VALIDATION ERROR] Request method: {request.method}")
+    logger.error(f"[VALIDATION ERROR] Request path: {request.url.path}")
+    logger.error(f"[VALIDATION ERROR] Validation errors count: {len(exc.errors())}")
+    
+    # Детальное логирование каждой ошибки валидации
+    for i, error in enumerate(exc.errors(), 1):
+        logger.error(
+            f"[VALIDATION ERROR] Error {i}: "
+            f"field={'.'.join(str(loc) for loc in error.get('loc', []))}, "
+            f"type={error.get('type', 'unknown')}, "
+            f"message={error.get('msg', 'no message')}"
+        )
+    
+    logger.debug(f"[VALIDATION ERROR] Request body: {exc.body if hasattr(exc, 'body') else 'N/A'}")
+    logger.debug(f"[VALIDATION ERROR] Request headers: {dict(request.headers)}")
     
     return JSONResponse(
         status_code=422,

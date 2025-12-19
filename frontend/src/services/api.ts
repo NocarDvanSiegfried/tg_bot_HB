@@ -201,6 +201,13 @@ export const api = {
         body: JSON.stringify(data),
       })
       logger.info(`[API] updateBirthday response received, status: ${response.status}`)
+      logger.info(`[API] updateBirthday response headers:`, Object.fromEntries(response.headers.entries()))
+      
+      // Проверка статуса ответа
+      if (!response.ok) {
+        logger.error(`[API] updateBirthday received non-ok status: ${response.status} ${response.statusText}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
       
       // Проверка на наличие тела ответа перед чтением
       // Статусы 204 No Content и 205 Reset Content не имеют тела
@@ -216,7 +223,23 @@ export const api = {
         throw new Error('Сервер вернул пустой ответ')
       }
       
-      return response.json()
+      logger.info(`[API] updateBirthday reading response body`)
+      const result = await response.json()
+      logger.info(`[API] updateBirthday response data:`, result)
+      
+      // Проверка, что ответ содержит ожидаемые данные
+      if (!result || typeof result !== 'object') {
+        logger.error(`[API] updateBirthday received invalid response data:`, result)
+        throw new Error('Сервер вернул невалидные данные')
+      }
+      
+      if (!result.id || !result.full_name) {
+        logger.error(`[API] updateBirthday response missing required fields:`, result)
+        throw new Error('Сервер вернул неполные данные')
+      }
+      
+      logger.info(`[API] updateBirthday success: id=${result.id}, full_name=${result.full_name}`)
+      return result
     } catch (error) {
       logger.error(`[API] updateBirthday error:`, error)
       throw error
@@ -237,13 +260,31 @@ export const api = {
         headers: headers,
       })
       logger.info(`[API] deleteBirthday response received, status: ${response.status}`)
+      logger.info(`[API] deleteBirthday response headers:`, Object.fromEntries(response.headers.entries()))
+      
+      // Проверка статуса ответа
+      if (!response.ok) {
+        logger.error(`[API] deleteBirthday received non-ok status: ${response.status} ${response.statusText}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
       
       // DELETE запросы могут возвращать 204 No Content или 205 Reset Content без тела
       // Не пытаемся читать тело ответа для этих статусов
       if (response.status === 204 || response.status === 205) {
         logger.info(`[API] deleteBirthday received ${response.status} status (no body expected)`)
+        logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
         return
       }
+      
+      // Если статус не 204/205, проверяем наличие тела ответа
+      const contentLength = response.headers.get('Content-Length')
+      if (contentLength && contentLength !== '0') {
+        logger.info(`[API] deleteBirthday reading response body`)
+        const result = await response.json()
+        logger.info(`[API] deleteBirthday response data:`, result)
+      }
+      
+      logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
       
       // Если статус не 204/205, но тело может быть пустым, проверяем Content-Length
       const contentLength = response.headers.get('Content-Length')

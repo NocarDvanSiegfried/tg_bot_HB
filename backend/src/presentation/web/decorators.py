@@ -62,39 +62,51 @@ def handle_api_errors(func: Callable) -> Callable:
             return await func(*args, **kwargs)
         except (BirthdayNotFoundError, ResponsibleNotFoundError) as e:
             if session:
+                logger.info(f"[DECORATOR] Performing rollback for NotFoundError in {func.__name__}")
                 await session.rollback()
-            logger.warning(f"Resource not found: {e}")
+                logger.info(f"[DECORATOR] Rollback completed for NotFoundError")
+            logger.warning(f"[DECORATOR] Resource not found in {func.__name__}: {e}")
             raise HTTPException(status_code=404, detail=str(e)) from e
         except ValidationError as e:
             if session:
+                logger.info(f"[DECORATOR] Performing rollback for ValidationError in {func.__name__}")
                 await session.rollback()
-            logger.warning(f"Validation error: {e}")
+                logger.info(f"[DECORATOR] Rollback completed for ValidationError")
+            logger.warning(f"[DECORATOR] Validation error in {func.__name__}: {e}")
             raise HTTPException(status_code=400, detail=str(e)) from e
         except BusinessRuleError as e:
             if session:
+                logger.info(f"[DECORATOR] Performing rollback for BusinessRuleError in {func.__name__}")
                 await session.rollback()
-            logger.warning(f"Business rule error: {e}")
+                logger.info(f"[DECORATOR] Rollback completed for BusinessRuleError")
+            logger.warning(f"[DECORATOR] Business rule error in {func.__name__}: {e}")
             raise HTTPException(status_code=400, detail=str(e)) from e
         except OpenRouterRateLimitError as e:
-            logger.error(f"OpenRouter rate limit error: {e}")
+            logger.error(f"[DECORATOR] OpenRouter rate limit error in {func.__name__}: {e}")
             raise HTTPException(
                 status_code=503, detail="Service temporarily unavailable due to rate limiting"
             ) from e
         except OpenRouterTimeoutError as e:
-            logger.error(f"OpenRouter timeout error: {e}")
+            logger.error(f"[DECORATOR] OpenRouter timeout error in {func.__name__}: {e}")
             raise HTTPException(status_code=504, detail="External service timeout") from e
         except OpenRouterAPIError as e:
-            logger.error(f"OpenRouter API error: {e}")
+            logger.error(f"[DECORATOR] OpenRouter API error in {func.__name__}: {e}")
             raise HTTPException(status_code=502, detail="External service error") from e
         except ValueError as e:
             if session:
+                logger.info(f"[DECORATOR] Performing rollback for ValueError in {func.__name__}")
+                logger.info(f"[DECORATOR] Note: Endpoint may have already performed rollback, this is safe")
                 await session.rollback()
-            logger.warning(f"Value error: {e}")
+                logger.info(f"[DECORATOR] Rollback completed for ValueError")
+            logger.warning(f"[DECORATOR] Value error in {func.__name__}: {e}")
             raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
             if session:
+                logger.info(f"[DECORATOR] Performing rollback for Exception in {func.__name__}")
+                logger.info(f"[DECORATOR] Note: Endpoint may have already performed rollback, this is safe")
                 await session.rollback()
-            logger.error(f"Unexpected error in {func.__name__}", exc_info=True)
+                logger.info(f"[DECORATOR] Rollback completed for Exception")
+            logger.error(f"[DECORATOR] Unexpected error in {func.__name__}: {type(e).__name__}: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail="Internal server error") from e
 
     return wrapper
