@@ -127,7 +127,11 @@ class VerifyInitDataRequest(BaseModel):
 # Dependency для проверки авторизации через Telegram
 async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-Init-Data")) -> dict:
     """Dependency для проверки авторизации через Telegram WebApp."""
-    logger.info(f"[AUTH] verify_telegram_auth called, X-Init-Data present: {x_init_data is not None}")
+    # ЛОГИРОВАНИЕ В САМОМ НАЧАЛЕ ДО ВСЕХ ПРОВЕРОК
+    logger.info(f"[AUTH] ===== verify_telegram_auth CALLED =====")
+    logger.info(f"[AUTH] X-Init-Data present: {x_init_data is not None}")
+    logger.info(f"[AUTH] X-Init-Data length: {len(x_init_data) if x_init_data else 0}")
+    
     if not x_init_data:
         logger.warning("[AUTH] Missing X-Init-Data header")
         raise HTTPException(status_code=401, detail="Missing initData")
@@ -161,6 +165,10 @@ async def require_panel_access(
         HTTPException 401: Если пользователь не авторизован или нет user_id
         HTTPException 403: Если у пользователя нет доступа к панели
     """
+    # ЛОГИРОВАНИЕ В САМОМ НАЧАЛЕ ДО ВСЕХ ПРОВЕРОК
+    logger.info(f"[AUTH] ===== require_panel_access CALLED =====")
+    logger.info(f"[AUTH] User data received: user_id={user.get('id')}")
+    
     user_id = user.get("id")
     if not user_id:
         logger.warning("[AUTH] User ID not found in initData")
@@ -805,6 +813,24 @@ async def test_put_delete(request: Request):
     logger.info(f"[TEST] {request.method} /api/test/{request.method.lower()} - OK")
     return {"status": "ok", "method": request.method}
 
+# Простые тестовые endpoints без зависимостей
+@router.put("/api/test/put-simple")
+async def test_put_simple(request: Request):
+    """Тестовый endpoint для проверки PUT запросов без зависимостей."""
+    logger.info(f"[TEST] ===== PUT /api/test/put-simple - Request received =====")
+    logger.info(f"[TEST] Request method: {request.method}")
+    logger.info(f"[TEST] Request path: {request.url.path}")
+    logger.info(f"[TEST] Request headers: {dict(request.headers)}")
+    return {"status": "ok", "method": "PUT", "message": "Request reached server"}
+
+@router.delete("/api/test/delete-simple")
+async def test_delete_simple(request: Request):
+    """Тестовый endpoint для проверки DELETE запросов без зависимостей."""
+    logger.info(f"[TEST] ===== DELETE /api/test/delete-simple - Request received =====")
+    logger.info(f"[TEST] Request method: {request.method}")
+    logger.info(f"[TEST] Request path: {request.url.path}")
+    logger.info(f"[TEST] Request headers: {dict(request.headers)}")
+    return {"status": "ok", "method": "DELETE", "message": "Request reached server"}
 
 # Диагностический endpoint для проверки CORS
 @router.get("/api/debug/cors")

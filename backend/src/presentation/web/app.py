@@ -63,12 +63,15 @@ else:
         # Разрешаем все для разработки
         allowed_origins = ["*"]
 
+# Убедиться, что CORS middleware правильно настроен
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],  # Явно указать методы
+    allow_headers=["Content-Type", "X-Init-Data", "Authorization", "Accept"],  # Явно указать заголовки
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Экспортируем allowed_origins для использования в других модулях
@@ -81,23 +84,34 @@ async def log_requests(request: Request, call_next):
     """Логирование всех входящих запросов для отладки."""
     method = request.method
     path = request.url.path
-    query_params = str(request.query_params) if request.query_params else ""
     
-    # Логируем все запросы, включая OPTIONS
-    logger.info(f"[REQUEST] {method} {path}{'?' + query_params if query_params else ''}")
-    
-    # Для OPTIONS запросов логируем заголовки
-    if method == "OPTIONS":
-        logger.debug(f"[OPTIONS] Headers: {dict(request.headers)}")
-    
-    # Логируем заголовки (без чувствительных данных)
-    headers_to_log = {}
-    for key, value in request.headers.items():
-        if key.lower() in ['x-init-data', 'authorization']:
-            headers_to_log[key] = f"{value[:20]}..." if len(value) > 20 else "***"
-        else:
-            headers_to_log[key] = value
-    logger.debug(f"[REQUEST] Headers: {headers_to_log}")
+    # Детальное логирование для PUT/DELETE
+    if method in ["PUT", "DELETE"]:
+        logger.info(f"[REQUEST] ===== {method} {path} =====")
+        logger.info(f"[REQUEST] Query params: {dict(request.query_params)}")
+        headers_to_log = {}
+        for key, value in request.headers.items():
+            if key.lower() in ['x-init-data', 'authorization']:
+                headers_to_log[key] = f"{value[:20]}..." if len(value) > 20 else "***"
+            else:
+                headers_to_log[key] = value
+        logger.info(f"[REQUEST] Headers: {headers_to_log}")
+    else:
+        query_params = str(request.query_params) if request.query_params else ""
+        logger.info(f"[REQUEST] {method} {path}{'?' + query_params if query_params else ''}")
+        
+        # Для OPTIONS запросов логируем заголовки
+        if method == "OPTIONS":
+            logger.debug(f"[OPTIONS] Headers: {dict(request.headers)}")
+        
+        # Логируем заголовки (без чувствительных данных)
+        headers_to_log = {}
+        for key, value in request.headers.items():
+            if key.lower() in ['x-init-data', 'authorization']:
+                headers_to_log[key] = f"{value[:20]}..." if len(value) > 20 else "***"
+            else:
+                headers_to_log[key] = value
+        logger.debug(f"[REQUEST] Headers: {headers_to_log}")
     
     try:
         response = await call_next(request)

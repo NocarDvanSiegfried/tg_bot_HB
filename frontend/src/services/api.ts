@@ -32,18 +32,20 @@ async function fetchWithErrorHandling(
   options: RequestInit = {}
 ): Promise<Response> {
   const method = options.method || 'GET'
+  
+  // ЛОГИРОВАНИЕ ПЕРЕД ОТПРАВКОЙ
   logger.info(`[API] ===== Starting ${method} ${url} =====`)
   logger.info(`[API] Request options:`, {
     method,
     headers: options.headers,
-    body: options.body ? (typeof options.body === 'string' ? options.body.substring(0, 100) + '...' : '[...]') : undefined
+    body: options.body ? (typeof options.body === 'string' ? options.body.substring(0, 200) + '...' : '[...]') : undefined
   })
   
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
     
-    logger.info(`[API] Sending ${method} request to ${url}`)
+    logger.info(`[API] Sending ${method} request to ${url}...`)
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -93,9 +95,10 @@ async function fetchWithErrorHandling(
     
     return response
   } catch (error) {
-    logger.error(`[API] Fetch error for ${method} ${url}:`, error)
+    logger.error(`[API] ===== Fetch ERROR for ${method} ${url} =====`)
     logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
     logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
+    logger.error(`[API] Error stack: ${error instanceof Error ? error.stack : 'N/A'}`)
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout: сервер не отвечает')

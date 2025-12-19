@@ -99,56 +99,64 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const validateEditForm = (): boolean => {
-    logger.info('[BirthdayManagement] Starting validation...')
-    logger.info('[BirthdayManagement] editFormData:', editFormData)
+    logger.info('[BirthdayManagement] ===== Starting validation =====')
+    logger.info('[BirthdayManagement] editFormData:', JSON.stringify(editFormData))
     
-    // Проверка формата birth_date
+    // Проверка формата birth_date с детальным логированием
     if (editFormData.birth_date) {
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/
       if (!dateRegex.test(editFormData.birth_date)) {
         const errorMsg = 'Неверный формат даты. Используйте формат YYYY-MM-DD'
+        logger.error('[BirthdayManagement] Validation failed: Invalid birth_date format', {
+          value: editFormData.birth_date,
+          expectedFormat: 'YYYY-MM-DD'
+        })
         setError(errorMsg)
-        logger.error('[BirthdayManagement] Invalid birth_date format:', editFormData.birth_date)
         return false
       }
-    }
-    
-    // Проверка обязательных полей
-    if (!editFormData.full_name?.trim()) {
-      setError('ФИО не может быть пустым')
-      logger.warn('[BirthdayManagement] Validation failed: full_name is empty')
-      return false
-    }
-    if (!editFormData.company?.trim()) {
-      setError('Компания не может быть пустой')
-      logger.warn('[BirthdayManagement] Validation failed: company is empty')
-      return false
-    }
-    if (!editFormData.position?.trim()) {
-      setError('Должность не может быть пустой')
-      logger.warn('[BirthdayManagement] Validation failed: position is empty')
-      return false
-    }
-    if (!editFormData.birth_date) {
-      setError('Дата рождения обязательна')
+      logger.info('[BirthdayManagement] ✓ birth_date format is valid')
+    } else {
       logger.warn('[BirthdayManagement] Validation failed: birth_date is missing')
+      setError('Дата рождения обязательна')
       return false
     }
     
-    logger.info('[BirthdayManagement] Validation passed')
+    // Проверка обязательных полей с детальным логированием
+    if (!editFormData.full_name?.trim()) {
+      logger.warn('[BirthdayManagement] Validation failed: full_name is empty')
+      setError('ФИО не может быть пустым')
+      return false
+    }
+    logger.info('[BirthdayManagement] ✓ full_name is valid')
+    
+    if (!editFormData.company?.trim()) {
+      logger.warn('[BirthdayManagement] Validation failed: company is empty')
+      setError('Компания не может быть пустой')
+      return false
+    }
+    logger.info('[BirthdayManagement] ✓ company is valid')
+    
+    if (!editFormData.position?.trim()) {
+      logger.warn('[BirthdayManagement] Validation failed: position is empty')
+      setError('Должность не может быть пустой')
+      return false
+    }
+    logger.info('[BirthdayManagement] ✓ position is valid')
+    
+    logger.info('[BirthdayManagement] ===== Validation PASSED =====')
     return true
   }
 
   const handleUpdate = async (id: number) => {
-    logger.info(`[BirthdayManagement] handleUpdate called for id=${id}`)
-    logger.info(`[BirthdayManagement] editFormData:`, editFormData)
+    logger.info(`[BirthdayManagement] ===== handleUpdate CALLED for id=${id} =====`)
+    logger.info(`[BirthdayManagement] editFormData:`, JSON.stringify(editFormData))
     
     try {
       setError(null)
       
       // Валидация обязательных полей
       if (!validateEditForm()) {
-        logger.warn('[BirthdayManagement] Validation failed - not sending request')
+        logger.warn('[BirthdayManagement] Validation failed - NOT sending request')
         return
       }
       
@@ -167,12 +175,12 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         return
       }
       
-      // Перед отправкой проверить, что все готово
-      logger.info(`[BirthdayManagement] Ready to send PUT request for id=${id}`)
+      logger.info(`[BirthdayManagement] ===== READY TO SEND PUT REQUEST =====`)
       logger.info(`[BirthdayManagement] URL: ${API_BASE_URL}/api/panel/birthdays/${id}`)
-      logger.info('[BirthdayManagement] Sending data:', normalizedData)
+      logger.info(`[BirthdayManagement] Method: PUT`)
+      logger.info(`[BirthdayManagement] Data:`, JSON.stringify(normalizedData))
       
-      // Отправка запроса - БЕЗ дополнительных проверок
+      // Отправка запроса
       const result = await api.updateBirthday(id, normalizedData)
       
       logger.info(`[BirthdayManagement] Birthday ${id} updated successfully:`, result)
@@ -204,7 +212,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   const handleDelete = async (id: number) => {
-    logger.info(`[BirthdayManagement] handleDelete called for id=${id}`)
+    logger.info(`[BirthdayManagement] ===== handleDelete CALLED for id=${id} =====`)
     
     if (!confirm('Удалить день рождения?')) {
       logger.info(`[BirthdayManagement] Delete cancelled for birthday ${id}`)
@@ -214,6 +222,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     try {
       setError(null)
       
+      logger.info(`[BirthdayManagement] ===== READY TO SEND DELETE REQUEST =====`)
+      logger.info(`[BirthdayManagement] URL: ${API_BASE_URL}/api/panel/birthdays/${id}`)
+      logger.info(`[BirthdayManagement] Method: DELETE`)
       logger.info(`[BirthdayManagement] Deleting birthday ${id}`)
       
       await api.deleteBirthday(id)
