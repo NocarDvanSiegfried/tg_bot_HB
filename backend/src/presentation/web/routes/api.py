@@ -167,6 +167,76 @@ async def _check_panel_access(session: AsyncSession, user_id: int) -> bool:
     return await use_case.execute(user_id)
 
 
+# Вспомогательная функция для аутентификации и проверки доступа к панели
+async def _authenticate_and_check_access(
+    session: AsyncSession,
+    request: Request,
+) -> dict:
+    """
+    Аутентификация пользователя через Telegram и проверка доступа к панели управления.
+    
+    Выполняет:
+    1. Проверку X-Init-Data header
+    2. Верификацию пользователя через auth use case
+    3. Проверку доступа к панели
+    4. Обработку ошибок авторизации
+    
+    Args:
+        session: Сессия БД для использования при проверке доступа
+        request: FastAPI Request объект для получения headers
+        
+    Returns:
+        dict: Данные пользователя (содержит 'id' и другие поля)
+        
+    Raises:
+        HTTPException 401: Если пользователь не авторизован или нет user_id
+        HTTPException 403: Если у пользователя нет доступа к панели
+    """
+    logger.info(f"[AUTH_HELPER] ===== Starting authentication and access check =====")
+    
+    # Проверяем авторизацию через Telegram
+    logger.info(f"[AUTH_HELPER] [STEP 1] Checking X-Init-Data header")
+    x_init_data = request.headers.get("X-Init-Data")
+    if not x_init_data:
+        logger.warning("[AUTH_HELPER] [STEP 1] Missing X-Init-Data header")
+        raise HTTPException(status_code=401, detail="Missing initData")
+    
+    logger.info(f"[AUTH_HELPER] [STEP 1] X-Init-Data header present: {x_init_data[:20]}...")
+    
+    # Верифицируем пользователя
+    logger.info(f"[AUTH_HELPER] [STEP 2] Verifying user via auth use case")
+    auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
+    auth_use_case = auth_factory.create_auth_use_case()
+    try:
+        logger.info(f"[AUTH_HELPER] [STEP 2] Executing auth use case")
+        user = await auth_use_case.execute(x_init_data)
+        logger.info(f"[AUTH_HELPER] [STEP 2] Authentication successful, user: {user}")
+    except ValueError as e:
+        logger.warning(f"[AUTH_HELPER] [STEP 2] Invalid initData: {e}")
+        raise HTTPException(status_code=401, detail="Invalid initData") from e
+    
+    user_id = user.get("id")
+    if not user_id:
+        logger.warning("[AUTH_HELPER] [STEP 2] User ID not found in initData")
+        raise HTTPException(status_code=401, detail="User ID not found in initData")
+    
+    logger.info(f"[AUTH_HELPER] [STEP 2] Authentication completed, user_id={user_id}")
+    
+    # Проверяем доступ к панели используя переданную сессию
+    logger.info(f"[AUTH_HELPER] [STEP 3] Checking panel access for user_id={user_id}")
+    has_access = await _check_panel_access(session, user_id)
+    if not has_access:
+        logger.warning(f"[AUTH_HELPER] [STEP 3] Access denied for user_id={user_id}")
+        raise HTTPException(
+            status_code=403, detail="Access denied. You don't have permission to access the panel."
+        )
+    
+    logger.info(f"[AUTH_HELPER] [STEP 3] Panel access granted for user_id={user_id}")
+    logger.info(f"[AUTH_HELPER] ===== Authentication and access check completed successfully =====")
+    
+    return user
+
+
 # Dependency для проверки прав доступа к панели управления
 async def require_panel_access(
     user: dict = Depends(verify_telegram_auth),
@@ -440,49 +510,16 @@ async def update_birthday(
     logger.info(f"[API] [STEP 1] Pydantic validation passed")
     logger.info(f"[API] [STEP 1] Received data: birthday_id={birthday_id}, full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}")
     
-    # Получаем сессию первым делом, затем создаём factory с этой сессией
-    # Проверяем авторизацию через Telegram
-    logger.info(f"[API] [STEP 2] Starting Telegram authentication")
-    x_init_data = request.headers.get("X-Init-Data")
-    if not x_init_data:
-        logger.warning("[API] [STEP 2] Missing X-Init-Data header")
-        raise HTTPException(status_code=401, detail="Missing initData")
-    
-    logger.info(f"[API] [STEP 2] X-Init-Data header present: {x_init_data[:20]}...")
-    
-    # Верифицируем пользователя
-    auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
-    auth_use_case = auth_factory.create_auth_use_case()
-    try:
-        logger.info(f"[API] [STEP 2] Executing auth use case")
-        user = await auth_use_case.execute(x_init_data)
-        logger.info(f"[API] [STEP 2] Authentication successful, user: {user}")
-    except ValueError as e:
-        logger.warning(f"[API] [STEP 2] Invalid initData: {e}")
-        raise HTTPException(status_code=401, detail="Invalid initData") from e
-    
+    # Аутентификация и проверка доступа к панели
+    logger.info(f"[API] [STEP 2] Starting authentication and access check")
+    user = await _authenticate_and_check_access(session, request)
     user_id = user.get("id")
-    if not user_id:
-        logger.warning("[API] [STEP 2] User ID not found in initData")
-        raise HTTPException(status_code=401, detail="User ID not found in initData")
+    logger.info(f"[API] [STEP 2] Authentication and access check completed, user_id={user_id}")
     
-    logger.info(f"[API] [STEP 2] Authentication completed, user_id={user_id}")
-    
-    # Создаём factory с переданной сессией для проверки доступа и операций
+    # Создаём factory с переданной сессией для операций
     logger.info(f"[API] [STEP 3] Creating UseCaseFactory with session")
     factory = UseCaseFactory(session=session)
     logger.info(f"[API] [STEP 3] UseCaseFactory created")
-    
-    # Проверяем доступ к панели используя ту же сессию
-    logger.info(f"[API] [STEP 3] Checking panel access for user_id={user_id}")
-    has_access = await _check_panel_access(session, user_id)
-    if not has_access:
-        logger.warning(f"[API] [STEP 3] Access denied for user_id={user_id}")
-        raise HTTPException(
-            status_code=403, detail="Access denied. You don't have permission to access the panel."
-        )
-    
-    logger.info(f"[API] [STEP 3] Panel access granted for user_id={user_id}")
     
     # Выполняем операцию обновления
     logger.info(f"[API] [STEP 4] Creating birthday use cases")
@@ -553,49 +590,16 @@ async def delete_birthday(
     logger.info(f"[API] [STEP 1] Path validation passed")
     logger.info(f"[API] [STEP 1] Received birthday_id: {birthday_id}")
     
-    # Получаем сессию первым делом, затем создаём factory с этой сессией
-    # Проверяем авторизацию через Telegram
-    logger.info(f"[API] [STEP 2] Starting Telegram authentication")
-    x_init_data = request.headers.get("X-Init-Data")
-    if not x_init_data:
-        logger.warning("[API] [STEP 2] Missing X-Init-Data header")
-        raise HTTPException(status_code=401, detail="Missing initData")
-    
-    logger.info(f"[API] [STEP 2] X-Init-Data header present: {x_init_data[:20]}...")
-    
-    # Верифицируем пользователя
-    auth_factory = UseCaseFactory(session=None)  # Auth не требует БД сессии
-    auth_use_case = auth_factory.create_auth_use_case()
-    try:
-        logger.info(f"[API] [STEP 2] Executing auth use case")
-        user = await auth_use_case.execute(x_init_data)
-        logger.info(f"[API] [STEP 2] Authentication successful, user: {user}")
-    except ValueError as e:
-        logger.warning(f"[API] [STEP 2] Invalid initData: {e}")
-        raise HTTPException(status_code=401, detail="Invalid initData") from e
-    
+    # Аутентификация и проверка доступа к панели
+    logger.info(f"[API] [STEP 2] Starting authentication and access check")
+    user = await _authenticate_and_check_access(session, request)
     user_id = user.get("id")
-    if not user_id:
-        logger.warning("[API] [STEP 2] User ID not found in initData")
-        raise HTTPException(status_code=401, detail="User ID not found in initData")
+    logger.info(f"[API] [STEP 2] Authentication and access check completed, user_id={user_id}")
     
-    logger.info(f"[API] [STEP 2] Authentication completed, user_id={user_id}")
-    
-    # Создаём factory с переданной сессией для проверки доступа и операций
+    # Создаём factory с переданной сессией для операций
     logger.info(f"[API] [STEP 3] Creating UseCaseFactory with session")
     factory = UseCaseFactory(session=session)
     logger.info(f"[API] [STEP 3] UseCaseFactory created")
-    
-    # Проверяем доступ к панели используя ту же сессию
-    logger.info(f"[API] [STEP 3] Checking panel access for user_id={user_id}")
-    has_access = await _check_panel_access(session, user_id)
-    if not has_access:
-        logger.warning(f"[API] [STEP 3] Access denied for user_id={user_id}")
-        raise HTTPException(
-            status_code=403, detail="Access denied. You don't have permission to access the panel."
-        )
-    
-    logger.info(f"[API] [STEP 3] Panel access granted for user_id={user_id}")
     
     # Выполняем операцию удаления
     logger.info(f"[API] [STEP 4] Creating birthday use cases")

@@ -106,7 +106,18 @@ def handle_api_errors(func: Callable) -> Callable:
                 logger.info(f"[DECORATOR] Note: Endpoint may have already performed rollback, this is safe")
                 await session.rollback()
                 logger.info(f"[DECORATOR] Rollback completed for Exception")
-            logger.error(f"[DECORATOR] Unexpected error in {func.__name__}: {type(e).__name__}: {e}", exc_info=True)
+            # Структурированное логирование с контекстом
+            error_context = {
+                "function": func.__name__,
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+                "has_session": session is not None,
+            }
+            logger.error(
+                f"[DECORATOR] Unexpected error in {func.__name__}: {type(e).__name__}: {e}",
+                extra={"error_context": error_context},
+                exc_info=True
+            )
             raise HTTPException(status_code=500, detail="Internal server error") from e
 
     return wrapper

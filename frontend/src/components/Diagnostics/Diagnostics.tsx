@@ -134,7 +134,7 @@ export default function Diagnostics() {
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
   const [apiError, setApiError] = useState<string | null>(null)
   const [apiErrorInfo, setApiErrorInfo] = useState<ApiErrorInfo | null>(null)
-  const [currentOrigin, setCurrentOrigin] = useState<string>(() => {
+  const [currentOrigin] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       return window.location.origin
     }

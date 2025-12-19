@@ -13,7 +13,7 @@ export default function Calendar() {
   const [error, setError] = useState<string | null>(null)
   const [renderError, setRenderError] = useState<string | null>(null)
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
-  const [loadingMonth, setLoadingMonth] = useState(false)
+  const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
 
   // Логирование для отладки
   useEffect(() => {

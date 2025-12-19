@@ -75,18 +75,43 @@ async function fetchWithErrorHandling(
           } else if (Array.isArray(errorData.detail)) {
             // Если detail - массив (ошибки валидации FastAPI)
             const validationErrors = errorData.detail.map((e: any) => {
-              const field = e.loc ? e.loc.join('.') : 'unknown'
-              return `${field}: ${e.msg || e.message || 'validation error'}`
-            }).join(', ')
+              const field = e.loc ? e.loc.slice(1).join('.') : 'unknown' // Убираем 'body' из пути
+              const fieldName = field === 'full_name' ? 'ФИО' :
+                               field === 'company' ? 'Компания' :
+                               field === 'position' ? 'Должность' :
+                               field === 'birth_date' ? 'Дата рождения' :
+                               field === 'comment' ? 'Комментарий' : field
+              const message = e.msg || e.message || 'Ошибка валидации'
+              return `${fieldName}: ${message}`
+            }).join('; ')
             errorMessage = `Ошибка валидации: ${validationErrors}`
           }
         } else if (errorData.errors) {
           // Обработка ошибок валидации Pydantic (формат с errors)
           const validationErrors = errorData.errors.map((e: any) => {
-            const field = e.loc ? e.loc.join('.') : 'unknown'
-            return `${field}: ${e.msg || e.message || 'validation error'}`
-          }).join(', ')
+            const field = e.loc ? e.loc.slice(1).join('.') : 'unknown' // Убираем 'body' из пути
+            const fieldName = field === 'full_name' ? 'ФИО' :
+                             field === 'company' ? 'Компания' :
+                             field === 'position' ? 'Должность' :
+                             field === 'birth_date' ? 'Дата рождения' :
+                             field === 'comment' ? 'Комментарий' : field
+            const message = e.msg || e.message || 'Ошибка валидации'
+            return `${fieldName}: ${message}`
+          }).join('; ')
           errorMessage = `Ошибка валидации: ${validationErrors}`
+        }
+        
+        // Улучшенные сообщения для различных статусов
+        if (response.status === 401) {
+          errorMessage = errorMessage || 'Ошибка авторизации. Пожалуйста, обновите страницу.'
+        } else if (response.status === 403) {
+          errorMessage = errorMessage || 'Доступ запрещен. У вас нет прав для выполнения этого действия.'
+        } else if (response.status === 404) {
+          errorMessage = errorMessage || 'Ресурс не найден. Возможно, он был удален.'
+        } else if (response.status === 422) {
+          errorMessage = errorMessage || 'Ошибка валидации данных. Проверьте введенные данные.'
+        } else if (response.status >= 500) {
+          errorMessage = 'Ошибка сервера. Пожалуйста, попробуйте позже.'
         }
         logger.error(`[API] Error response for ${method} ${url}:`, errorData)
       } catch {
@@ -282,16 +307,12 @@ export const api = {
         logger.info(`[API] deleteBirthday reading response body`)
         const result = await response.json()
         logger.info(`[API] deleteBirthday response data:`, result)
-      }
-      
-      logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
-      
-      // Если статус не 204/205, но тело может быть пустым, проверяем Content-Length
-      const contentLength = response.headers.get('Content-Length')
-      if (contentLength === '0') {
+      } else if (contentLength === '0') {
         logger.info(`[API] deleteBirthday received response with Content-Length: 0`)
         return
       }
+      
+      logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
       
       // Если есть тело ответа, пытаемся его прочитать (опционально, для логирования)
       // Но для DELETE обычно не требуется читать тело

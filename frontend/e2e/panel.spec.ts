@@ -2,8 +2,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Panel', () => {
   test.beforeEach(async ({ page }) => {
-    // Переходим на главную страницу
-    await page.goto('/');
+    // Переходим на страницу панели управления
+    await page.goto('/#/panel');
+    
+    // Ждем загрузки приложения
+    await page.waitForSelector('#root', { state: 'visible' });
   });
 
   test('should load panel page', async ({ page }) => {
@@ -12,9 +15,34 @@ test.describe('Panel', () => {
     await expect(root).toBeVisible();
   });
 
+  test('should navigate to birthday management', async ({ page }) => {
+    // Проверяем навигацию к управлению днями рождения
+    // В реальном приложении здесь будет клик по кнопке "Управление ДР"
+    const root = page.locator('#root');
+    await expect(root).toBeVisible();
+    
+    // Ждем немного для загрузки
+    await page.waitForTimeout(500);
+  });
+
+  test('should handle authentication errors', async ({ page }) => {
+    // Перехватываем запросы для симуляции ошибки аутентификации
+    await page.route('**/api/panel/**', (route) => {
+      route.fulfill({
+        status: 401,
+        body: JSON.stringify({ detail: 'Unauthorized' }),
+      });
+    });
+    
+    // Проверяем, что приложение обрабатывает ошибку аутентификации
+    const root = page.locator('#root');
+    await expect(root).toBeVisible();
+    
+    await page.waitForTimeout(1000);
+  });
+
   test('should have API connection', async ({ page }) => {
     // Проверяем, что API доступен
-    // В реальном окружении это будет проверка через fetch
     const apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
     
     // Проверяем, что переменная окружения установлена

@@ -11,7 +11,8 @@
 #   Windows: .\scripts\download-all-images.ps1
 #   Linux/macOS: ./scripts/download-all-images.sh
 
-FROM python:3.11-slim
+# Используем последнюю версию python:3.11-slim для получения обновлений безопасности
+FROM python:3.11-slim-bookworm
 
 # Build arguments for metadata
 ARG BUILD_DATE
@@ -28,9 +29,12 @@ LABEL org.opencontainers.image.created="$BUILD_DATE" \
 WORKDIR /app
 
 # Install system dependencies with BuildKit cache mounts for faster rebuilds
+# Обновляем системные пакеты для устранения уязвимостей
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean

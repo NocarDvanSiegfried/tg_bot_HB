@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithRouter } from '../../test/test-utils'
 import Panel from './Panel'
 
 // Мокируем дочерние компоненты
@@ -33,7 +34,7 @@ describe('Panel', () => {
   })
 
   it('should render main panel view by default', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     expect(screen.getByText('Панель управления')).toBeInTheDocument()
     expect(screen.getByText('🎂 Управление ДР')).toBeInTheDocument()
@@ -42,7 +43,7 @@ describe('Panel', () => {
   })
 
   it('should navigate to birthday management view', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     const birthdayButton = screen.getByText('🎂 Управление ДР')
     fireEvent.click(birthdayButton)
@@ -52,7 +53,7 @@ describe('Panel', () => {
   })
 
   it('should navigate to responsible management view', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     const responsibleButton = screen.getByText('👤 Управление ответственными')
     fireEvent.click(responsibleButton)
@@ -62,7 +63,7 @@ describe('Panel', () => {
   })
 
   it('should navigate to greeting generator view', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     const greetingButton = screen.getByText('🎉 Генерация поздравлений')
     fireEvent.click(greetingButton)
@@ -72,7 +73,7 @@ describe('Panel', () => {
   })
 
   it('should return to main view when back button is clicked', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     // Переходим в birthday management
     const birthdayButton = screen.getByText('🎂 Управление ДР')
@@ -89,7 +90,7 @@ describe('Panel', () => {
   })
 
   it('should switch between different views', () => {
-    render(<Panel />)
+    renderWithRouter(<Panel />)
     
     // Переходим в birthday management
     const birthdayButton = screen.getByText('🎂 Управление ДР')
