@@ -146,16 +146,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     try {
       setError(null)
       
-      // Проверка авторизации перед отправкой
-      const initData = typeof window !== 'undefined' && window.Telegram?.WebApp?.initData
-      if (!initData) {
-        const errorMsg = 'Ошибка авторизации. Обновите страницу.'
-        setError(errorMsg)
-        logger.error('[BirthdayManagement] Missing initData - cannot proceed with update')
-        return
-      }
-      logger.info('[BirthdayManagement] Authorization check passed')
-      
       // Валидация обязательных полей
       if (!validateEditForm()) {
         logger.warn('[BirthdayManagement] Validation failed - not sending request')
@@ -182,6 +172,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       logger.info(`[BirthdayManagement] URL: ${API_BASE_URL}/api/panel/birthdays/${id}`)
       logger.info('[BirthdayManagement] Sending data:', normalizedData)
       
+      // Отправка запроса - БЕЗ дополнительных проверок
       const result = await api.updateBirthday(id, normalizedData)
       
       logger.info(`[BirthdayManagement] Birthday ${id} updated successfully:`, result)
@@ -191,27 +182,17 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       loadBirthdays()
     } catch (error) {
       logger.error(`[BirthdayManagement] PUT request failed:`, error)
-      // Проверить тип ошибки
-      if (error instanceof TypeError) {
-        setError('Ошибка сети. Проверьте подключение к интернету.')
-      } else {
-        let errorMessage = 'Не удалось обновить день рождения'
-        if (error instanceof Error) {
-          // Пытаемся извлечь детальное сообщение из ответа
-          if (error.message.includes('Field cannot be empty') || error.message.includes('Validation error')) {
-            errorMessage = 'Обязательные поля не могут быть пустыми'
-          } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-            errorMessage = 'Ошибка авторизации. Обновите страницу.'
-          } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
-            errorMessage = 'У вас нет доступа к этой операции'
-          } else if (error.message.includes('not found')) {
-            errorMessage = 'День рождения не найден'
-          } else {
-            errorMessage = error.message
-          }
-        }
-        setError(errorMessage)
+      logger.error(`[BirthdayManagement] Error details:`, {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      })
+      
+      let errorMessage = 'Не удалось обновить день рождения'
+      if (error instanceof Error) {
+        errorMessage = error.message || errorMessage
       }
+      setError(errorMessage)
       throw error // Пробросить ошибку дальше для обработки в onSubmit
     }
   }
@@ -233,16 +214,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     try {
       setError(null)
       
-      // Проверка авторизации перед отправкой
-      const initData = typeof window !== 'undefined' && window.Telegram?.WebApp?.initData
-      if (!initData) {
-        const errorMsg = 'Ошибка авторизации. Обновите страницу.'
-        setError(errorMsg)
-        logger.error('[BirthdayManagement] Missing initData - cannot proceed with delete')
-        return
-      }
-      logger.info('[BirthdayManagement] Authorization check passed')
-      
       logger.info(`[BirthdayManagement] Deleting birthday ${id}`)
       
       await api.deleteBirthday(id)
@@ -251,18 +222,16 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       
       loadBirthdays()
     } catch (error) {
-      logger.error(`[BirthdayManagement] Failed to delete birthday ${id}:`, error)
+      logger.error(`[BirthdayManagement] DELETE request failed:`, error)
+      logger.error(`[BirthdayManagement] Error details:`, {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      })
+      
       let errorMessage = 'Не удалось удалить день рождения'
       if (error instanceof Error) {
-        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-          errorMessage = 'Ошибка авторизации. Обновите страницу.'
-        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
-          errorMessage = 'У вас нет доступа к этой операции'
-        } else if (error.message.includes('not found')) {
-          errorMessage = 'День рождения не найден'
-        } else {
-          errorMessage = error.message
-        }
+        errorMessage = error.message || errorMessage
       }
       setError(errorMessage)
     }
@@ -328,13 +297,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     onSubmit={async (e) => {
                       e.preventDefault()
                       logger.info(`[BirthdayManagement] Form submitted for birthday id=${bd.id}`)
-                      
-                      const form = e.currentTarget
-                      if (!form.checkValidity()) {
-                        logger.warn('[BirthdayManagement] Form validation failed (HTML5)')
-                        form.reportValidity()
-                        return
-                      }
                       
                       if (!bd.id) {
                         logger.error('[BirthdayManagement] Cannot update: birthday id is missing')

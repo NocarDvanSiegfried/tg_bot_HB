@@ -393,22 +393,6 @@ async def create_birthday(
     }
 
 
-@router.options("/api/panel/birthdays/{birthday_id}")
-async def options_birthday(request: Request, birthday_id: int = Path(..., gt=0)):
-    """Обработка preflight запросов для PUT/DELETE."""
-    logger.info(f"[OPTIONS] Preflight request for /api/panel/birthdays/{birthday_id}")
-    origin = request.headers.get("origin", "*")
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Methods": "PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, X-Init-Data",
-            "Access-Control-Max-Age": "3600",
-        }
-    )
-
-
 @router.put("/api/panel/birthdays/{birthday_id}")
 @limiter.limit(WRITE_LIMIT)
 @handle_api_errors
@@ -421,7 +405,11 @@ async def update_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Обновить ДР."""
-    logger.info(f"[API] PUT /api/panel/birthdays/{birthday_id} - Request received")
+    # Логирование в самом начале endpoint'а до всех проверок
+    logger.info(f"[API] ===== PUT /api/panel/birthdays/{birthday_id} - Request received =====")
+    logger.info(f"[API] Request method: {request.method}")
+    logger.info(f"[API] Request path: {request.url.path}")
+    logger.info(f"[API] Request headers: {dict(request.headers)}")
     logger.info(f"[API] Updating birthday {birthday_id} with data: full_name={data.full_name}, company={data.company}, position={data.position}")
     
     use_cases = factory.create_birthday_use_cases()
@@ -465,7 +453,11 @@ async def delete_birthday(
     factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
     """Удалить ДР."""
-    logger.info(f"[API] DELETE /api/panel/birthdays/{birthday_id} - Request received")
+    # Логирование в самом начале endpoint'а до всех проверок
+    logger.info(f"[API] ===== DELETE /api/panel/birthdays/{birthday_id} - Request received =====")
+    logger.info(f"[API] Request method: {request.method}")
+    logger.info(f"[API] Request path: {request.url.path}")
+    logger.info(f"[API] Request headers: {dict(request.headers)}")
     logger.info(f"[API] Deleting birthday {birthday_id}")
     
     use_cases = factory.create_birthday_use_cases()
