@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns'
+// Оптимизированные импорты из date-fns для tree-shaking
+import format from 'date-fns/format'
+import startOfMonth from 'date-fns/startOfMonth'
+import endOfMonth from 'date-fns/endOfMonth'
+import eachDayOfInterval from 'date-fns/eachDayOfInterval'
+import isToday from 'date-fns/isToday'
 import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'

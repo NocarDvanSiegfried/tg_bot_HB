@@ -36,12 +36,20 @@ logger = logging.getLogger(__name__)
 
 async def start_bot():
     """Запуск Telegram бота."""
+    # Проверяем, включен ли бот
+    enable_bot = os.getenv("ENABLE_TELEGRAM_BOT", "true").lower() in ("true", "1", "yes")
+    if not enable_bot:
+        logger.info("Telegram бот отключен через ENABLE_TELEGRAM_BOT=false. Пропускаем запуск бота.")
+        return
+    
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not bot_token:
-        raise ValueError(
-            "TELEGRAM_BOT_TOKEN environment variable is required. "
-            "Получите токен от @BotFather в Telegram и добавьте его в .env файл."
+        logger.warning(
+            "TELEGRAM_BOT_TOKEN не установлен. Бот не будет запущен. "
+            "Веб-сервер продолжит работать. "
+            "Чтобы включить бота, установите TELEGRAM_BOT_TOKEN в .env файл."
         )
+        return
 
     # Валидация формата токена
     is_valid, error_message = validate_telegram_token(bot_token)
@@ -90,6 +98,28 @@ async def start_bot():
     logger.info("Регистрация middleware для сессий БД...")
     dp.message.middleware(DatabaseMiddleware())
     dp.callback_query.middleware(DatabaseMiddleware())
+    
+    # Добавляем обработчик ошибок для конфликтов
+    from aiogram.exceptions import TelegramConflictError
+    
+    @dp.errors()
+    async def error_handler(update, exception):
+        """Обработчик ошибок для перехвата конфликтов."""
+        if isinstance(exception, TelegramConflictError):
+            logger.error(
+                "⚠️ КОНФЛИКТ: Другой экземпляр бота уже запущен с тем же токеном.\n"
+                f"Ошибка: {exception}\n"
+                "Возможные решения:\n"
+                "1. Остановите другие экземпляры бота (локальные или на других серверах)\n"
+                "2. Используйте webhook вместо polling (настройте через переменные окружения)\n"
+                "3. Отключите бота, установив ENABLE_TELEGRAM_BOT=false в .env\n"
+                "Веб-сервер продолжит работать без бота."
+            )
+            # Останавливаем polling при конфликте
+            await dp.stop_polling()
+            await bot.session.close()
+            return True  # Обработано, не пробрасываем дальше
+        return False  # Не обработано, пробрасываем дальше
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)
@@ -100,13 +130,34 @@ async def start_bot():
     dp.include_router(greeting_handlers.router)
 
     # Запуск polling с обработкой ошибок
+    # Обработчик конфликтов уже зарегистрирован через @dp.errors() выше
     try:
         logger.info("Запуск Telegram polling...")
-        await dp.start_polling(bot)
+        await dp.start_polling(bot, allowed_updates=["message", "callback_query"])
     except Exception as e:
-        logger.error(f"Критическая ошибка при работе Telegram бота: {type(e).__name__}: {e}")
+        error_type = type(e).__name__
+        error_message = str(e)
+        logger.error(f"Критическая ошибка при работе Telegram бота: {error_type}: {error_message}")
+        
+        # Обработка конфликта с другим экземпляром бота (fallback)
+        if "Conflict" in error_message or "TelegramConflictError" in error_type:
+            logger.error(
+                "⚠️ КОНФЛИКТ: Другой экземпляр бота уже запущен с тем же токеном.\n"
+                "Возможные решения:\n"
+                "1. Остановите другие экземпляры бота (локальные или на других серверах)\n"
+                "2. Используйте webhook вместо polling (настройте через переменные окружения)\n"
+                "3. Отключите бота, установив ENABLE_TELEGRAM_BOT=false в .env\n"
+                "Веб-сервер продолжит работать без бота."
+            )
+            # Пытаемся корректно закрыть сессию
+            try:
+                await bot.session.close()
+            except:
+                pass
+            return
+        
         # Пробуем получить более детальную информацию об ошибке
-        if "Unauthorized" in str(e) or "TelegramUnauthorizedError" in str(type(e).__name__):
+        if "Unauthorized" in error_message or "TelegramUnauthorizedError" in error_type:
             logger.error(
                 "Telegram API вернул ошибку 'Unauthorized'. Возможные причины:\n"
                 "1. Токен недействителен или был отозван\n"
@@ -115,7 +166,20 @@ async def start_bot():
                 "4. Проблемы с сетью при обращении к Telegram API\n"
                 "Проверьте токен в .env файле и убедитесь, что бот активен в @BotFather."
             )
-        raise
+            # Пытаемся корректно закрыть сессию
+            try:
+                await bot.session.close()
+            except:
+                pass
+            return
+        
+        # Для других ошибок логируем и продолжаем работу веб-сервера
+        logger.warning("Telegram бот не запущен, но веб-сервер продолжит работать")
+        try:
+            await bot.session.close()
+        except:
+            pass
+        return
 
 
 async def start_web():
@@ -178,25 +242,32 @@ async def main():
 
     # Запускаем бота и веб-сервер параллельно
     # Используем return_exceptions=True, чтобы ошибка бота не блокировала веб-сервер
-    results = await asyncio.gather(
-        start_bot(),
-        start_web(),
-        return_exceptions=True,
-    )
+    enable_bot = os.getenv("ENABLE_TELEGRAM_BOT", "true").lower() in ("true", "1", "yes")
     
-    # Проверяем результаты
-    bot_result, web_result = results
-    
-    if isinstance(bot_result, Exception):
-        logger.error(f"Telegram бот завершился с ошибкой: {bot_result}")
-        logger.warning("Веб-сервер продолжает работать, но функционал бота недоступен")
-        # Если веб-сервер тоже упал, поднимаем ошибку
-        if isinstance(web_result, Exception):
-            logger.error(f"Веб-сервер также завершился с ошибкой: {web_result}")
+    if enable_bot:
+        logger.info("Запуск Telegram бота и веб-сервера...")
+        results = await asyncio.gather(
+            start_bot(),
+            start_web(),
+            return_exceptions=True,
+        )
+        
+        # Проверяем результаты
+        bot_result, web_result = results
+        
+        if isinstance(bot_result, Exception):
+            logger.error(f"Telegram бот завершился с ошибкой: {bot_result}")
+            logger.warning("Веб-сервер продолжает работать, но функционал бота недоступен")
+            # Если веб-сервер тоже упал, поднимаем ошибку
+            if isinstance(web_result, Exception):
+                logger.error(f"Веб-сервер также завершился с ошибкой: {web_result}")
+                raise web_result
+        elif isinstance(web_result, Exception):
+            logger.error(f"Веб-сервер завершился с ошибкой: {web_result}")
             raise web_result
-    elif isinstance(web_result, Exception):
-        logger.error(f"Веб-сервер завершился с ошибкой: {web_result}")
-        raise web_result
+    else:
+        logger.info("Telegram бот отключен через ENABLE_TELEGRAM_BOT=false. Запускаем только веб-сервер...")
+        await start_web()
 
 
 if __name__ == "__main__":

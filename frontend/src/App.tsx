@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense, lazy } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useTelegram } from './hooks/useTelegram'
-import Calendar from './components/Calendar/Calendar'
-import PanelWrapper from './components/Panel/PanelWrapper'
-import Diagnostics from './components/Diagnostics/Diagnostics'
 import { logger } from './utils/logger'
+
+// Lazy loading для оптимизации bundle
+const Calendar = lazy(() => import('./components/Calendar/Calendar'))
+const PanelWrapper = lazy(() => import('./components/Panel/PanelWrapper'))
+const Diagnostics = lazy(() => import('./components/Diagnostics/Diagnostics'))
 
 function App() {
   const { webApp, isReady } = useTelegram()
@@ -60,12 +62,35 @@ function App() {
         </div>
       )}
       <Routes>
-        <Route path="/" element={<Calendar />} />
-        <Route path="/panel" element={<PanelWrapper />} />
+        <Route
+          path="/"
+          element={
+            <Suspense fallback={<div className="app-loading">Загрузка календаря...</div>}>
+              <Calendar />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/panel"
+          element={
+            <Suspense fallback={<div className="app-loading">Загрузка панели...</div>}>
+              <PanelWrapper />
+            </Suspense>
+          }
+        />
         {/* Fallback route - все остальные пути ведут на календарь */}
-        <Route path="*" element={<Calendar />} />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<div className="app-loading">Загрузка календаря...</div>}>
+              <Calendar />
+            </Suspense>
+          }
+        />
       </Routes>
-      <Diagnostics />
+      <Suspense fallback={null}>
+        <Diagnostics />
+      </Suspense>
     </div>
   )
 }

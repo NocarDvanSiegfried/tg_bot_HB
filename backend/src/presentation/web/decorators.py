@@ -60,6 +60,10 @@ def handle_api_errors(func: Callable) -> Callable:
 
         try:
             return await func(*args, **kwargs)
+        except HTTPException:
+            # HTTPException пробрасывается дальше без обработки
+            # Это позволяет endpoints явно контролировать HTTP статус коды
+            raise
         except (BirthdayNotFoundError, ResponsibleNotFoundError) as e:
             if session:
                 logger.info(f"[DECORATOR] Performing rollback for NotFoundError in {func.__name__}")

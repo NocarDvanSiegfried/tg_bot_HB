@@ -39,9 +39,14 @@ if ! docker compose ps backend | grep -q "running"; then
     sleep 5
 fi
 
-# Запускаем тесты в контейнере
+# Устанавливаем тестовые зависимости и запускаем тесты
+# Используем docker compose run для создания временного контейнера с тестовыми зависимостями
+echo -e "${CYAN}Установка тестовых зависимостей...${NC}"
 echo -e "${CYAN}Запуск pytest с аргументами: ${PYTEST_ARGS[*]}${NC}"
-docker compose exec -T backend pytest tests/ "${PYTEST_ARGS[@]}"
+
+# Запускаем тесты в новом контейнере с установкой тестовых зависимостей
+# Перенаправляем вывод pip в /dev/null, чтобы не мешать выводу pytest
+docker compose run --rm backend sh -c "pip install -q -r requirements.txt 2>&1 >/dev/null && python -m pytest tests/ ${PYTEST_ARGS[*]}"
 
 EXIT_CODE=$?
 

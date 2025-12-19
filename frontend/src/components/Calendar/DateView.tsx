@@ -1,5 +1,7 @@
-import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
+// Оптимизированные импорты из date-fns для tree-shaking
+import { memo } from 'react'
+import format from 'date-fns/format'
+import ru from 'date-fns/locale/ru'
 import { CalendarData } from '../../services/api'
 import { logger } from '../../utils/logger'
 import './Calendar.css'
@@ -11,7 +13,7 @@ interface DateViewProps {
   error?: string | null
 }
 
-export default function DateView({ date, data, loading, error }: DateViewProps) {
+function DateView({ date, data, loading, error }: DateViewProps) {
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
@@ -116,4 +118,7 @@ export default function DateView({ date, data, loading, error }: DateViewProps) 
     </div>
   )
 }
+
+// Мемоизация компонента для оптимизации рендеринга
+export default memo(DateView)
 

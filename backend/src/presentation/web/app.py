@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -62,6 +63,9 @@ else:
     else:
         # Разрешаем все для разработки
         allowed_origins = ["*"]
+
+# Сжатие ответов (gzip) для уменьшения размера передаваемых данных
+app.add_middleware(GZipMiddleware, minimum_size=1000)  # Сжимать ответы больше 1KB
 
 # Убедиться, что CORS middleware правильно настроен
 app.add_middleware(

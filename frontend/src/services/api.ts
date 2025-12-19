@@ -2,6 +2,7 @@ import { Birthday } from '../types/birthday'
 import { Responsible } from '../types/responsible'
 import { API_BASE_URL, API_TIMEOUT_MS } from '../config/api'
 import { logger } from '../utils/logger'
+import { cache, CacheKeys, CacheTTL } from '../utils/cache'
 
 // Получить initData из Telegram WebApp
 function getInitData(): string | null {
@@ -188,17 +189,47 @@ export const api = {
   },
 
   async getCalendarMonth(year: number, month: number): Promise<MonthBirthdays> {
+    const cacheKey = CacheKeys.calendarMonth(year, month)
+    
+    // Проверяем кэш
+    const cached = cache.get<MonthBirthdays>(cacheKey)
+    if (cached) {
+      logger.info(`[API] Cache hit for calendar month ${year}/${month}`)
+      return cached
+    }
+    
+    // Загружаем данные
     const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/month/${year}/${month}`, {
       headers: getHeaders(),
     })
-    return response.json()
+    const data = await response.json()
+    
+    // Сохраняем в кэш
+    cache.set(cacheKey, data, CacheTTL.calendarMonth)
+    
+    return data
   },
 
   async getBirthdays(): Promise<Birthday[]> {
+    const cacheKey = CacheKeys.birthdays
+    
+    // Проверяем кэш
+    const cached = cache.get<Birthday[]>(cacheKey)
+    if (cached) {
+      logger.info('[API] Cache hit for birthdays')
+      return cached
+    }
+    
+    // Загружаем данные
     const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays`, {
       headers: getHeaders(),
     })
-    return response.json()
+    const data = await response.json()
+    
+    // Сохраняем в кэш
+    cache.set(cacheKey, data, CacheTTL.birthdays)
+    
+    return data
   },
 
   async createBirthday(data: Omit<Birthday, 'id'>): Promise<Birthday> {
@@ -207,7 +238,13 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    return response.json()
+    const result = await response.json()
+    
+    // Инвалидируем кэш дней рождения
+    cache.delete(CacheKeys.birthdays)
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+    
+    return result
   },
 
   async updateBirthday(id: number, data: Partial<Birthday>): Promise<Birthday> {
@@ -264,6 +301,12 @@ export const api = {
       }
       
       logger.info(`[API] updateBirthday success: id=${result.id}, full_name=${result.full_name}`)
+      
+      // Инвалидируем кэш дней рождения
+      cache.delete(CacheKeys.birthdays)
+      cache.delete(CacheKeys.birthday(id))
+      cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+      
       return result
     } catch (error) {
       logger.error(`[API] updateBirthday error:`, error)
@@ -314,8 +357,11 @@ export const api = {
       
       logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
       
-      // Если есть тело ответа, пытаемся его прочитать (опционально, для логирования)
-      // Но для DELETE обычно не требуется читать тело
+      // Инвалидируем кэш дней рождения
+      cache.delete(CacheKeys.birthdays)
+      cache.delete(CacheKeys.birthday(id))
+      cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+      
       logger.info(`[API] deleteBirthday completed successfully`)
     } catch (error) {
       logger.error(`[API] deleteBirthday error:`, error)

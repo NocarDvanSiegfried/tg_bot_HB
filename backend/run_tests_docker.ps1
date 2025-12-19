@@ -29,9 +29,14 @@ if (-not $backendRunning) {
     Start-Sleep -Seconds 5
 }
 
-# Запускаем тесты в контейнере
+# Устанавливаем тестовые зависимости и запускаем тесты
+# Используем docker compose run для создания временного контейнера с тестовыми зависимостями
+Write-Host "Установка тестовых зависимостей..." -ForegroundColor Cyan
 Write-Host "Запуск pytest с аргументами: $($PytestArgs -join ' ')" -ForegroundColor Cyan
-docker compose exec -T backend pytest tests/ $PytestArgs
+
+# Запускаем тесты в новом контейнере с установкой тестовых зависимостей
+# Перенаправляем вывод pip в stderr, чтобы не мешать выводу pytest
+docker compose run --rm backend sh -c "pip install -q -r requirements.txt 2>&1 >/dev/null && python -m pytest tests/ $($PytestArgs -join ' ')"
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""

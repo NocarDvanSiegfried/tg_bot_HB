@@ -81,6 +81,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       # Другие переменные окружения
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ENABLE_TELEGRAM_BOT: ${ENABLE_TELEGRAM_BOT:-true}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       WEB_PORT: ${WEB_PORT:-8000}
     ports:

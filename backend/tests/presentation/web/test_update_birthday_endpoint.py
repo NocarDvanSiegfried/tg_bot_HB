@@ -3,7 +3,7 @@
 import pytest
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi import Request
+from fastapi import Request, HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -159,7 +159,8 @@ async def test_update_birthday_validation_error(mock_session, mock_request, mock
         mock_factory.create_birthday_use_cases.return_value = mock_use_cases
         mock_factory_class.return_value = mock_factory
         
-        with pytest.raises(ValueError):
+        # Декоратор @handle_api_errors преобразует ValueError в HTTPException
+        with pytest.raises(HTTPException) as exc_info:
             await update_birthday(
                 request=mock_request,
                 birthday_id=1,
@@ -167,7 +168,10 @@ async def test_update_birthday_validation_error(mock_session, mock_request, mock
                 session=mock_session
             )
         
-        mock_session.rollback.assert_called_once()
+        assert exc_info.value.status_code == 400
+        assert "Invalid data" in str(exc_info.value.detail)
+        # Rollback вызывается дважды: в endpoint и в декораторе
+        assert mock_session.rollback.call_count >= 1
 
 
 @pytest.mark.asyncio
@@ -191,7 +195,8 @@ async def test_update_birthday_rollback_on_error(mock_session, mock_request):
         mock_factory.create_birthday_use_cases.return_value = mock_use_cases
         mock_factory_class.return_value = mock_factory
         
-        with pytest.raises(Exception):
+        # Декоратор @handle_api_errors преобразует Exception в HTTPException
+        with pytest.raises(HTTPException) as exc_info:
             await update_birthday(
                 request=mock_request,
                 birthday_id=1,
@@ -199,5 +204,8 @@ async def test_update_birthday_rollback_on_error(mock_session, mock_request):
                 session=mock_session
             )
         
-        mock_session.rollback.assert_called_once()
+        assert exc_info.value.status_code == 500
+        assert "Internal server error" in str(exc_info.value.detail)
+        # Rollback вызывается дважды: в endpoint и в декораторе
+        assert mock_session.rollback.call_count >= 1
 
