@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import date
 
@@ -968,11 +969,10 @@ async def test_put_delete(request: Request):
         if body:
             logger.info(f"[TEST] Request body length: {len(body)} bytes")
             try:
-                import json
                 body_json = json.loads(body)
                 logger.info(f"[TEST] Request body (JSON): {body_json}")
-            except:
-                logger.info(f"[TEST] Request body (raw): {body[:200]}...")
+            except Exception as e:
+                logger.info(f"[TEST] Request body (raw): {body[:200]}... (JSON parse error: {e})")
         else:
             logger.info(f"[TEST] Request body: empty")
     except Exception as e:
