@@ -29,7 +29,12 @@ LABEL org.opencontainers.image.created="$BUILD_DATE" \
 WORKDIR /app
 
 # Install system dependencies with BuildKit cache mounts for faster rebuilds
-# Обновляем системные пакеты для устранения уязвимостей
+# Обновляем системные пакеты для устранения уязвимостей безопасности
+# Критичные пакеты (CRITICAL): libsqlite3-0 (CVE-2025-7458), zlib1g (CVE-2023-45853)
+# Высокие уязвимости (HIGH): libpam-* (CVE-2025-6020) - обновляются через apt-get upgrade
+# Средние уязвимости (MEDIUM): util-linux (CVE-2025-14104), gpgv (CVE-2025-30258),
+#   ncurses (CVE-2023-50495), libsqlite3-0 (CVE-2025-7709) - обновляются через apt-get upgrade
+# Неизвестные уязвимости (UNKNOWN): libgnutls30 (CVE-2025-9820) - обновляются через apt-get upgrade
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
