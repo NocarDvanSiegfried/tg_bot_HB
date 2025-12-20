@@ -84,6 +84,8 @@ services:
       ENABLE_TELEGRAM_BOT: ${ENABLE_TELEGRAM_BOT:-true}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       WEB_PORT: ${WEB_PORT:-8000}
+      # URL для Telegram Mini App (должен быть HTTPS)
+      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
     ports:
       # Доступен только на localhost для Nginx reverse proxy
       # Внешний доступ через Nginx на порту 8001 (HTTPS)

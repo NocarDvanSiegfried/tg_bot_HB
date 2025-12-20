@@ -71,6 +71,13 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard.append(
             [InlineKeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))]
         )
+    else:
+        # Логируем предупреждение, если URL не настроен
+        logger.warning(
+            "TELEGRAM_WEBAPP_URL не настроен или использует значение по умолчанию. "
+            "Кнопка Mini App не будет отображаться в панели управления. "
+            "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
+        )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard
