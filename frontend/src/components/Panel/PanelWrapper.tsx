@@ -17,21 +17,32 @@ export default function PanelWrapper() {
 
   // Проверка режима panel - если режим не panel, редиректим на календарь
   useEffect(() => {
+    logger.info('[PanelWrapper] ===== MODE CHECK =====')
+    logger.info('[PanelWrapper] modeReady:', modeReady)
+    logger.info('[PanelWrapper] current mode:', mode)
+    logger.info('[PanelWrapper] current path:', window.location.pathname)
+
     if (!modeReady) {
+      logger.info('[PanelWrapper] ⏳ Waiting for mode to be ready')
       return
     }
 
     if (mode !== 'panel') {
-      if (import.meta.env.DEV) {
-        logger.info('[PanelWrapper] Not in panel mode, redirecting to calendar. Mode:', mode)
-      }
-      setAccessError('Панель управления доступна только в режиме panel. Откройте Mini App через команду /panel в боте.')
+      logger.warn('[PanelWrapper] ❌ NOT IN PANEL MODE! Current mode:', mode)
+      logger.warn('[PanelWrapper] Redirecting to calendar...')
+      setAccessError('Откройте панель через команду /panel в боте')
       setIsCheckingAccess(false)
       setHasAccess(false)
-      setTimeout(() => {
+      // Используем setTimeout только для UX - даем пользователю прочитать сообщение
+      const redirectTimer = setTimeout(() => {
+        logger.info('[PanelWrapper] Executing redirect to / (not panel mode)')
         navigate('/', { replace: true })
       }, 2000)
+      return () => clearTimeout(redirectTimer)
+    } else {
+      logger.info('[PanelWrapper] ✅ Panel mode confirmed')
     }
+    logger.info('[PanelWrapper] ===== MODE CHECK COMPLETE =====')
   }, [mode, modeReady, navigate])
 
   useEffect(() => {

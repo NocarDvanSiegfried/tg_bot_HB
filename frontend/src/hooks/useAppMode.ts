@@ -20,34 +20,46 @@ export function useAppMode(): { mode: AppMode; isReady: boolean } {
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
+    // ЖЕСТКОЕ ЛОГИРОВАНИЕ: начало определения режима
+    logger.info('[useAppMode] ===== START MODE DETECTION =====')
+    logger.info('[useAppMode] Window available:', typeof window !== 'undefined')
+    logger.info('[useAppMode] Telegram available:', typeof window !== 'undefined' && !!window.Telegram)
+    logger.info('[useAppMode] WebApp available:', typeof window !== 'undefined' && !!window.Telegram?.WebApp)
+
     // Проверяем наличие Telegram WebApp
     if (typeof window === 'undefined' || !window.Telegram?.WebApp) {
       // Если WebApp недоступен, используем режим по умолчанию
+      logger.warn('[useAppMode] Telegram WebApp not available, using default user mode')
       setMode('user')
       setIsReady(true)
-      if (import.meta.env.DEV) {
-        logger.info('[useAppMode] Telegram WebApp not available, using default user mode')
-      }
       return
     }
 
     const webApp = window.Telegram.WebApp
+    
+    // ЖЕСТКОЕ ЛОГИРОВАНИЕ: проверка startParam
     const startParam = webApp.startParam
+    logger.info('[useAppMode] Raw startParam value:', startParam)
+    logger.info('[useAppMode] startParam type:', typeof startParam)
+    logger.info('[useAppMode] startParam === "panel":', startParam === 'panel')
+    logger.info('[useAppMode] startParam === null:', startParam === null)
+    logger.info('[useAppMode] startParam === undefined:', startParam === undefined)
+    logger.info('[useAppMode] startParam truthy:', !!startParam)
 
     // Определяем режим на основе startParam
-    if (startParam === 'panel') {
-      setMode('panel')
-      if (import.meta.env.DEV) {
-        logger.info('[useAppMode] Panel mode detected (startParam=panel)')
-      }
+    const detectedMode: AppMode = startParam === 'panel' ? 'panel' : 'user'
+    
+    if (detectedMode === 'panel') {
+      logger.info('[useAppMode] ✅ PANEL MODE DETECTED (startParam === "panel")')
     } else {
-      setMode('user')
-      if (import.meta.env.DEV) {
-        logger.info('[useAppMode] User mode detected (startParam:', startParam || 'null', ')')
-      }
+      logger.info('[useAppMode] ✅ USER MODE DETECTED (startParam:', startParam || 'null/undefined', ')')
     }
 
+    setMode(detectedMode)
     setIsReady(true)
+    logger.info('[useAppMode] ===== MODE DETECTION COMPLETE =====')
+    logger.info('[useAppMode] Final mode:', detectedMode === 'panel' ? 'PANEL' : 'USER')
+    logger.info('[useAppMode] isReady:', true)
   }, [])
 
   return { mode, isReady }

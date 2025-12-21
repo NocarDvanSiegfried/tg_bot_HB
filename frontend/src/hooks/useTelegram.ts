@@ -44,11 +44,15 @@ export function useTelegram() {
           timeoutRef.current = null
         }
         
-        // Логирование для отладки (только в dev режиме)
-        logger.log('Telegram WebApp initialized:', {
-          hasWebApp: !!tg,
-          hasInitData: !!tg.initData,
-        })
+        // ЖЕСТКОЕ ЛОГИРОВАНИЕ: инициализация Telegram WebApp
+        logger.info('[useTelegram] ===== TELEGRAM WEBAPP INITIALIZED =====')
+        logger.info('[useTelegram] WebApp object:', !!tg)
+        logger.info('[useTelegram] initData available:', !!tg.initData)
+        logger.info('[useTelegram] initData length:', tg.initData?.length || 0)
+        logger.info('[useTelegram] startParam available:', 'startParam' in tg)
+        logger.info('[useTelegram] startParam value:', tg.startParam)
+        logger.info('[useTelegram] startParam type:', typeof tg.startParam)
+        logger.info('[useTelegram] ===== INITIALIZATION COMPLETE =====')
       } else {
         // Если WebApp еще не загружен, ждем немного и пробуем снова
         // Это может произойти, если скрипт загружается асинхронно
@@ -70,7 +74,9 @@ export function useTelegram() {
                 timeoutRef.current = null
               }
               
-              logger.log('Telegram WebApp initialized (delayed)')
+              logger.info('[useTelegram] ===== TELEGRAM WEBAPP INITIALIZED (DELAYED) =====')
+              logger.info('[useTelegram] startParam value:', tg.startParam)
+              logger.info('[useTelegram] startParam type:', typeof tg.startParam)
             }
           }, 100)
 
