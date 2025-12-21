@@ -1,4 +1,5 @@
 import logging
+import os
 
 from aiogram import Router
 from aiogram.filters import Command
@@ -6,7 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
-from src.presentation.telegram.keyboards import get_panel_menu_keyboard
+from src.presentation.telegram.keyboards import get_panel_menu_keyboard, is_webapp_url_configured
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +31,24 @@ async def cmd_panel(message: Message, session: AsyncSession):
         # Продолжаем выполнение, даже если не удалось записать доступ
         # Пользователь все равно получит меню панели
 
+    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
+    
+    # Формируем сообщение в зависимости от наличия Mini App
+    if is_webapp_url_configured(webapp_url):
+        message_text = (
+            "🎛️ Панель управления\n\n"
+            "Здесь вы можете управлять днями рождения, ответственными лицами и генерировать поздравления.\n\n"
+            "Нажмите кнопку ниже, чтобы открыть панель управления в Mini App."
+        )
+    else:
+        message_text = (
+            "🎛️ Панель управления\n\n"
+            "Здесь вы можете управлять днями рождения, ответственными лицами и генерировать поздравления.\n\n"
+            "Используйте кнопки ниже для управления."
+        )
+    
     await message.answer(
-        "Панель управления",
+        message_text,
         reply_markup=get_panel_menu_keyboard(),
     )
 

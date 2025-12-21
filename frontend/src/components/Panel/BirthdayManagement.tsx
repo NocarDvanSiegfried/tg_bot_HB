@@ -344,7 +344,13 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     
     if (deleting === id) return // Предотвращаем множественные удаления
     
-    if (!confirm('Удалить день рождения?')) {
+    // Находим день рождения для отображения имени в подтверждении
+    const birthdayToDelete = birthdays.find(bd => bd.id === id)
+    const birthdayName = birthdayToDelete 
+      ? `${birthdayToDelete.full_name}${birthdayToDelete.company ? ` (${birthdayToDelete.company})` : ''}`
+      : 'этот день рождения'
+    
+    if (!confirm(`Вы уверены, что хотите удалить день рождения "${birthdayName}"?\n\nЭто действие нельзя отменить.`)) {
       logger.info(`[BirthdayManagement] Delete cancelled for birthday ${id}`)
       return
     }

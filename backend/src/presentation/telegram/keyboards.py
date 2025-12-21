@@ -55,21 +55,12 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
 def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
     """Меню панели управления."""
     webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    inline_keyboard = [
-        [InlineKeyboardButton(text="🎂 Управление ДР", callback_data="panel_birthdays")],
-        [
-            InlineKeyboardButton(
-                text="👤 Управление ответственными", callback_data="panel_responsible"
-            )
-        ],
-        [InlineKeyboardButton(text="🎉 Генерация поздравлений", callback_data="panel_greetings")],
-        [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
-    ]
+    inline_keyboard = []
 
-    # Добавляем кнопку Mini App, если URL настроен
+    # Добавляем кнопку Mini App в начало, если URL настроен (для лучшей видимости)
     if is_webapp_url_configured(webapp_url):
         inline_keyboard.append(
-            [InlineKeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))]
+            [InlineKeyboardButton(text="🌐 Открыть панель управления", web_app=WebAppInfo(url=webapp_url))]
         )
     else:
         # Логируем предупреждение, если URL не настроен
@@ -78,6 +69,18 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
             "Кнопка Mini App не будет отображаться в панели управления. "
             "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
         )
+
+    # Остальные кнопки меню
+    inline_keyboard.extend([
+        [InlineKeyboardButton(text="🎂 Управление ДР", callback_data="panel_birthdays")],
+        [
+            InlineKeyboardButton(
+                text="👤 Управление ответственными", callback_data="panel_responsible"
+            )
+        ],
+        [InlineKeyboardButton(text="🎉 Генерация поздравлений", callback_data="panel_greetings")],
+        [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
+    ])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard
