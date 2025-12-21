@@ -150,87 +150,43 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      # cache_from закомментирован, так как может вызывать ошибки при отсутствии образов
-      # Раскомментируйте после первой успешной сборки для ускорения последующих сборок:
-      # cache_from:
-      #   - tg_bot_hb-frontend:latest
-      args:
-        <<: *build-args
-        # Режим работы frontend: dev (по умолчанию) или production
-        # Для production build установите: FRONTEND_MODE=production
-        # Для dev-режима оставьте: FRONTEND_MODE=dev (или не указывайте)
-        FRONTEND_MODE: ${FRONTEND_MODE:-dev}
-      # Target для выбора стадии сборки на основе FRONTEND_MODE
-      # Для production (FRONTEND_MODE=production): используйте target: runtime-prod
-      # Для dev (FRONTEND_MODE=dev): используйте target: runtime-dev (по умолчанию)
-      # Установите FRONTEND_TARGET=runtime-prod в .env для production build
-      target: ${FRONTEND_TARGET:-runtime-dev}
-    container_name: tg_bot_hb-frontend
-    ports:
-      # Пробрасываем на хост для доступа Nginx (только localhost для безопасности)
-      - "127.0.0.1:3000:3000"
-    environment:
-      # Для Mini App нужен внешний HTTPS URL
-      # В production используйте реальный домен
-      # Обязательная переменная - должна быть установлена в .env файле
-      VITE_API_URL: ${VITE_API_URL}
-      # Для внутренней связи между контейнерами (если нужно)
-      INTERNAL_API_URL: http://backend:8000
-      # Режим работы frontend (используется для выбора команды запуска)
-      # Должен совпадать с FRONTEND_MODE в build args
-      FRONTEND_MODE: ${FRONTEND_MODE:-dev}
-    # Volume mounts для кода
-    #
-    # ⚠️ ВАЖНО: Volume mounts включены для совместимости
-    #
-    # PRODUCTION (рекомендуется):
-    #   - Убрать volume mounts для полной изоляции и безопасности
-    #   - Код должен быть скопирован в образ при сборке
-    #   - Для обновлений пересобирайте образ: docker compose build frontend
-    #   - Закомментируйте секцию volumes ниже
-    #   - Пример команды для пересборки: docker compose build --no-cache frontend
-    #
-    # DEVELOPMENT:
-    #   - Volume mounts полезны для hot-reload во время разработки
-    #   - Изменения в коде сразу видны в контейнере без пересборки
-    #   - Оставьте секцию volumes ниже активной
-    #
-    # Текущая конфигурация: volume mounts включены
-    # Для полного production закомментируйте volumes и пересоберите образ
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    # Команда запуска
-    #
-    # ⚠️ ВАЖНО: Команда определяется автоматически в Dockerfile на основе target
-    #
-    # PRODUCTION (FRONTEND_TARGET=runtime-prod):
-    #   - Используется production build с nginx
-    #   - Статические файлы обслуживаются через nginx
-    #   - Меньший размер образа, лучшая производительность
-    #   - Установите FRONTEND_MODE=production и FRONTEND_TARGET=runtime-prod в .env
-    #   - Команда: nginx -g 'daemon off;' (определяется в Dockerfile)
-    #
-    # DEVELOPMENT (FRONTEND_TARGET=runtime-dev, по умолчанию):
-    #   - Dev-режим работает через nginx на сервере
-    #   - Vite dev server работает внутри контейнера на порту 3000
-    #   - Nginx проксирует запросы к Vite dev server
-    #   - Hot module replacement (HMR) доступен для разработки
-    #   - Команда: npm run dev (определяется в Dockerfile)
-    #
-    # Команда не указывается явно - используется CMD из Dockerfile на основе target
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    restart: unless-stopped
-    networks:
-      - app_network
+  # ПРИМЕЧАНИЕ: Frontend контейнер отключен для статического хостинга
+  # 
+  # В статическом режиме:
+  #   - Frontend собирается локально или в CI/CD: npm run build
+  #   - Статические файлы копируются в /var/www/miniapp на сервере
+  #   - Nginx отдает статику напрямую без proxy_pass (см. nginx/conf.d/miniapp-static.conf)
+  #   - Нет зависимости от Node.js или dev-серверов на сервере
+  #   - Нет порта 3000 и Docker контейнера для frontend
+  #
+  # Для разработки раскомментируйте блок ниже и используйте frontend.conf в nginx
+  #
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #     args:
+  #       <<: *build-args
+  #       FRONTEND_MODE: ${FRONTEND_MODE:-dev}
+  #     target: ${FRONTEND_TARGET:-runtime-dev}
+  #   container_name: tg_bot_hb-frontend
+  #   ports:
+  #     - "127.0.0.1:3000:3000"
+  #   environment:
+  #     VITE_API_URL: ${VITE_API_URL}
+  #     INTERNAL_API_URL: http://backend:8000
+  #     FRONTEND_MODE: ${FRONTEND_MODE:-dev}
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #   restart: unless-stopped
+  #   networks:
+  #     - app_network
 
 volumes:
   postgres_data:

@@ -1,0 +1,97 @@
+# Docker Compose для статического хостинга Mini App
+# Frontend контейнер НЕ используется - статика отдается напрямую через Nginx
+# Используйте этот файл как пример или объедините с основным docker-compose.yml
+
+# BuildKit optimization configuration
+x-build-args: &build-args
+  BUILDKIT_INLINE_CACHE: "1"
+
+# Явная сеть для изоляции сервисов
+networks:
+  app_network:
+    driver: bridge
+    name: tg_bot_hb_network
+
+services:
+  postgres:
+    container_name: tg_bot_hb-postgres
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-birthday_calendar_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        <<: *build-args
+    container_name: tg_bot_hb-backend
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DEBUG: ${DEBUG:-false}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ENABLE_TELEGRAM_BOT: ${ENABLE_TELEGRAM_BOT:-true}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      WEB_PORT: ${WEB_PORT:-8000}
+      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: python main.py
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ПРИМЕЧАНИЕ: Frontend контейнер НЕ используется в статическом режиме
+  # Статические файлы должны быть скопированы в /var/www/miniapp на сервере
+  # Nginx отдает статику напрямую без proxy_pass
+  #
+  # Если нужен frontend контейнер для разработки, используйте основной docker-compose.yml
+
+volumes:
+  postgres_data:
+    name: tg_bot_hb_postgres_data
+
