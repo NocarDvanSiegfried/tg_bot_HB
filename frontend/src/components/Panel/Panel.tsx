@@ -18,9 +18,25 @@ export default function Panel() {
 
   return (
     <div className="panel-container">
+      {/* Визуальный заголовок панели управления */}
+      <div style={{
+        padding: '16px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: '20px',
+        borderRadius: '0 0 12px 12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      }}>
+        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>🎛️ Панель управления</h1>
+        <p style={{ margin: '8px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+          Режим управления днями рождения
+        </p>
+      </div>
+
       {currentView === 'main' && (
         <div className="panel-main">
-          <h2>Панель управления</h2>
+          <h2>Меню управления</h2>
           <p className="panel-description">
             Управляйте днями рождения, ответственными и генерируйте поздравления
           </p>

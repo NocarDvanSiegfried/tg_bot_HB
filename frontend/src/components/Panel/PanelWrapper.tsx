@@ -1,19 +1,45 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTelegram } from '../../hooks/useTelegram'
+import { useAppMode } from '../../hooks/useAppMode'
 import { api } from '../../services/api'
 import { logger } from '../../utils/logger'
 import Panel from './Panel'
 
 export default function PanelWrapper() {
   const { initData, isReady } = useTelegram()
+  const { mode, isReady: modeReady } = useAppMode()
   const navigate = useNavigate()
   const [isCheckingAccess, setIsCheckingAccess] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [accessError, setAccessError] = useState<string | null>(null)
   const [waitingForInitData, setWaitingForInitData] = useState(true)
 
+  // Проверка режима panel - если режим не panel, редиректим на календарь
   useEffect(() => {
+    if (!modeReady) {
+      return
+    }
+
+    if (mode !== 'panel') {
+      if (import.meta.env.DEV) {
+        logger.info('[PanelWrapper] Not in panel mode, redirecting to calendar. Mode:', mode)
+      }
+      setAccessError('Панель управления доступна только в режиме panel. Откройте Mini App через команду /panel в боте.')
+      setIsCheckingAccess(false)
+      setHasAccess(false)
+      setTimeout(() => {
+        navigate('/', { replace: true })
+      }, 2000)
+    }
+  }, [mode, modeReady, navigate])
+
+  useEffect(() => {
+    // Если режим не panel, не проверяем доступ
+    if (mode !== 'panel' || !modeReady) {
+      return
+    }
+
     // Если initData появился, прекращаем ожидание
     if (initData && waitingForInitData) {
       setWaitingForInitData(false)
@@ -50,9 +76,9 @@ export default function PanelWrapper() {
     }
 
     // Если WebApp готов и есть initData, проверяем доступ
-    if (isReady && initData) {
+    if (isReady && initData && mode === 'panel') {
       if (import.meta.env.DEV) {
-        logger.info('[PanelWrapper] Проверка доступа к панели...', { initDataLength: initData.length })
+        logger.info('[PanelWrapper] Проверка доступа к панели...', { initDataLength: initData.length, mode })
       }
       setIsCheckingAccess(true)
       setAccessError(null)
@@ -90,7 +116,7 @@ export default function PanelWrapper() {
           setIsCheckingAccess(false)
         })
     }
-  }, [initData, isReady, navigate, waitingForInitData])
+  }, [initData, isReady, mode, modeReady, navigate, waitingForInitData])
 
   // Показываем индикатор загрузки
   if (isCheckingAccess || waitingForInitData) {
