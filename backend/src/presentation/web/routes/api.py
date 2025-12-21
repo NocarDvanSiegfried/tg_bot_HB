@@ -1014,35 +1014,10 @@ async def test_delete_simple(request: Request):
 @router.get("/api/debug/cors")
 async def debug_cors(request: Request):
     """Диагностический endpoint для проверки CORS."""
-    import os
-    from src.infrastructure.config.constants import TELEGRAM_ORIGINS
+    from src.infrastructure.config.cors import get_allowed_origins
     
-    # Получаем allowed_origins так же, как в app.py
-    allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
-    is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
-    
-    if is_production:
-        if not allowed_origins_env:
-            allowed_origins = TELEGRAM_ORIGINS.copy()
-        elif "," in allowed_origins_env:
-            allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
-            for tg_origin in TELEGRAM_ORIGINS:
-                if tg_origin not in allowed_origins:
-                    allowed_origins.append(tg_origin)
-        else:
-            allowed_origins = [allowed_origins_env.strip()]
-            allowed_origins.extend(TELEGRAM_ORIGINS)
-    else:
-        if allowed_origins_env and allowed_origins_env != "*":
-            if "," in allowed_origins_env:
-                allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
-            else:
-                allowed_origins = [allowed_origins_env.strip()]
-            for tg_origin in TELEGRAM_ORIGINS:
-                if tg_origin not in allowed_origins:
-                    allowed_origins.append(tg_origin)
-        else:
-            allowed_origins = ["*"]
+    # Используем централизованную функцию для определения allowed_origins
+    allowed_origins = get_allowed_origins()
     
     return {
         "origin": request.headers.get("origin"),

@@ -2,8 +2,15 @@
 x-build-args: &build-args
   BUILDKIT_INLINE_CACHE: "1"
 
+# Явная сеть для изоляции сервисов
+networks:
+  app_network:
+    driver: bridge
+    name: tg_bot_hb_network
+
 services:
   postgres:
+    container_name: tg_bot_hb-postgres
     # Если возникают проблемы с загрузкой образа (TLS handshake timeout), попробуйте:
     #
     # Вариант 1: Использовать скрипт для предварительной загрузки всех образов с retry
@@ -41,8 +48,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
+    # БД не пробрасывается наружу для безопасности в production
+    # Для доступа админа раскомментируйте строку ниже:
+    # ports:
+    #   - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -54,6 +63,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - app_network
     logging:
       driver: "json-file"
       options:
@@ -70,6 +83,7 @@ services:
       #   - tg_bot_hb-backend:latest
       args:
         <<: *build-args
+    container_name: tg_bot_hb-backend
     # Явное указание .env файла для надежной загрузки переменных окружения
     # Docker Compose автоматически загружает .env, но явное указание гарантирует корректную работу
     env_file:
@@ -82,8 +96,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      # Составной URL подключения (формируется из базовых переменных выше)
+      # Составной URL подключения (использует имя сервиса postgres, не localhost!)
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Production настройки
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DEBUG: ${DEBUG:-false}
       # Другие переменные окружения
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       ENABLE_TELEGRAM_BOT: ${ENABLE_TELEGRAM_BOT:-true}
@@ -92,12 +109,29 @@ services:
       # URL для Telegram Mini App (должен быть HTTPS)
       TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
     ports:
-      # Доступен только на localhost для Nginx reverse proxy
-      # Внешний доступ через Nginx на порту 8001 (HTTPS)
-      - "8000:8000"
+      # Пробрасываем на хост для доступа Nginx (только localhost для безопасности)
+      - "127.0.0.1:8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+    # Volume mounts для кода
+    # 
+    # ⚠️ ВАЖНО: Volume mounts включены для совместимости
+    # 
+    # PRODUCTION (рекомендуется):
+    #   - Убрать volume mounts для полной изоляции и безопасности
+    #   - Код должен быть скопирован в образ при сборке
+    #   - Для обновлений пересобирайте образ: docker compose build backend
+    #   - Закомментируйте секцию volumes ниже
+    #   - Пример команды для пересборки: docker compose build --no-cache backend
+    #
+    # DEVELOPMENT:
+    #   - Volume mounts полезны для hot-reload во время разработки
+    #   - Изменения в коде сразу видны в контейнере без пересборки
+    #   - Оставьте секцию volumes ниже активной
+    #
+    # Текущая конфигурация: volume mounts включены
+    # Для полного production закомментируйте volumes и пересоберите образ
     volumes:
       - ./backend:/app
     command: python main.py
@@ -107,6 +141,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
+    networks:
+      - app_network
     logging:
       driver: "json-file"
       options:
@@ -123,10 +160,19 @@ services:
       #   - tg_bot_hb-frontend:latest
       args:
         <<: *build-args
+        # Режим работы frontend: dev (по умолчанию) или production
+        # Для production build установите: FRONTEND_MODE=production
+        # Для dev-режима оставьте: FRONTEND_MODE=dev (или не указывайте)
+        FRONTEND_MODE: ${FRONTEND_MODE:-dev}
+      # Target для выбора стадии сборки на основе FRONTEND_MODE
+      # Для production (FRONTEND_MODE=production): используйте target: runtime-prod
+      # Для dev (FRONTEND_MODE=dev): используйте target: runtime-dev (по умолчанию)
+      # Установите FRONTEND_TARGET=runtime-prod в .env для production build
+      target: ${FRONTEND_TARGET:-runtime-dev}
+    container_name: tg_bot_hb-frontend
     ports:
-      # Доступен только на localhost для Nginx reverse proxy
-      # Внешний доступ через Nginx на порту 3001 (HTTPS)
-      - "3000:3000"
+      # Пробрасываем на хост для доступа Nginx (только localhost для безопасности)
+      - "127.0.0.1:3000:3000"
     environment:
       # Для Mini App нужен внешний HTTPS URL
       # В production используйте реальный домен
@@ -134,15 +180,58 @@ services:
       VITE_API_URL: ${VITE_API_URL}
       # Для внутренней связи между контейнерами (если нужно)
       INTERNAL_API_URL: http://backend:8000
+      # Режим работы frontend (используется для выбора команды запуска)
+      # Должен совпадать с FRONTEND_MODE в build args
+      FRONTEND_MODE: ${FRONTEND_MODE:-dev}
+    # Volume mounts для кода
+    #
+    # ⚠️ ВАЖНО: Volume mounts включены для совместимости
+    #
+    # PRODUCTION (рекомендуется):
+    #   - Убрать volume mounts для полной изоляции и безопасности
+    #   - Код должен быть скопирован в образ при сборке
+    #   - Для обновлений пересобирайте образ: docker compose build frontend
+    #   - Закомментируйте секцию volumes ниже
+    #   - Пример команды для пересборки: docker compose build --no-cache frontend
+    #
+    # DEVELOPMENT:
+    #   - Volume mounts полезны для hot-reload во время разработки
+    #   - Изменения в коде сразу видны в контейнере без пересборки
+    #   - Оставьте секцию volumes ниже активной
+    #
+    # Текущая конфигурация: volume mounts включены
+    # Для полного production закомментируйте volumes и пересоберите образ
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: npm run dev
+    # Команда запуска
+    #
+    # ⚠️ ВАЖНО: Команда определяется автоматически в Dockerfile на основе target
+    #
+    # PRODUCTION (FRONTEND_TARGET=runtime-prod):
+    #   - Используется production build с nginx
+    #   - Статические файлы обслуживаются через nginx
+    #   - Меньший размер образа, лучшая производительность
+    #   - Установите FRONTEND_MODE=production и FRONTEND_TARGET=runtime-prod в .env
+    #   - Команда: nginx -g 'daemon off;' (определяется в Dockerfile)
+    #
+    # DEVELOPMENT (FRONTEND_TARGET=runtime-dev, по умолчанию):
+    #   - Dev-режим работает через nginx на сервере
+    #   - Vite dev server работает внутри контейнера на порту 3000
+    #   - Nginx проксирует запросы к Vite dev server
+    #   - Hot module replacement (HMR) доступен для разработки
+    #   - Команда: npm run dev (определяется в Dockerfile)
+    #
+    # Команда не указывается явно - используется CMD из Dockerfile на основе target
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    restart: unless-stopped
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
+    name: tg_bot_hb_postgres_data

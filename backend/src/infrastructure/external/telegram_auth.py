@@ -84,20 +84,94 @@ class TelegramAuthServiceImpl(TelegramAuthService):
 
 
 # Функции для обратной совместимости (deprecated, использовать TelegramAuthServiceImpl)
+import warnings
+
+
 def verify_telegram_init_data(init_data: str, bot_token: str) -> bool:
-    """Верифицировать initData от Telegram WebApp через HMAC SHA256 (deprecated)."""
+    """Верифицировать initData от Telegram WebApp через HMAC SHA256 (deprecated).
+    
+    .. deprecated:: 1.0.0
+        Используйте :class:`TelegramAuthServiceImpl` вместо этой функции.
+        Пример:
+            service = TelegramAuthServiceImpl()
+            service.verify_init_data(init_data, bot_token)
+    
+    Args:
+        init_data: InitData строка от Telegram WebApp
+        bot_token: Токен Telegram бота
+        
+    Returns:
+        bool: True если initData валиден, False иначе
+        
+    .. warning::
+        Эта функция устарела и будет удалена в будущих версиях.
+        Используйте TelegramAuthServiceImpl для новых проектов.
+    """
+    warnings.warn(
+        "verify_telegram_init_data() is deprecated. "
+        "Use TelegramAuthServiceImpl.verify_init_data() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
     service = TelegramAuthServiceImpl()
     return service.verify_init_data(init_data, bot_token)
 
 
 def parse_init_data(init_data: str) -> dict | None:
-    """Парсить initData и извлечь данные пользователя (deprecated)."""
+    """Парсить initData и извлечь данные пользователя (deprecated).
+    
+    .. deprecated:: 1.0.0
+        Используйте :class:`TelegramAuthServiceImpl` вместо этой функции.
+        Пример:
+            service = TelegramAuthServiceImpl()
+            service.parse_init_data(init_data)
+    
+    Args:
+        init_data: InitData строка от Telegram WebApp
+        
+    Returns:
+        dict | None: Словарь с данными пользователя или None если невалидно
+        
+    .. warning::
+        Эта функция устарела и будет удалена в будущих версиях.
+        Используйте TelegramAuthServiceImpl для новых проектов.
+    """
+    warnings.warn(
+        "parse_init_data() is deprecated. "
+        "Use TelegramAuthServiceImpl.parse_init_data() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
     service = TelegramAuthServiceImpl()
     return service.parse_init_data(init_data)
 
 
 def get_user_id_from_init_data(init_data: str) -> int | None:
-    """Извлечь user_id из initData."""
+    """Извлечь user_id из initData (deprecated).
+    
+    .. deprecated:: 1.0.0
+        Используйте :class:`TelegramAuthServiceImpl` вместо этой функции.
+        Пример:
+            service = TelegramAuthServiceImpl()
+            user_data = service.parse_init_data(init_data)
+            user_id = user_data.get("id") if user_data else None
+    
+    Args:
+        init_data: InitData строка от Telegram WebApp
+        
+    Returns:
+        int | None: ID пользователя или None если невалидно
+        
+    .. warning::
+        Эта функция устарела и будет удалена в будущих версиях.
+        Используйте TelegramAuthServiceImpl для новых проектов.
+    """
+    warnings.warn(
+        "get_user_id_from_init_data() is deprecated. "
+        "Use TelegramAuthServiceImpl.parse_init_data() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
     service = TelegramAuthServiceImpl()
     user_data = service.parse_init_data(init_data)
     if user_data and "id" in user_data:

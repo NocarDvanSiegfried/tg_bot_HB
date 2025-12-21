@@ -10,7 +10,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from src.infrastructure.config.constants import TELEGRAM_ORIGINS
+from src.infrastructure.config.cors import get_allowed_origins
 from src.presentation.web.routes.api import router
 
 logger = logging.getLogger(__name__)
@@ -25,44 +25,8 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS для Telegram Mini App
-# Определяем окружение (development или production)
-is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
-
-# Получаем разрешенные origins из переменной окружения
-allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
-
-if is_production:
-    # В production используем только конкретные домены
-    if not allowed_origins_env:
-        # Если не указано, используем только Telegram origins
-        allowed_origins = TELEGRAM_ORIGINS.copy()
-    elif "," in allowed_origins_env:
-        # Если указано несколько доменов через запятую
-        allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
-        # Добавляем Telegram origins, если их еще нет
-        for tg_origin in TELEGRAM_ORIGINS:
-            if tg_origin not in allowed_origins:
-                allowed_origins.append(tg_origin)
-    else:
-        # Один домен
-        allowed_origins = [allowed_origins_env.strip()]
-        # Добавляем Telegram origins
-        allowed_origins.extend(TELEGRAM_ORIGINS)
-else:
-    # В development разрешаем все для удобства разработки
-    if allowed_origins_env and allowed_origins_env != "*":
-        # Если указаны конкретные домены, используем их
-        if "," in allowed_origins_env:
-            allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
-        else:
-            allowed_origins = [allowed_origins_env.strip()]
-        # Добавляем Telegram origins для разработки
-        for tg_origin in TELEGRAM_ORIGINS:
-            if tg_origin not in allowed_origins:
-                allowed_origins.append(tg_origin)
-    else:
-        # Разрешаем все для разработки
-        allowed_origins = ["*"]
+# Используем централизованную функцию для определения allowed_origins
+allowed_origins = get_allowed_origins()
 
 # Сжатие ответов (gzip) для уменьшения размера передаваемых данных
 app.add_middleware(GZipMiddleware, minimum_size=1000)  # Сжимать ответы больше 1KB

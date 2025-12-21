@@ -20,6 +20,8 @@ FROM node:20-alpine AS builder
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
+# Build mode: dev or production (default: dev)
+ARG FRONTEND_MODE=dev
 
 # Labels for metadata
 LABEL org.opencontainers.image.created="$BUILD_DATE" \
@@ -41,35 +43,37 @@ RUN --mount=type=cache,target=/root/.npm \
 # Copy application code
 COPY . .
 
-# Note: For dev mode, we use vite dev server directly
-# For production build, uncomment: RUN npm run build
+# Build stage
+# 
+# DEVELOPMENT MODE (FRONTEND_MODE=dev):
+#   - Uses Vite dev server directly
+#   - Hot module replacement enabled
+#   - All devDependencies included
+#   - Command: npm run dev
+#
+# PRODUCTION MODE (FRONTEND_MODE=production):
+#   - Builds static assets
+#   - Uses nginx to serve static files
+#   - Smaller image size, better performance
+#
+RUN if [ "$FRONTEND_MODE" = "production" ]; then \
+        npm run build; \
+    fi
 
-# Stage 2: Runtime - use builder for dev mode (needs devDependencies for vite dev server)
-# For production, this would use --only=production, but for dev mode we need all deps
-FROM builder AS runtime
-
-# Build arguments for metadata
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-
-# Labels for metadata
-LABEL org.opencontainers.image.created="$BUILD_DATE" \
-      org.opencontainers.image.revision="$VCS_REF" \
-      org.opencontainers.image.version="$VERSION" \
-      org.opencontainers.image.title="Telegram Birthday Calendar Frontend" \
-      org.opencontainers.image.description="Frontend service for Telegram Birthday Calendar Mini App"
-
-# Create non-root user for security (for production builds)
-# For dev mode with volume mounts, we skip USER directive to avoid permission issues
-# Volume mounts can overwrite permissions, so running as root in dev is acceptable
-RUN addgroup -g 1000 appuser 2>/dev/null || true && \
-    adduser -D -u 1000 -G appuser appuser 2>/dev/null || true
-
-# For development mode: run as root to avoid volume mount permission issues
-# For production: uncomment the line below and ensure proper file permissions
-# USER appuser
-
+# Stage 2: Production runtime (nginx)
+FROM nginx:alpine AS runtime-prod
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]
 
+# Stage 3: Development runtime (Vite dev server)
+FROM builder AS runtime-dev
+EXPOSE 3000
 CMD ["npm", "run", "dev"]
+
+# Stage 4: Default runtime (dev mode for backward compatibility)
+# Docker Compose will use --target to select the correct stage:
+#   - For production: target: runtime-prod
+#   - For dev: target: runtime-dev (default)
+FROM runtime-dev AS runtime
