@@ -43,7 +43,10 @@ test.describe('Panel', () => {
 
   test('should have API connection', async ({ page }) => {
     // Проверяем, что API доступен
-    const apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
+    const apiUrl = process.env.VITE_API_URL;
+    if (!apiUrl) {
+      throw new Error('VITE_API_URL is required for E2E tests. Please set it in environment variables.');
+    }
     
     // Проверяем, что переменная окружения установлена
     expect(apiUrl).toBeDefined();

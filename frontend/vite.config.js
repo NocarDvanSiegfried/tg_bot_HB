@@ -12,7 +12,6 @@ export default defineConfig({
       "www.micro-tab.ru",
       "api.micro-tab.ru",
       "mini.micro-tab.ru",
-      "localhost",
       "0.0.0.0",
     ],
   },

@@ -1,37 +1,25 @@
-const fallbackUrl = 'http://localhost:8000'
-const apiUrl = import.meta.env.VITE_API_URL || fallbackUrl
+// VITE_API_URL обязателен для работы приложения
+// Проект работает на сервере, localhost не поддерживается
+const apiUrl = import.meta.env.VITE_API_URL
+
+if (!apiUrl) {
+  const errorMessage = 'VITE_API_URL is required and must be set in environment variables. ' +
+    'The application runs on a server and requires a production URL (HTTPS). ' +
+    'Please set VITE_API_URL in your environment configuration.'
+  console.error('[Config]', errorMessage)
+  throw new Error(errorMessage)
+}
 
 // Таймаут для API запросов (в миллисекундах)
 // Можно переопределить через переменную окружения VITE_API_TIMEOUT_MS
 export const API_TIMEOUT_MS = Number(import.meta.env.VITE_API_TIMEOUT_MS) || 30000
 
-// Проверка на localhost (не работает для Telegram Mini App)
-const isLocalhost = apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1') || apiUrl.startsWith('http://localhost') || apiUrl.startsWith('http://127.0.0.1')
-
-// Предупреждение в dev режиме, если используется fallback URL
-// Используем прямой console.warn, так как logger может быть еще не инициализирован
-if (import.meta.env.DEV && apiUrl === fallbackUrl) {
+// Проверка на использование HTTP (для production рекомендуется HTTPS)
+if (apiUrl.startsWith('http://')) {
   console.warn(
-    '[Config] VITE_API_URL не установлен, используется fallback URL:',
-    fallbackUrl,
-    '\nВ production обязательно установите VITE_API_URL в переменных окружения.',
-    '\nДля Telegram Mini App нужен внешний URL (не localhost).',
-    '\nДля разработки используйте ngrok или другой tunnel.'
-  )
-}
-
-// Предупреждение, если используется localhost (не работает для Mini App)
-// Проверяем только если приложение запущено в Telegram (есть window.Telegram)
-if (typeof window !== 'undefined' && window.Telegram?.WebApp && isLocalhost) {
-  console.error(
-    '[Config] КРИТИЧЕСКАЯ ОШИБКА: VITE_API_URL указывает на localhost!',
-    '\nTelegram Mini App не может обращаться к localhost.',
-    '\nТекущий URL:', apiUrl,
-    '\n\nРешение:',
-    '\n1. Для разработки: используйте ngrok (ngrok http 8000)',
-    '\n2. Для production: установите VITE_API_URL на внешний HTTPS URL',
-    '\n   Пример: VITE_API_URL=https://your-domain.com:8001',
-    '\n\nПодробные инструкции: см. MINI_APP_SETUP.md'
+    '[Config] VITE_API_URL использует HTTP вместо HTTPS.',
+    '\nДля production рекомендуется использовать HTTPS для безопасности.',
+    '\nТекущий URL:', apiUrl
   )
 }
 

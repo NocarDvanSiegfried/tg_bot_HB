@@ -638,7 +638,7 @@ export default function Diagnostics() {
                           <li>Запущен ли backend сервер</li>
                           <li>Правильно ли настроен VITE_API_URL</li>
                           <li>
-                            Доступен ли API из браузера (для Mini App нужен внешний URL, не localhost)
+                            Доступен ли API из браузера (для Mini App нужен внешний HTTPS URL)
                           </li>
                           <li>Для разработки используйте ngrok или другой tunnel</li>
                         </>
@@ -650,17 +650,16 @@ export default function Diagnostics() {
                       <li>Запущен ли backend сервер</li>
                       <li>Правильно ли настроен VITE_API_URL</li>
                       <li>
-                        Доступен ли API из браузера (для Mini App нужен внешний URL, не localhost)
+                        Доступен ли API из браузера (для Mini App нужен внешний HTTPS URL)
                       </li>
                       <li>Для разработки используйте ngrok или другой tunnel</li>
                     </ul>
                   )}
                 </li>
               )}
-              {API_BASE_URL.includes('localhost') && (
+              {!API_BASE_URL.startsWith('https://') && (
                 <li>
-                  ⚠️ VITE_API_URL указывает на localhost. Для Mini App нужен внешний HTTPS URL.
-                  Используйте ngrok для разработки.
+                  ⚠️ VITE_API_URL использует HTTP. Для production рекомендуется HTTPS для безопасности.
                 </li>
               )}
             </ul>

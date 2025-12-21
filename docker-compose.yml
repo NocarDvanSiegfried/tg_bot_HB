@@ -112,10 +112,10 @@ services:
       # Внешний доступ через Nginx на порту 3001 (HTTPS)
       - "3000:3000"
     environment:
-      # Для Mini App нужен внешний URL (не localhost или backend)
-      # В development можно использовать ngrok или другой tunnel
+      # Для Mini App нужен внешний HTTPS URL
       # В production используйте реальный домен
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      # Обязательная переменная - должна быть установлена в .env файле
+      VITE_API_URL: ${VITE_API_URL}
       # Для внутренней связи между контейнерами (если нужно)
       INTERNAL_API_URL: http://backend:8000
     volumes:

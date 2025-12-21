@@ -400,7 +400,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     initDataLength: typeof window !== 'undefined' && window.Telegram?.WebApp?.initData 
       ? window.Telegram.WebApp.initData.length 
       : 0,
-    isLocalhost: API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1'),
   }
 
   return (
@@ -421,12 +420,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         }}>
           <strong>🔍 Диагностика:</strong><br/>
           API URL: {diagnosticInfo.apiUrl}<br/>
-          InitData: {diagnosticInfo.hasInitData ? `✅ (${diagnosticInfo.initDataLength} символов)` : '❌ отсутствует'}<br/>
-          {diagnosticInfo.isLocalhost && (
-            <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
-              ⚠️ ВНИМАНИЕ: Используется localhost! Mini App не сможет обращаться к API!
-            </span>
-          )}
+          InitData: {diagnosticInfo.hasInitData ? `✅ (${diagnosticInfo.initDataLength} символов)` : '❌ отсутствует'}
         </div>
       )}
 
