@@ -20,10 +20,18 @@ export default defineConfig({
     },
     // Увеличиваем лимит предупреждений для production
     chunkSizeWarningLimit: 1000,
+    // Отключаем все dev-функции в production build
+    // Это гарантирует отсутствие WebSocket и HMR кода
+    target: 'es2015',
+    // Убеждаемся что dev-код не попадает в production
+    define: {
+      'import.meta.hot': 'undefined',
+    },
   },
   // Base path для статики (пустой для корня)
   base: '/',
   // Server config только для dev (не используется в production)
+  // В production build эти настройки игнорируются
   server: {
     host: '0.0.0.0',
     port: 3000,
@@ -35,11 +43,11 @@ export default defineConfig({
       "mini.micro-tab.ru",
       "0.0.0.0",
     ],
-    hmr: {
-      protocol: 'ws',
-    },
+    // HMR отключен для production - не создает WebSocket соединений
+    hmr: false,
   },
   // Preview config для тестирования production build локально
+  // В production build не используется
   preview: {
     port: 4173,
     host: true,

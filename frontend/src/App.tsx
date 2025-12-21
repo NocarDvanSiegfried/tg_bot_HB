@@ -6,7 +6,10 @@ import { logger } from './utils/logger'
 // Lazy loading для оптимизации bundle
 const Calendar = lazy(() => import('./components/Calendar/Calendar'))
 const PanelWrapper = lazy(() => import('./components/Panel/PanelWrapper'))
-const Diagnostics = lazy(() => import('./components/Diagnostics/Diagnostics'))
+// Diagnostics загружается только в development режиме
+const Diagnostics = import.meta.env.DEV
+  ? lazy(() => import('./components/Diagnostics/Diagnostics'))
+  : null
 
 function App() {
   const { webApp, isReady } = useTelegram()
@@ -88,9 +91,12 @@ function App() {
           }
         />
       </Routes>
-      <Suspense fallback={null}>
-        <Diagnostics />
-      </Suspense>
+      {/* Diagnostics загружается только в development режиме */}
+      {import.meta.env.DEV && Diagnostics && (
+        <Suspense fallback={null}>
+          <Diagnostics />
+        </Suspense>
+      )}
     </div>
   )
 }

@@ -323,8 +323,9 @@ export default function Diagnostics() {
         setApiError(errorInfo.message)
         setApiErrorInfo(errorInfo)
 
-        // Логируем детали в консоль для отладки
-        if (import.meta.env.DEV) {
+        // Логируем детали в консоль для отладки (только в dev)
+        // В production ошибки логируются через logger.error
+        if (import.meta.env.DEV && typeof console !== 'undefined' && console.error) {
           console.error('[Diagnostics] API Error Details:', {
             type: errorInfo.type,
             message: errorInfo.message,
