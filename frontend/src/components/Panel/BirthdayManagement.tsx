@@ -393,10 +393,42 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     }
   }
 
+  // Диагностическая информация
+  const diagnosticInfo = {
+    apiUrl: API_BASE_URL,
+    hasInitData: typeof window !== 'undefined' && !!window.Telegram?.WebApp?.initData,
+    initDataLength: typeof window !== 'undefined' && window.Telegram?.WebApp?.initData 
+      ? window.Telegram.WebApp.initData.length 
+      : 0,
+    isLocalhost: API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1'),
+  }
+
   return (
     <div className="panel-section">
       <button className="back-button" onClick={onBack}>🔙 Назад</button>
       <h3>Управление днями рождения</h3>
+
+      {/* Диагностическая информация (только в dev режиме) */}
+      {import.meta.env.DEV && (
+        <div style={{ 
+          padding: '10px', 
+          marginBottom: '10px', 
+          background: '#e3f2fd', 
+          color: '#1976d2', 
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontFamily: 'monospace'
+        }}>
+          <strong>🔍 Диагностика:</strong><br/>
+          API URL: {diagnosticInfo.apiUrl}<br/>
+          InitData: {diagnosticInfo.hasInitData ? `✅ (${diagnosticInfo.initDataLength} символов)` : '❌ отсутствует'}<br/>
+          {diagnosticInfo.isLocalhost && (
+            <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
+              ⚠️ ВНИМАНИЕ: Используется localhost! Mini App не сможет обращаться к API!
+            </span>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="error-message" style={{ padding: '10px', marginBottom: '10px', background: '#fee', color: '#c00', borderRadius: '4px', whiteSpace: 'pre-line' }}>

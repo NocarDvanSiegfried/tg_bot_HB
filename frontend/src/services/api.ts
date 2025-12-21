@@ -233,12 +233,31 @@ export const api = {
   },
 
   async createBirthday(data: Omit<Birthday, 'id'>): Promise<Birthday> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays`, {
+    const url = `${API_BASE_URL}/api/panel/birthdays`
+    logger.info(`[API] ===== createBirthday START =====`)
+    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
+    logger.info(`[API] Full URL: ${url}`)
+    logger.info(`[API] Request data:`, data)
+    
+    const headers = getHeaders()
+    const initData = getInitData()
+    logger.info(`[API] initData available: ${!!initData}`)
+    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
+    logger.info(`[API] Headers:`, { 
+      'Content-Type': headers['Content-Type'],
+      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
+    })
+    
+    logger.info(`[API] Sending POST request to ${url}...`)
+    const response = await fetchWithErrorHandling(url, {
       method: 'POST',
-      headers: getHeaders(),
+      headers: headers,
       body: JSON.stringify(data),
     })
+    logger.info(`[API] createBirthday response received, status: ${response.status}`)
     const result = await response.json()
+    logger.info(`[API] createBirthday result:`, result)
+    logger.info(`[API] ===== createBirthday SUCCESS =====`)
     
     // Инвалидируем кэш дней рождения
     cache.delete(CacheKeys.birthdays)
@@ -248,22 +267,34 @@ export const api = {
   },
 
   async updateBirthday(id: number, data: Partial<Birthday>): Promise<Birthday> {
+    const url = `${API_BASE_URL}/api/panel/birthdays/${id}`
+    logger.info(`[API] ===== updateBirthday START =====`)
     logger.info(`[API] updateBirthday called with id=${id}, data:`, data)
+    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
+    logger.info(`[API] Full URL: ${url}`)
+    
     const headers = getHeaders()
     headers['Content-Type'] = 'application/json'
+    
+    const initData = getInitData()
+    logger.info(`[API] initData available: ${!!initData}`)
+    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
     logger.info(`[API] updateBirthday headers:`, { 
       'Content-Type': headers['Content-Type'],
       'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
     })
+    logger.info(`[API] Request body:`, JSON.stringify(data))
     
     try {
-      const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+      logger.info(`[API] Sending PUT request to ${url}...`)
+      const response = await fetchWithErrorHandling(url, {
         method: 'PUT',
         headers: headers,
         body: JSON.stringify(data),
       })
       logger.info(`[API] updateBirthday response received, status: ${response.status}`)
       logger.info(`[API] updateBirthday response headers:`, Object.fromEntries(response.headers.entries()))
+      logger.info(`[API] ===== updateBirthday RESPONSE RECEIVED =====`)
       
       // Проверка статуса ответа
       if (!response.ok) {
@@ -301,6 +332,7 @@ export const api = {
       }
       
       logger.info(`[API] updateBirthday success: id=${result.id}, full_name=${result.full_name}`)
+      logger.info(`[API] ===== updateBirthday SUCCESS =====`)
       
       // Инвалидируем кэш дней рождения
       cache.delete(CacheKeys.birthdays)
@@ -309,26 +341,42 @@ export const api = {
       
       return result
     } catch (error) {
+      logger.error(`[API] ===== updateBirthday ERROR =====`)
       logger.error(`[API] updateBirthday error:`, error)
+      logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
+      logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
+      if (error instanceof Error && error.stack) {
+        logger.error(`[API] Error stack:`, error.stack)
+      }
       throw error
     }
   },
 
   async deleteBirthday(id: number): Promise<void> {
+    const url = `${API_BASE_URL}/api/panel/birthdays/${id}`
+    logger.info(`[API] ===== deleteBirthday START =====`)
     logger.info(`[API] deleteBirthday called with id=${id}`)
+    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
+    logger.info(`[API] Full URL: ${url}`)
+    
     const headers = getHeaders()
+    const initData = getInitData()
+    logger.info(`[API] initData available: ${!!initData}`)
+    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
     logger.info(`[API] deleteBirthday headers:`, { 
       'Content-Type': headers['Content-Type'],
       'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
     })
     
     try {
-      const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays/${id}`, {
+      logger.info(`[API] Sending DELETE request to ${url}...`)
+      const response = await fetchWithErrorHandling(url, {
         method: 'DELETE',
         headers: headers,
       })
       logger.info(`[API] deleteBirthday response received, status: ${response.status}`)
       logger.info(`[API] deleteBirthday response headers:`, Object.fromEntries(response.headers.entries()))
+      logger.info(`[API] ===== deleteBirthday RESPONSE RECEIVED =====`)
       
       // Проверка статуса ответа
       if (!response.ok) {
@@ -356,6 +404,7 @@ export const api = {
       }
       
       logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
+      logger.info(`[API] ===== deleteBirthday SUCCESS =====`)
       
       // Инвалидируем кэш дней рождения
       cache.delete(CacheKeys.birthdays)
@@ -364,7 +413,13 @@ export const api = {
       
       logger.info(`[API] deleteBirthday completed successfully`)
     } catch (error) {
+      logger.error(`[API] ===== deleteBirthday ERROR =====`)
       logger.error(`[API] deleteBirthday error:`, error)
+      logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
+      logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
+      if (error instanceof Error && error.stack) {
+        logger.error(`[API] Error stack:`, error.stack)
+      }
       throw error
     }
   },
