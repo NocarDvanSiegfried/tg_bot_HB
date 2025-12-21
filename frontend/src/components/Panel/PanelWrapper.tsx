@@ -1,44 +1,30 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTelegram } from '../../hooks/useTelegram'
-import { useAppMode } from '../../hooks/useAppMode'
 import { api } from '../../services/api'
 import { logger } from '../../utils/logger'
 import Panel from './Panel'
 
+/**
+ * PanelWrapper - обертка для панели управления
+ * 
+ * КРИТИЧНО: Это компонент только для panel-режима
+ * - Не знает про user режим
+ * - Не делает redirect
+ * - Не вызывает navigate
+ * - Не проверяет startParam
+ * - Не использует useAppMode
+ * 
+ * Режим определяется только в App.tsx, который рендерит нужное дерево компонентов
+ */
 export default function PanelWrapper() {
-  // КРИТИЧНО: Все хуки должны вызываться всегда, на верхнем уровне, без условий
-  // Это правило React hooks - нарушение приводит к ошибке #310
+  // Все хуки вызываются всегда, без условий
   const { initData, isReady, webApp } = useTelegram()
-  const { mode, isReady: modeReady } = useAppMode()
-  const navigate = useNavigate()
   const [isCheckingAccess, setIsCheckingAccess] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [accessError, setAccessError] = useState<string | null>(null)
   const [waitingForInitData, setWaitingForInitData] = useState(true)
 
-  // КРИТИЧНО: Редирект выполняется ТОЛЬКО внутри useEffect
-  // navigate() не должен вызываться напрямую в теле компонента
   useEffect(() => {
-    if (!modeReady) {
-      return // Ждем определения режима
-    }
-
-    if (mode !== 'panel') {
-      logger.warn('[PanelWrapper] ❌❌❌ BLOCKING RENDER - NOT IN PANEL MODE ❌❌❌')
-      logger.warn('[PanelWrapper] Current mode:', mode)
-      logger.warn('[PanelWrapper] PanelWrapper is NOT allowed in user mode. Redirecting to /')
-      navigate('/', { replace: true })
-    } else {
-      logger.info('[PanelWrapper] ✅✅✅ PANEL MODE CONFIRMED ✅✅✅')
-    }
-  }, [mode, modeReady, navigate])
-
-  useEffect(() => {
-    // Если режим не panel, не проверяем доступ
-    if (mode !== 'panel' || !modeReady) {
-      return
-    }
 
     // Если initData появился, прекращаем ожидание
     if (initData && waitingForInitData) {
@@ -59,8 +45,6 @@ export default function PanelWrapper() {
           setAccessError(
             'Не удалось получить данные авторизации. Убедитесь, что приложение открыто через Telegram Mini App.'
           )
-          // КРИТИЧНО: Немедленный редирект без задержки
-          navigate('/', { replace: true })
         }
       }, 5000)
 
@@ -74,9 +58,9 @@ export default function PanelWrapper() {
     }
 
     // Если WebApp готов и есть initData, проверяем доступ
-    if (isReady && initData && mode === 'panel') {
+    if (isReady && initData) {
       if (import.meta.env.DEV) {
-        logger.info('[PanelWrapper] Проверка доступа к панели...', { initDataLength: initData.length, mode })
+        logger.info('[PanelWrapper] Проверка доступа к панели...', { initDataLength: initData.length })
       }
       setIsCheckingAccess(true)
       setAccessError(null)
@@ -91,8 +75,6 @@ export default function PanelWrapper() {
             setAccessError(
               'У вас нет доступа к панели управления. Используйте команду /panel в боте для получения доступа.'
             )
-            // КРИТИЧНО: Немедленный редирект без задержки
-            navigate('/', { replace: true })
           }
         })
         .catch((error) => {
@@ -103,17 +85,15 @@ export default function PanelWrapper() {
               ? `Ошибка при проверке доступа: ${error.message}`
               : 'Не удалось проверить доступ к панели. Попробуйте обновить страницу.'
           )
-          // КРИТИЧНО: Немедленный редирект без задержки
-          navigate('/', { replace: true })
         })
         .finally(() => {
           setIsCheckingAccess(false)
         })
     }
-  }, [initData, isReady, mode, modeReady, navigate, waitingForInitData])
+  }, [initData, isReady, waitingForInitData])
 
-  // Визуальный индикатор режима для отладки
-  const debugInfo = modeReady && webApp ? (
+  // Визуальный индикатор для отладки
+  const debugInfo = webApp && import.meta.env.DEV ? (
     <div style={{
       position: 'fixed',
       top: '50px',
@@ -127,39 +107,10 @@ export default function PanelWrapper() {
       fontFamily: 'monospace',
       maxWidth: '200px',
     }}>
-      <div><strong>Режим:</strong> {mode === 'panel' ? '🔧 PANEL' : '👤 USER'}</div>
-      <div><strong>startParam:</strong> {webApp.startParam || 'null'}</div>
-      <div><strong>modeReady:</strong> {modeReady ? '✅' : '❌'}</div>
       <div><strong>isReady:</strong> {isReady ? '✅' : '❌'}</div>
       <div><strong>hasAccess:</strong> {hasAccess ? '✅' : '❌'}</div>
     </div>
   ) : null
-
-  // КРИТИЧНО: Условный рендер происходит только в return, не через ранние return
-  // Это гарантирует, что все хуки вызываются всегда
-
-  // Если режим еще не определен, показываем экран инициализации
-  if (!modeReady) {
-    return (
-      <div className="app-loading">
-        <div className="loading-spinner">⏳</div>
-        <p>Инициализация панели управления...</p>
-      </div>
-    )
-  }
-
-  // Если режим не panel, показываем сообщение о перенаправлении
-  // Редирект уже выполнен в useEffect выше
-  if (mode !== 'panel') {
-    return (
-      <div className="app-loading">
-        <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
-          <p>⚠️ Откройте панель через команду /panel в боте</p>
-          <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
-        </div>
-      </div>
-    )
-  }
 
   // Показываем индикатор загрузки
   if (isCheckingAccess || waitingForInitData) {
@@ -172,11 +123,6 @@ export default function PanelWrapper() {
             ? 'Ожидание инициализации Telegram WebApp...'
             : 'Проверка доступа к панели...'}
         </p>
-        {modeReady && (
-          <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-            Режим: {mode === 'panel' ? '🔧 PANEL' : '👤 USER'} | startParam: {webApp?.startParam || 'null'}
-          </p>
-        )}
       </div>
     )
   }
@@ -189,18 +135,12 @@ export default function PanelWrapper() {
         <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
           <p>⚠️ {accessError || 'У вас нет доступа к панели управления.'}</p>
           <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
-          {modeReady && (
-            <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-              Режим: {mode === 'panel' ? '🔧 PANEL' : '👤 USER'} | startParam: {webApp?.startParam || 'null'}
-            </p>
-          )}
         </div>
       </div>
     )
   }
 
-  // КРИТИЧНО: Panel рендерится ТОЛЬКО в режиме panel
-  // Все проверки выполнены выше, режим гарантированно panel
+  // Panel рендерится только если есть доступ
   return (
     <>
       {debugInfo}

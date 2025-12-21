@@ -8,15 +8,22 @@ import isToday from 'date-fns/isToday'
 import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'
-import { useAppMode } from '../../hooks/useAppMode'
-import { useNavigate } from 'react-router-dom'
 import './Calendar.css'
 
+/**
+ * Calendar - компонент для просмотра календаря дней рождения
+ * 
+ * КРИТИЧНО: Это "тупой" компонент только для user-режима
+ * - Не знает про panel режим
+ * - Не делает redirect
+ * - Не вызывает navigate
+ * - Не проверяет startParam
+ * - Не использует useAppMode
+ * 
+ * Режим определяется только в App.tsx, который рендерит нужное дерево компонентов
+ */
 export default function Calendar() {
-  // КРИТИЧНО: Все хуки должны вызываться всегда, на верхнем уровне, без условий
-  // Это правило React hooks - нарушение приводит к ошибке #310
-  const { mode, isReady: modeReady } = useAppMode()
-  const navigate = useNavigate()
+  // Все хуки вызываются всегда, без условий
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null)
@@ -26,45 +33,15 @@ export default function Calendar() {
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
 
-  // КРИТИЧНО: Редирект выполняется ТОЛЬКО внутри useEffect
-  // navigate() не должен вызываться напрямую в теле компонента
-  useEffect(() => {
-    if (!modeReady) {
-      return // Ждем определения режима
-    }
-
-    if (mode === 'panel') {
-      logger.warn('[Calendar] ❌❌❌ BLOCKING RENDER - panel mode detected ❌❌❌')
-      logger.warn('[Calendar] Calendar is NOT allowed in panel mode. Redirecting to /panel')
-      navigate('/panel', { replace: true })
-    }
-  }, [mode, modeReady, navigate])
-
   // Логирование для отладки
   useEffect(() => {
     if (import.meta.env.DEV) {
-      logger.info('[Calendar] Component mounted, mode:', mode, 'modeReady:', modeReady)
-      if (modeReady && mode === 'user') {
-        logger.info('[Calendar] ✅ Calendar rendering in user mode')
-      }
+      logger.info('[Calendar] Component mounted')
     }
-  }, [mode, modeReady])
+  }, [])
 
-  // КРИТИЧНО: Загрузка данных разрешена ТОЛЬКО в режиме user
-  // Если режим panel, этот эффект не должен выполняться
   // Загрузка дней рождения за месяц
   useEffect(() => {
-    // Дополнительная защита: не загружаем данные в режиме panel
-    if (modeReady && mode === 'panel') {
-      logger.warn('[Calendar] Blocking data load - panel mode detected')
-      return
-    }
-
-    // Если режим еще не определен, не загружаем данные
-    if (!modeReady) {
-      return
-    }
-
     const loadMonthBirthdays = async () => {
       const year = currentDate.getFullYear()
       const month = currentDate.getMonth() + 1 // date-fns использует 0-11, API ожидает 1-12
@@ -95,7 +72,7 @@ export default function Calendar() {
     }
 
     loadMonthBirthdays()
-  }, [currentDate, mode, modeReady]) // Добавляем mode и modeReady в зависимости
+  }, [currentDate])
 
   // Безопасное вычисление дней месяца с обработкой ошибок
   const getDays = (): Date[] => {
@@ -142,18 +119,6 @@ export default function Calendar() {
   }
 
   const handleDateClick = async (date: Date) => {
-    // КРИТИЧНО: Дополнительная защита - не обрабатываем клики в режиме panel
-    if (modeReady && mode === 'panel') {
-      logger.warn('[Calendar] Blocking date click - panel mode detected')
-      return
-    }
-
-    // Если режим еще не определен, не обрабатываем клик
-    if (!modeReady) {
-      logger.info('[Calendar] Mode not ready, skipping date click')
-      return
-    }
-
     try {
       setSelectedDate(date)
       setLoading(true)
