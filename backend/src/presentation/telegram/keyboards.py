@@ -1,5 +1,6 @@
 import logging
 import os
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 from aiogram.types import (
     InlineKeyboardButton,
@@ -25,6 +26,37 @@ def is_webapp_url_configured(webapp_url: str) -> bool:
         True, если URL настроен и не является placeholder значением
     """
     return bool(webapp_url and webapp_url != WEBAPP_URL_PLACEHOLDER)
+
+
+def _add_version_query_param(url: str, version: int) -> str:
+    """
+    Добавляет query-параметр версии к URL для обхода кэша Telegram.
+
+    КРИТИЧНО: Telegram кэширует Mini App по URL. Изменение query-параметра
+    используется как принудительный cache-bust, чтобы гарантировать актуальную версию.
+
+    Args:
+        url: Исходный URL Mini App
+        version: Версия для добавления в query-параметр (например, 2)
+
+    Returns:
+        URL с добавленным query-параметром ?v={version} или &v={version}
+    """
+    try:
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
+        # Обновляем или добавляем параметр версии
+        query_params['v'] = [str(version)]
+        # Формируем новую query-строку
+        new_query = urlencode(query_params, doseq=True)
+        # Собираем URL обратно
+        new_parsed = parsed._replace(query=new_query)
+        return urlunparse(new_parsed)
+    except Exception as e:
+        # В случае ошибки парсинга URL, просто добавляем параметр в конец
+        logger.warning(f"Failed to parse URL for version param: {e}, using fallback")
+        separator = '&' if '?' in url else '?'
+        return f"{url}{separator}v={version}"
 
 
 def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
@@ -59,11 +91,17 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
 
     # Добавляем кнопку Mini App в начало, если URL настроен (для лучшей видимости)
     # Передаем start_param="panel" для открытия Mini App в режиме панели управления
+    # КРИТИЧНО: Добавляем query-параметр версии для обхода кэша Telegram
+    # Telegram кэширует Mini App по URL, изменение query-параметра заставляет обновить кэш
     if is_webapp_url_configured(webapp_url):
+        # Добавляем query-параметр версии к URL для обхода кэша
+        # Это архитектурное решение для гарантии актуальной версии панели
+        panel_webapp_url = _add_version_query_param(webapp_url, version=2)
+        
         inline_keyboard.append(
             [InlineKeyboardButton(
                 text="🌐 Открыть панель управления",
-                web_app=WebAppInfo(url=webapp_url, start_param="panel")
+                web_app=WebAppInfo(url=panel_webapp_url, start_param="panel")
             )]
         )
     else:
