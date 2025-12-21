@@ -58,9 +58,13 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
     inline_keyboard = []
 
     # Добавляем кнопку Mini App в начало, если URL настроен (для лучшей видимости)
+    # Передаем start_param="panel" для открытия Mini App в режиме панели управления
     if is_webapp_url_configured(webapp_url):
         inline_keyboard.append(
-            [InlineKeyboardButton(text="🌐 Открыть панель управления", web_app=WebAppInfo(url=webapp_url))]
+            [InlineKeyboardButton(
+                text="🌐 Открыть панель управления",
+                web_app=WebAppInfo(url=webapp_url, start_param="panel")
+            )]
         )
     else:
         # Логируем предупреждение, если URL не настроен

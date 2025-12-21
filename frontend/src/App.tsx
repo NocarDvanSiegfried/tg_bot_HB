@@ -1,6 +1,7 @@
 import { useEffect, useState, Suspense, lazy } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useTelegram } from './hooks/useTelegram'
+import { useAppMode } from './hooks/useAppMode'
 import { logger } from './utils/logger'
 
 // Lazy loading для оптимизации bundle
@@ -13,8 +14,11 @@ const Diagnostics = import.meta.env.DEV
 
 function App() {
   const { webApp, isReady } = useTelegram()
+  const { mode, isReady: modeReady } = useAppMode()
   const location = useLocation()
+  const navigate = useNavigate()
   const [initError, setInitError] = useState<string | null>(null)
+  const [hasRedirected, setHasRedirected] = useState(false)
 
   useEffect(() => {
     if (webApp) {
@@ -46,10 +50,56 @@ function App() {
       logger.info('[App] App state:', {
         hasWebApp: !!webApp,
         isReady,
+        mode,
+        modeReady,
         initError,
+        currentPath: location.pathname,
       })
     }
-  }, [webApp, isReady, initError])
+  }, [webApp, isReady, mode, modeReady, initError, location.pathname])
+
+  // Автоматический редирект на основе режима приложения
+  useEffect(() => {
+    // Ждем готовности режима и WebApp
+    if (!modeReady || !isReady || hasRedirected) {
+      return
+    }
+
+    // Если мы уже на правильном роуте, не делаем редирект
+    if (mode === 'panel' && location.pathname === '/panel') {
+      setHasRedirected(true)
+      if (import.meta.env.DEV) {
+        logger.info('[App] Already on /panel route, no redirect needed')
+      }
+      return
+    }
+
+    if (mode === 'user' && location.pathname === '/') {
+      setHasRedirected(true)
+      if (import.meta.env.DEV) {
+        logger.info('[App] Already on / route, no redirect needed')
+      }
+      return
+    }
+
+    // Выполняем редирект на основе режима
+    if (mode === 'panel') {
+      if (import.meta.env.DEV) {
+        logger.info('[App] Redirecting to /panel (panel mode)')
+      }
+      navigate('/panel', { replace: true })
+      setHasRedirected(true)
+    } else {
+      // Режим user - редиректим на календарь
+      if (location.pathname === '/panel') {
+        if (import.meta.env.DEV) {
+          logger.info('[App] Redirecting to / (user mode, was on /panel)')
+        }
+        navigate('/', { replace: true })
+        setHasRedirected(true)
+      }
+    }
+  }, [mode, modeReady, isReady, location.pathname, navigate, hasRedirected])
 
   return (
     <div className="app">
