@@ -177,3 +177,4 @@ docker compose config | grep TELEGRAM_WEBAPP_URL
 **Статус:** ✅ Все технические проверки пройдены  
 **Следующий шаг:** Ручное тестирование команды `/panel` в Telegram боте
 
+

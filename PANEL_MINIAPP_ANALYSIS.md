@@ -355,3 +355,4 @@ print(f"Is configured: {bool(webapp_url and webapp_url != 'https://your-domain.c
 **Статус:** ✅ Проблема идентифицирована  
 **Следующий шаг:** Реализовать исправления из плана
 
+
