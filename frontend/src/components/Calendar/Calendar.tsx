@@ -13,8 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import './Calendar.css'
 
 export default function Calendar() {
-  // КРИТИЧНО: Calendar НЕ должен рендериться в режиме panel
-  // Если режим panel, редиректим на /panel
+  // КРИТИЧНО: Все хуки должны вызываться всегда, на верхнем уровне, без условий
+  // Это правило React hooks - нарушение приводит к ошибке #310
   const { mode, isReady: modeReady } = useAppMode()
   const navigate = useNavigate()
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -26,37 +26,27 @@ export default function Calendar() {
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
 
-  // КРИТИЧНО: Calendar НИКОГДА не должен рендериться в режиме panel
-  // Эта проверка должна быть ПЕРВОЙ, до любых эффектов и загрузки данных
-  // Это архитектурная блокировка, а не визуальная
-  if (modeReady && mode === 'panel') {
-    logger.warn('[Calendar] ❌❌❌ BLOCKING RENDER - panel mode detected ❌❌❌')
-    logger.warn('[Calendar] Calendar is NOT allowed in panel mode. Redirecting to /panel')
-    // Немедленный редирект без задержки
-    navigate('/panel', { replace: true })
-    return (
-      <div className="app-loading">
-        <p>Перенаправление на панель управления...</p>
-      </div>
-    )
-  }
+  // КРИТИЧНО: Редирект выполняется ТОЛЬКО внутри useEffect
+  // navigate() не должен вызываться напрямую в теле компонента
+  useEffect(() => {
+    if (!modeReady) {
+      return // Ждем определения режима
+    }
 
-  // КРИТИЧНО: Если режим еще не определен, ждем
-  // Calendar не должен загружать данные до определения режима
-  if (!modeReady) {
-    logger.info('[Calendar] ⏳ Waiting for mode to be ready')
-    return (
-      <div className="app-loading">
-        <p>Инициализация календаря...</p>
-      </div>
-    )
-  }
+    if (mode === 'panel') {
+      logger.warn('[Calendar] ❌❌❌ BLOCKING RENDER - panel mode detected ❌❌❌')
+      logger.warn('[Calendar] Calendar is NOT allowed in panel mode. Redirecting to /panel')
+      navigate('/panel', { replace: true })
+    }
+  }, [mode, modeReady, navigate])
 
   // Логирование для отладки
   useEffect(() => {
     if (import.meta.env.DEV) {
-      logger.info('[Calendar] ✅ Calendar rendering in user mode')
       logger.info('[Calendar] Component mounted, mode:', mode, 'modeReady:', modeReady)
+      if (modeReady && mode === 'user') {
+        logger.info('[Calendar] ✅ Calendar rendering in user mode')
+      }
     }
   }, [mode, modeReady])
 

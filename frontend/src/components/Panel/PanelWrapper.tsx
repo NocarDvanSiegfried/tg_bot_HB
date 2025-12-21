@@ -7,6 +7,8 @@ import { logger } from '../../utils/logger'
 import Panel from './Panel'
 
 export default function PanelWrapper() {
+  // КРИТИЧНО: Все хуки должны вызываться всегда, на верхнем уровне, без условий
+  // Это правило React hooks - нарушение приводит к ошибке #310
   const { initData, isReady, webApp } = useTelegram()
   const { mode, isReady: modeReady } = useAppMode()
   const navigate = useNavigate()
@@ -15,38 +17,22 @@ export default function PanelWrapper() {
   const [accessError, setAccessError] = useState<string | null>(null)
   const [waitingForInitData, setWaitingForInitData] = useState(true)
 
-  // КРИТИЧНО: PanelWrapper НИКОГДА не должен рендериться в режиме user
-  // Эта проверка должна быть ПЕРВОЙ, до любых эффектов и API запросов
-  // Это архитектурная блокировка, а не визуальная
-  if (!modeReady) {
-    logger.info('[PanelWrapper] ⏳ Waiting for mode to be ready, blocking render')
-    return (
-      <div className="app-loading">
-        <div className="loading-spinner">⏳</div>
-        <p>Инициализация панели управления...</p>
-      </div>
-    )
-  }
+  // КРИТИЧНО: Редирект выполняется ТОЛЬКО внутри useEffect
+  // navigate() не должен вызываться напрямую в теле компонента
+  useEffect(() => {
+    if (!modeReady) {
+      return // Ждем определения режима
+    }
 
-  if (mode !== 'panel') {
-    logger.warn('[PanelWrapper] ❌❌❌ BLOCKING RENDER - NOT IN PANEL MODE ❌❌❌')
-    logger.warn('[PanelWrapper] Current mode:', mode)
-    logger.warn('[PanelWrapper] PanelWrapper is NOT allowed in user mode. Redirecting to /')
-    // Немедленный редирект без задержки
-    navigate('/', { replace: true })
-    return (
-      <div className="app-loading">
-        <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
-          <p>⚠️ Откройте панель через команду /panel в боте</p>
-          <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // КРИТИЧНО: Проверка режима завершена, режим panel подтвержден
-  // Только теперь можно выполнять API запросы
-  logger.info('[PanelWrapper] ✅✅✅ PANEL MODE CONFIRMED - Proceeding with access check ✅✅✅')
+    if (mode !== 'panel') {
+      logger.warn('[PanelWrapper] ❌❌❌ BLOCKING RENDER - NOT IN PANEL MODE ❌❌❌')
+      logger.warn('[PanelWrapper] Current mode:', mode)
+      logger.warn('[PanelWrapper] PanelWrapper is NOT allowed in user mode. Redirecting to /')
+      navigate('/', { replace: true })
+    } else {
+      logger.info('[PanelWrapper] ✅✅✅ PANEL MODE CONFIRMED ✅✅✅')
+    }
+  }, [mode, modeReady, navigate])
 
   useEffect(() => {
     // Если режим не panel, не проверяем доступ
@@ -149,6 +135,32 @@ export default function PanelWrapper() {
     </div>
   ) : null
 
+  // КРИТИЧНО: Условный рендер происходит только в return, не через ранние return
+  // Это гарантирует, что все хуки вызываются всегда
+
+  // Если режим еще не определен, показываем экран инициализации
+  if (!modeReady) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner">⏳</div>
+        <p>Инициализация панели управления...</p>
+      </div>
+    )
+  }
+
+  // Если режим не panel, показываем сообщение о перенаправлении
+  // Редирект уже выполнен в useEffect выше
+  if (mode !== 'panel') {
+    return (
+      <div className="app-loading">
+        <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
+          <p>⚠️ Откройте панель через команду /panel в боте</p>
+          <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
+        </div>
+      </div>
+    )
+  }
+
   // Показываем индикатор загрузки
   if (isCheckingAccess || waitingForInitData) {
     return (
@@ -187,7 +199,8 @@ export default function PanelWrapper() {
     )
   }
 
-  // Если доступ есть, рендерим панель
+  // КРИТИЧНО: Panel рендерится ТОЛЬКО в режиме panel
+  // Все проверки выполнены выше, режим гарантированно panel
   return (
     <>
       {debugInfo}
