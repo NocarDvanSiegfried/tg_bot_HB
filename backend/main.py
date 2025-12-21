@@ -184,13 +184,18 @@ async def start_bot():
 
 async def start_web():
     """Запуск FastAPI веб-сервера."""
+    port = int(os.getenv("WEB_PORT", "8000"))
+    logger.info(f"🌐 Инициализация веб-сервера на порту {port}...")
+    
     config = uvicorn.Config(
         web_app,
         host="0.0.0.0",
-        port=int(os.getenv("WEB_PORT", "8000")),
+        port=port,
         log_level="info",
     )
     server = uvicorn.Server(config)
+    
+    logger.info(f"✅ Веб-сервер готов к запуску на http://0.0.0.0:{port}")
     await server.serve()
 
 
@@ -240,34 +245,45 @@ async def main():
     else:
         logger.warning("DATABASE_URL не установлен. Будет проверен позже при инициализации.")
 
-    # Запускаем бота и веб-сервер параллельно
-    # Используем return_exceptions=True, чтобы ошибка бота не блокировала веб-сервер
+    # ВСЕГДА запускаем веб-сервер независимо от бота
+    logger.info("🚀 Запуск веб-сервера...")
+    web_task = asyncio.create_task(start_web())
+    
+    # Даем веб-серверу время запуститься
+    await asyncio.sleep(2)
+    
+    # Проверяем, что веб-сервер запустился
+    if web_task.done():
+        error = web_task.exception()
+        if error:
+            logger.error(f"❌ Веб-сервер завершился с ошибкой: {error}")
+            raise error
+        else:
+            logger.error("❌ Веб-сервер завершился сразу после запуска!")
+            raise RuntimeError("Веб-сервер не запустился")
+    
+    logger.info("✅ Веб-сервер успешно запущен и работает")
+    
+    # Запускаем бота отдельно, если включен
     enable_bot = os.getenv("ENABLE_TELEGRAM_BOT", "true").lower() in ("true", "1", "yes")
     
     if enable_bot:
-        logger.info("Запуск Telegram бота и веб-сервера...")
-        results = await asyncio.gather(
-            start_bot(),
-            start_web(),
-            return_exceptions=True,
-        )
-        
-        # Проверяем результаты
-        bot_result, web_result = results
-        
-        if isinstance(bot_result, Exception):
-            logger.error(f"Telegram бот завершился с ошибкой: {bot_result}")
-            logger.warning("Веб-сервер продолжает работать, но функционал бота недоступен")
-            # Если веб-сервер тоже упал, поднимаем ошибку
-            if isinstance(web_result, Exception):
-                logger.error(f"Веб-сервер также завершился с ошибкой: {web_result}")
-                raise web_result
-        elif isinstance(web_result, Exception):
-            logger.error(f"Веб-сервер завершился с ошибкой: {web_result}")
-            raise web_result
+        logger.info("🤖 Запуск Telegram бота...")
+        try:
+            await start_bot()
+        except Exception as e:
+            logger.error(f"❌ Бот не запущен: {e}")
+            logger.warning("⚠️  Веб-сервер продолжает работать независимо от бота")
+            # Веб-сервер продолжает работать независимо
     else:
-        logger.info("Telegram бот отключен через ENABLE_TELEGRAM_BOT=false. Запускаем только веб-сервер...")
-        await start_web()
+        logger.info("ℹ️  Telegram бот отключен через ENABLE_TELEGRAM_BOT=false")
+    
+    # Ждем завершения веб-сервера (он должен работать бесконечно)
+    try:
+        await web_task
+    except Exception as e:
+        logger.error(f"❌ Веб-сервер завершился с ошибкой: {e}")
+        raise
 
 
 if __name__ == "__main__":
