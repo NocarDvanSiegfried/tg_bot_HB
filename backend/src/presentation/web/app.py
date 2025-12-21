@@ -167,6 +167,22 @@ async def root():
     return {"message": "Telegram Birthday Calendar API"}
 
 
+@app.options("/")
+async def root_options():
+    """Обработка OPTIONS запросов для корневого endpoint (CORS preflight)."""
+    # FastAPI CORS middleware должен обработать это автоматически,
+    # но явная обработка гарантирует правильный ответ
+    from fastapi.responses import Response
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",  # CORS middleware переопределит это
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, X-Init-Data, Authorization, Accept",
+        }
+    )
+
+
 @app.get("/health")
 async def health():
     """Health check endpoint для проверки доступности API."""

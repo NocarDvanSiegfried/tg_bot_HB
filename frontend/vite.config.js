@@ -14,5 +14,9 @@ export default defineConfig({
       "mini.micro-tab.ru",
       "0.0.0.0",
     ],
+    // Отключить HMR в production для уменьшения ошибок WebSocket в консоли
+    hmr: {
+      protocol: import.meta.env.PROD ? undefined : 'ws',
+    },
   },
 })

@@ -6,7 +6,7 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <App />
     </HashRouter>
   </ErrorBoundary>,

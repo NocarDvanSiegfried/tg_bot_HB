@@ -177,7 +177,8 @@ export default function Diagnostics() {
       const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 секунды для CORS проверки
 
       try {
-        const response = await fetch(`${API_BASE_URL}/`, {
+        // Используем /health endpoint вместо корня, так как корневой endpoint не обрабатывает OPTIONS
+        const response = await fetch(`${API_BASE_URL}/health`, {
           method: 'OPTIONS',
           headers: {
             'Origin': currentOrigin,
