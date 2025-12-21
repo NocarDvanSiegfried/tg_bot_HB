@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import BirthdayManagement from './BirthdayManagement'
 import ResponsibleManagement from './ResponsibleManagement'
 import GreetingGenerator from './GreetingGenerator'
@@ -9,12 +8,10 @@ type PanelView = 'main' | 'birthdays' | 'responsible' | 'greetings'
 
 export default function Panel() {
   const [currentView, setCurrentView] = useState<PanelView>('main')
-  const navigate = useNavigate()
 
-  const handleBackToCalendar = () => {
-    // Переходим на календарь через роутинг
-    navigate('/')
-  }
+  // КРИТИЧНО: В режиме panel переход на календарь архитектурно запрещен
+  // Панель и календарь не могут существовать одновременно
+  // Пользователь должен закрыть Mini App и открыть через /start для просмотра календаря
 
   return (
     <div className="panel-container">
@@ -50,9 +47,11 @@ export default function Panel() {
             <button onClick={() => setCurrentView('greetings')} className="panel-button">
               🎉 Генерация поздравлений
             </button>
-            <button onClick={handleBackToCalendar} className="panel-button panel-button-secondary">
-              📅 Вернуться к календарю
-            </button>
+            {/* КРИТИЧНО: Кнопка "Вернуться к календарю" удалена
+                В режиме panel переход на календарь архитектурно запрещен
+                Панель и календарь не могут существовать одновременно
+                Пользователь должен закрыть Mini App и открыть через /start для просмотра календаря
+            */}
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@ import { logger } from '../../utils/logger'
 import Panel from './Panel'
 
 export default function PanelWrapper() {
-  const { initData, isReady } = useTelegram()
+  const { initData, isReady, webApp } = useTelegram()
   const { mode, isReady: modeReady } = useAppMode()
   const navigate = useNavigate()
   const [isCheckingAccess, setIsCheckingAccess] = useState(true)
@@ -15,35 +15,38 @@ export default function PanelWrapper() {
   const [accessError, setAccessError] = useState<string | null>(null)
   const [waitingForInitData, setWaitingForInitData] = useState(true)
 
-  // Проверка режима panel - если режим не panel, редиректим на календарь
-  useEffect(() => {
-    logger.info('[PanelWrapper] ===== MODE CHECK =====')
-    logger.info('[PanelWrapper] modeReady:', modeReady)
-    logger.info('[PanelWrapper] current mode:', mode)
-    logger.info('[PanelWrapper] current path:', window.location.pathname)
+  // КРИТИЧНО: PanelWrapper НИКОГДА не должен рендериться в режиме user
+  // Эта проверка должна быть ПЕРВОЙ, до любых эффектов и API запросов
+  // Это архитектурная блокировка, а не визуальная
+  if (!modeReady) {
+    logger.info('[PanelWrapper] ⏳ Waiting for mode to be ready, blocking render')
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner">⏳</div>
+        <p>Инициализация панели управления...</p>
+      </div>
+    )
+  }
 
-    if (!modeReady) {
-      logger.info('[PanelWrapper] ⏳ Waiting for mode to be ready')
-      return
-    }
+  if (mode !== 'panel') {
+    logger.warn('[PanelWrapper] ❌❌❌ BLOCKING RENDER - NOT IN PANEL MODE ❌❌❌')
+    logger.warn('[PanelWrapper] Current mode:', mode)
+    logger.warn('[PanelWrapper] PanelWrapper is NOT allowed in user mode. Redirecting to /')
+    // Немедленный редирект без задержки
+    navigate('/', { replace: true })
+    return (
+      <div className="app-loading">
+        <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
+          <p>⚠️ Откройте панель через команду /panel в боте</p>
+          <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
+        </div>
+      </div>
+    )
+  }
 
-    if (mode !== 'panel') {
-      logger.warn('[PanelWrapper] ❌ NOT IN PANEL MODE! Current mode:', mode)
-      logger.warn('[PanelWrapper] Redirecting to calendar...')
-      setAccessError('Откройте панель через команду /panel в боте')
-      setIsCheckingAccess(false)
-      setHasAccess(false)
-      // Используем setTimeout только для UX - даем пользователю прочитать сообщение
-      const redirectTimer = setTimeout(() => {
-        logger.info('[PanelWrapper] Executing redirect to / (not panel mode)')
-        navigate('/', { replace: true })
-      }, 2000)
-      return () => clearTimeout(redirectTimer)
-    } else {
-      logger.info('[PanelWrapper] ✅ Panel mode confirmed')
-    }
-    logger.info('[PanelWrapper] ===== MODE CHECK COMPLETE =====')
-  }, [mode, modeReady, navigate])
+  // КРИТИЧНО: Проверка режима завершена, режим panel подтвержден
+  // Только теперь можно выполнять API запросы
+  logger.info('[PanelWrapper] ✅✅✅ PANEL MODE CONFIRMED - Proceeding with access check ✅✅✅')
 
   useEffect(() => {
     // Если режим не panel, не проверяем доступ
@@ -70,10 +73,8 @@ export default function PanelWrapper() {
           setAccessError(
             'Не удалось получить данные авторизации. Убедитесь, что приложение открыто через Telegram Mini App.'
           )
-          // Редиректим на календарь через 3 секунды
-          setTimeout(() => {
-            navigate('/')
-          }, 3000)
+          // КРИТИЧНО: Немедленный редирект без задержки
+          navigate('/', { replace: true })
         }
       }, 5000)
 
@@ -104,10 +105,8 @@ export default function PanelWrapper() {
             setAccessError(
               'У вас нет доступа к панели управления. Используйте команду /panel в боте для получения доступа.'
             )
-            // Редиректим на календарь через 3 секунды
-            setTimeout(() => {
-              navigate('/')
-            }, 3000)
+            // КРИТИЧНО: Немедленный редирект без задержки
+            navigate('/', { replace: true })
           }
         })
         .catch((error) => {
@@ -118,10 +117,8 @@ export default function PanelWrapper() {
               ? `Ошибка при проверке доступа: ${error.message}`
               : 'Не удалось проверить доступ к панели. Попробуйте обновить страницу.'
           )
-          // Редиректим на календарь через 3 секунды
-          setTimeout(() => {
-            navigate('/')
-          }, 3000)
+          // КРИТИЧНО: Немедленный редирект без задержки
+          navigate('/', { replace: true })
         })
         .finally(() => {
           setIsCheckingAccess(false)
@@ -129,16 +126,45 @@ export default function PanelWrapper() {
     }
   }, [initData, isReady, mode, modeReady, navigate, waitingForInitData])
 
+  // Визуальный индикатор режима для отладки
+  const debugInfo = modeReady && webApp ? (
+    <div style={{
+      position: 'fixed',
+      top: '50px',
+      right: '10px',
+      padding: '8px 12px',
+      background: 'rgba(0,0,0,0.8)',
+      color: 'white',
+      borderRadius: '8px',
+      fontSize: '11px',
+      zIndex: 9998,
+      fontFamily: 'monospace',
+      maxWidth: '200px',
+    }}>
+      <div><strong>Режим:</strong> {mode === 'panel' ? '🔧 PANEL' : '👤 USER'}</div>
+      <div><strong>startParam:</strong> {webApp.startParam || 'null'}</div>
+      <div><strong>modeReady:</strong> {modeReady ? '✅' : '❌'}</div>
+      <div><strong>isReady:</strong> {isReady ? '✅' : '❌'}</div>
+      <div><strong>hasAccess:</strong> {hasAccess ? '✅' : '❌'}</div>
+    </div>
+  ) : null
+
   // Показываем индикатор загрузки
   if (isCheckingAccess || waitingForInitData) {
     return (
       <div className="app-loading">
+        {debugInfo}
         <div className="loading-spinner">⏳</div>
         <p>
           {waitingForInitData
             ? 'Ожидание инициализации Telegram WebApp...'
             : 'Проверка доступа к панели...'}
         </p>
+        {modeReady && (
+          <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+            Режим: {mode === 'panel' ? '🔧 PANEL' : '👤 USER'} | startParam: {webApp?.startParam || 'null'}
+          </p>
+        )}
       </div>
     )
   }
@@ -147,15 +173,26 @@ export default function PanelWrapper() {
   if (!hasAccess) {
     return (
       <div className="app-loading">
+        {debugInfo}
         <div className="app-error-message" style={{ position: 'relative', marginTop: '20px' }}>
           <p>⚠️ {accessError || 'У вас нет доступа к панели управления.'}</p>
           <p style={{ marginTop: '10px', fontSize: '14px' }}>Перенаправление на календарь...</p>
+          {modeReady && (
+            <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+              Режим: {mode === 'panel' ? '🔧 PANEL' : '👤 USER'} | startParam: {webApp?.startParam || 'null'}
+            </p>
+          )}
         </div>
       </div>
     )
   }
 
   // Если доступ есть, рендерим панель
-  return <Panel />
+  return (
+    <>
+      {debugInfo}
+      <Panel />
+    </>
+  )
 }
 

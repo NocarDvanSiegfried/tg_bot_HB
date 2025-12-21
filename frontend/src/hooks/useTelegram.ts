@@ -115,6 +115,7 @@ export function useTelegram() {
     }
   }, []) // Пустой массив зависимостей - эффект выполняется только один раз
 
+  // Экспортируем webApp для доступа к startParam
   return { webApp, initData, isReady }
 }
 

@@ -71,15 +71,16 @@ function App() {
     if (webApp) {
       logger.info('[App] webApp.startParam:', webApp.startParam)
       logger.info('[App] webApp.startParam type:', typeof webApp.startParam)
+      logger.info('[App] webApp.startParam === "panel":', webApp.startParam === 'panel')
     }
 
-    // КРИТИЧНО: Ждем готовности режима И WebApp И startParam
-    if (!modeReady || !isReady || !webApp || hasRedirected) {
+    // КРИТИЧНО: Ждем готовности режима И WebApp
+    // НЕ проверяем hasRedirected здесь - редирект может понадобиться если режим изменился
+    if (!modeReady || !isReady || !webApp) {
       logger.info('[App] ⏳ Waiting for readiness:', {
         modeReady,
         isReady,
         hasWebApp: !!webApp,
-        hasRedirected,
       })
       return
     }
@@ -89,39 +90,78 @@ function App() {
     logger.info('[App] startParam before redirect:', startParam)
     logger.info('[App] Expected mode:', startParam === 'panel' ? 'panel' : 'user')
     logger.info('[App] Detected mode:', mode)
+    logger.info('[App] Mode matches startParam:', (startParam === 'panel' && mode === 'panel') || (startParam !== 'panel' && mode === 'user'))
+
+    // КРИТИЧНО: Если режим не совпадает с startParam, это ошибка
+    if (startParam === 'panel' && mode !== 'panel') {
+      logger.error('[App] ❌❌❌ CRITICAL: MODE MISMATCH! startParam=panel but mode=user ❌❌❌')
+      logger.error('[App] This indicates useAppMode() did not read startParam correctly!')
+    }
+    if (startParam !== 'panel' && mode === 'panel') {
+      logger.error('[App] ❌❌❌ CRITICAL: MODE MISMATCH! startParam!=panel but mode=panel ❌❌❌')
+    }
 
     // Если мы уже на правильном роуте, не делаем редирект
     if (mode === 'panel' && location.pathname === '/panel') {
-      setHasRedirected(true)
+      if (!hasRedirected) {
+        setHasRedirected(true)
+      }
       logger.info('[App] ✅ Already on /panel route, no redirect needed')
       return
     }
 
     if (mode === 'user' && location.pathname === '/') {
-      setHasRedirected(true)
+      if (!hasRedirected) {
+        setHasRedirected(true)
+      }
       logger.info('[App] ✅ Already on / route, no redirect needed')
+      return
+    }
+
+    // КРИТИЧНО: Если пользователь на /panel, но режим user - редиректим на /
+    if (location.pathname === '/panel' && mode === 'user') {
+      logger.warn('[App] ⚠️ User on /panel but mode is user - redirecting to /')
+      logger.warn('[App] startParam:', startParam || 'null/undefined')
+      navigate('/', { replace: true })
+      setHasRedirected(true)
+      logger.info('[App] ✅ Redirect to / completed (user mode, was on /panel)')
       return
     }
 
     // Выполняем редирект на основе режима
     if (mode === 'panel') {
-      logger.info('[App] 🔀 REDIRECTING to /panel (panel mode detected)')
+      // КРИТИЧНО: Редирект на /panel должен происходить немедленно
+      // Это гарантирует, что Calendar не успеет отрендериться
+      logger.info('[App] 🔀🔀🔀 REDIRECTING to /panel (panel mode detected) 🔀🔀🔀')
       logger.info('[App] startParam === "panel":', startParam === 'panel')
+      logger.info('[App] Current path before redirect:', location.pathname)
+      
+      // Используем replace: true для немедленного редиректа без истории
       navigate('/panel', { replace: true })
       setHasRedirected(true)
-      logger.info('[App] ✅ Redirect to /panel completed')
-    } else {
-      // Режим user - редиректим на календарь только если мы на /panel
-      if (location.pathname === '/panel') {
-        logger.info('[App] 🔀 REDIRECTING to / (user mode, was on /panel)')
-        logger.info('[App] startParam:', startParam || 'null/undefined')
-        navigate('/', { replace: true })
-        setHasRedirected(true)
-        logger.info('[App] ✅ Redirect to / completed')
-      }
+      
+      logger.info('[App] ✅✅✅ Redirect to /panel completed ✅✅✅')
+      return // Важно: выходим сразу после редиректа
     }
+    
+    // Режим user - редиректим на календарь только если мы на /panel (уже обработано выше)
+    // Если мы уже на /, ничего не делаем (уже обработано выше)
+    
     logger.info('[App] ===== REDIRECT CHECK COMPLETE =====')
   }, [mode, modeReady, isReady, webApp, location.pathname, navigate, hasRedirected])
+
+  // КРИТИЧНО: Пока !modeReady → НИЧЕГО не рендерить
+  // Это предотвращает рендеринг Calendar до определения режима
+  // и гарантирует, что редирект произойдет до первого рендера
+  if (!modeReady) {
+    logger.info('[App] ⏳ Waiting for mode to be ready, blocking render')
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner">⏳</div>
+        <p>Инициализация приложения...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="app">
@@ -171,7 +211,10 @@ function App() {
             </Suspense>
           }
         />
-        {/* Fallback route - все остальные пути ведут на календарь */}
+        {/* Fallback route - все остальные пути ведут на календарь
+            КРИТИЧНО: Этот роут НЕ должен перехватывать /panel, так как /panel уже определен выше
+            Fallback срабатывает только для путей, которые не совпадают с / и /panel
+        */}
         <Route
           path="*"
           element={
