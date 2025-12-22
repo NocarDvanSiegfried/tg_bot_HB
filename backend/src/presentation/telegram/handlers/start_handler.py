@@ -18,6 +18,14 @@ async def cmd_start(message: Message, bot: Bot):
     - Не редактирует старые сообщения
     - Идемпотентно: повторный вызов не создает дубликатов
     - Кнопка web_app не генерирует callback_query, обработчик не требуется
+    
+    МИГРАЦИЯ:
+    - Все старые callback handlers (birthday_*, panel_*, responsible_*, greeting_*) удалены
+    - Если пользователь видит BOT_RESPONSE_TIMEOUT при нажатии на старые кнопки:
+      → Это устаревшие UI-артефакты в истории чата
+      → Решение: пользователь должен удалить старые сообщения вручную
+      → НЕ добавлять catch-all handler (нарушает архитектуру)
+      → См. MIGRATION_GUIDE.md для деталей
     """
     keyboard = get_calendar_keyboard()
     await message.answer(
