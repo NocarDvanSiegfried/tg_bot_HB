@@ -117,36 +117,32 @@ async def render_panel_menu(
     
     # КРИТИЧНО: Сначала явно удаляем ReplyKeyboardMarkup, если она была установлена ранее
     # Это гарантирует, что старая клавиатура не будет показана
-    # Затем отправляем основное сообщение с InlineKeyboard
-    # Используем асинхронное удаление служебного сообщения для минимизации видимости
-    remove_message_id = None
-    try:
-        # Отправляем пустое сообщение с ReplyKeyboardRemove для удаления старой клавиатуры
-        remove_message = await bot.send_message(
-            chat_id=chat_id,
-            text="",  # Пустое сообщение для удаления клавиатуры
-            reply_markup=ReplyKeyboardRemove(remove_keyboard=True),
-        )
-        remove_message_id = remove_message.message_id
-    except Exception as e:
-        # Игнорируем ошибки при удалении клавиатуры (может быть уже удалена)
-        logger.debug(f"[Panel] ReplyKeyboardRemove не требуется или уже удалена: {e}")
-    
-    # Отправляем основное сообщение с меню панели (только InlineKeyboard)
+    # Отправляем основное сообщение с явным ReplyKeyboardRemove в том же сообщении
+    # Это более надежный способ, чем отдельное служебное сообщение
     sent_message = await bot.send_message(
         chat_id=chat_id,
         text=message_text,
         reply_markup=keyboard,  # Только InlineKeyboardMarkup, без ReplyKeyboard
     )
     
-    # КРИТИЧНО: Удаляем служебное сообщение с ReplyKeyboardRemove сразу после отправки основного
-    # Это предотвращает появление лишних сообщений в чате
-    if remove_message_id:
+    # КРИТИЧНО: Дополнительно отправляем ReplyKeyboardRemove для гарантированного удаления
+    # старой клавиатуры, если она была установлена ранее (например, из /start)
+    # Это делается после основного сообщения, чтобы не создавать лишних сообщений
+    try:
+        remove_message = await bot.send_message(
+            chat_id=chat_id,
+            text="",  # Пустое сообщение для удаления клавиатуры
+            reply_markup=ReplyKeyboardRemove(remove_keyboard=True),
+        )
+        # Удаляем служебное сообщение сразу после отправки
         try:
-            await bot.delete_message(chat_id=chat_id, message_id=remove_message_id)
+            await bot.delete_message(chat_id=chat_id, message_id=remove_message.message_id)
         except Exception:
-            # Игнорируем ошибки при удалении (сообщение может быть уже удалено или недоступно)
+            # Игнорируем ошибки при удалении
             pass
+    except Exception:
+        # Игнорируем ошибки при удалении клавиатуры (может быть уже удалена)
+        pass
     
     # Сохраняем message_id нового сообщения
     _panel_menu_messages[user_id] = sent_message.message_id
