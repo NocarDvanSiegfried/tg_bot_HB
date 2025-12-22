@@ -39,37 +39,25 @@ async def responsible_add_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(ResponsibleForm.waiting_for_full_name, ~Command())
+@router.message(ResponsibleForm.waiting_for_full_name)
 async def process_full_name(message: Message, state: FSMContext):
-    """
-    Обработать ФИО.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать ФИО."""
     await state.update_data(full_name=message.text)
     await state.set_state(ResponsibleForm.waiting_for_company)
     await message.answer("Введите компанию:")
 
 
-@router.message(ResponsibleForm.waiting_for_company, ~Command())
+@router.message(ResponsibleForm.waiting_for_company)
 async def process_company(message: Message, state: FSMContext):
-    """
-    Обработать компанию.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать компанию."""
     await state.update_data(company=message.text)
     await state.set_state(ResponsibleForm.waiting_for_position)
     await message.answer("Введите должность:")
 
 
-@router.message(ResponsibleForm.waiting_for_position, ~Command())
+@router.message(ResponsibleForm.waiting_for_position)
 async def process_position(message: Message, state: FSMContext, session: AsyncSession):
-    """
-    Обработать должность и создать ответственного.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать должность и создать ответственного."""
     data = await state.get_data()
 
     factory = UseCaseFactory(session)

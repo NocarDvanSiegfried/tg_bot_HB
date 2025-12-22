@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 from aiogram import Router
-from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
@@ -91,13 +90,12 @@ async def birthday_add_start(callback: CallbackQuery, state: FSMContext):
 # Следующие handlers больше не используются, но оставлены для совместимости
 # (если пользователь случайно попадет в FSM состояние):
 
-@router.message(BirthdayForm.waiting_for_full_name, ~Command())
+@router.message(BirthdayForm.waiting_for_full_name)
 async def process_full_name(message: Message, state: FSMContext):
     """
     Обработчик FSM состояния (обезврежен).
     
     КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
     """
     await state.clear()
     await message.answer(
@@ -105,13 +103,12 @@ async def process_full_name(message: Message, state: FSMContext):
     )
 
 
-@router.message(BirthdayForm.waiting_for_company, ~Command())
+@router.message(BirthdayForm.waiting_for_company)
 async def process_company(message: Message, state: FSMContext):
     """
     Обработчик FSM состояния (обезврежен).
     
     КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
     """
     await state.clear()
     await message.answer(
@@ -119,13 +116,12 @@ async def process_company(message: Message, state: FSMContext):
     )
 
 
-@router.message(BirthdayForm.waiting_for_position, ~Command())
+@router.message(BirthdayForm.waiting_for_position)
 async def process_position(message: Message, state: FSMContext):
     """
     Обработчик FSM состояния (обезврежен).
     
     КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
     """
     await state.clear()
     await message.answer(
@@ -133,13 +129,12 @@ async def process_position(message: Message, state: FSMContext):
     )
 
 
-@router.message(BirthdayForm.waiting_for_birth_date, ~Command())
+@router.message(BirthdayForm.waiting_for_birth_date)
 async def process_birth_date(message: Message, state: FSMContext, session: AsyncSession):
     """
     Обработчик FSM состояния (обезврежен).
     
     КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
     """
     await state.clear()
     await message.answer(
@@ -147,13 +142,12 @@ async def process_birth_date(message: Message, state: FSMContext, session: Async
     )
 
 
-@router.message(BirthdayForm.waiting_for_comment, ~Command())
+@router.message(BirthdayForm.waiting_for_comment)
 async def process_comment(message: Message, state: FSMContext, session: AsyncSession):
     """
     Обработчик FSM состояния (обезврежен).
     
     КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
     """
     await state.clear()
     await message.answer(

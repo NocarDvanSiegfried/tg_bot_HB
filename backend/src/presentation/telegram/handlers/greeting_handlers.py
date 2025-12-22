@@ -46,13 +46,9 @@ async def greeting_generate_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(GreetingForm.waiting_for_birthday_id, ~Command())
+@router.message(GreetingForm.waiting_for_birthday_id)
 async def process_birthday_id(message: Message, state: FSMContext):
-    """
-    Обработать ID сотрудника.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать ID сотрудника."""
     try:
         birthday_id = int(message.text)
         await state.update_data(birthday_id=birthday_id)
@@ -68,37 +64,25 @@ async def process_birthday_id(message: Message, state: FSMContext):
         await message.answer("Неверный формат ID. Введите число.")
 
 
-@router.message(GreetingForm.waiting_for_style, ~Command())
+@router.message(GreetingForm.waiting_for_style)
 async def process_style(message: Message, state: FSMContext):
-    """
-    Обработать стиль.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать стиль."""
     await state.update_data(style=message.text)
     await state.set_state(GreetingForm.waiting_for_length)
     await message.answer("Выберите длину (short/medium/long):")
 
 
-@router.message(GreetingForm.waiting_for_length, ~Command())
+@router.message(GreetingForm.waiting_for_length)
 async def process_length(message: Message, state: FSMContext):
-    """
-    Обработать длину.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать длину."""
     await state.update_data(length=message.text)
     await state.set_state(GreetingForm.waiting_for_theme)
     await message.answer("Введите тему (или '-' для пропуска):")
 
 
-@router.message(GreetingForm.waiting_for_theme, ~Command())
+@router.message(GreetingForm.waiting_for_theme)
 async def process_theme(message: Message, state: FSMContext, session: AsyncSession):
-    """
-    Обработать тему и сгенерировать поздравление.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать тему и сгенерировать поздравление."""
     data = await state.get_data()
     theme = message.text if message.text != "-" else None
 
@@ -128,25 +112,17 @@ async def greeting_card_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(GreetingForm.waiting_for_text, ~Command())
+@router.message(GreetingForm.waiting_for_text)
 async def process_text(message: Message, state: FSMContext):
-    """
-    Обработать текст для открытки.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать текст для открытки."""
     await state.update_data(greeting_text=message.text)
     await state.set_state(GreetingForm.waiting_for_qr_url)
     await message.answer("Введите URL для QR-кода (или '-' для пропуска):")
 
 
-@router.message(GreetingForm.waiting_for_qr_url, ~Command())
+@router.message(GreetingForm.waiting_for_qr_url)
 async def process_qr_url(message: Message, state: FSMContext, session: AsyncSession):
-    """
-    Обработать QR URL и создать открытку.
-    
-    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
-    """
+    """Обработать QR URL и создать открытку."""
     data = await state.get_data()
     qr_url = message.text if message.text != "-" else None
 
