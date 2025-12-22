@@ -9,7 +9,6 @@ from src.presentation.telegram.handlers import (
     birthday_handlers,
     calendar_handler,
     greeting_handlers,
-    panel_handler,
     responsible_handlers,
     start_handler,
 )
@@ -37,7 +36,6 @@ async def main():
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)
-    dp.include_router(panel_handler.router)
     dp.include_router(calendar_handler.router)
     dp.include_router(birthday_handlers.router)
     dp.include_router(responsible_handlers.router)

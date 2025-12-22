@@ -21,16 +21,6 @@ class ResponsibleForm(StatesGroup):
     waiting_for_position = State()
 
 
-@router.callback_query(lambda c: c.data == "panel_responsible")
-async def panel_responsible_callback(callback: CallbackQuery):
-    """Меню управления ответственными."""
-    await callback.message.edit_text(
-        "Управление ответственными лицами",
-        reply_markup=get_responsible_management_keyboard(),
-    )
-    await callback.answer()
-
-
 @router.callback_query(lambda c: c.data == "responsible_add")
 async def responsible_add_start(callback: CallbackQuery, state: FSMContext):
     """Начать добавление ответственного."""

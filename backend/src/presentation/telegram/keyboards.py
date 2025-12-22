@@ -168,6 +168,42 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
     return keyboard
 
 
+def get_calendar_keyboard() -> InlineKeyboardMarkup:
+    """
+    Клавиатура для открытия календаря дней рождения.
+    
+    КРИТИЧНО: Bot = Launcher архитектура.
+    - Только одна кнопка для открытия Mini App
+    - Без start_param (Mini App всегда открывается в режиме календаря)
+    - Все управление выполняется внутри Mini App
+    """
+    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
+    inline_keyboard = []
+
+    if is_webapp_url_configured(webapp_url):
+        # Получаем версию автоматически из конфига/env
+        app_version = _get_app_version()
+        # Добавляем query-параметр версии к URL для обхода кэша
+        calendar_webapp_url = _add_version_query_param(webapp_url, version=app_version)
+        
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text="🌐 Открыть календарь",
+                web_app=WebAppInfo(url=calendar_webapp_url)  # БЕЗ start_param
+            )]
+        )
+    else:
+        # Логируем предупреждение, если URL не настроен
+        logger.warning(
+            "TELEGRAM_WEBAPP_URL не настроен или использует значение по умолчанию. "
+            "Кнопка Mini App не будет отображаться. "
+            "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
+        )
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return keyboard
+
+
 def get_calendar_navigation_keyboard(year: int, month: int) -> InlineKeyboardMarkup:
     """Навигация по календарю."""
     keyboard = InlineKeyboardMarkup(
@@ -205,9 +241,6 @@ def get_birthday_management_keyboard() -> InlineKeyboardMarkup:
             )]
         )
     
-    inline_keyboard.append(
-        [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")]
-    )
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard

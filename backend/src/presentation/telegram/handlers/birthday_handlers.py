@@ -9,10 +9,7 @@ from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
-from src.presentation.telegram.keyboards import (
-    get_birthday_management_keyboard,
-    is_webapp_url_configured,
-)
+from src.presentation.telegram.keyboards import is_webapp_url_configured
 
 logger = logging.getLogger(__name__)
 
@@ -25,39 +22,6 @@ class BirthdayForm(StatesGroup):
     waiting_for_position = State()
     waiting_for_birth_date = State()
     waiting_for_comment = State()
-
-
-@router.callback_query(lambda c: c.data == "panel_birthdays")
-async def panel_birthdays_callback(callback: CallbackQuery):
-    """
-    Меню управления ДР.
-    
-    КРИТИЧНО: CRUD-операции (добавление, редактирование, удаление дней рождения) 
-    выполняются исключительно через Telegram Mini App (панель управления).
-    Командный интерфейс бота больше не содержит CRUD-логики.
-    """
-    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    
-    if is_webapp_url_configured(webapp_url):
-        message_text = (
-            "🎂 Управление днями рождения\n\n"
-            "Управление днями рождения (добавление, редактирование, удаление) "
-            "доступно только через панель управления в Mini App.\n\n"
-            "Нажмите кнопку ниже, чтобы открыть панель управления."
-        )
-    else:
-        message_text = (
-            "🎂 Управление днями рождения\n\n"
-            "Управление днями рождения (добавление, редактирование, удаление) "
-            "доступно только через панель управления в Mini App.\n\n"
-            "Для использования панели управления необходимо настроить TELEGRAM_WEBAPP_URL."
-        )
-    
-    await callback.message.edit_text(
-        message_text,
-        reply_markup=get_birthday_management_keyboard(),
-    )
-    await callback.answer()
 
 
 @router.callback_query(lambda c: c.data == "birthday_add")

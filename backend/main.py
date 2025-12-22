@@ -15,7 +15,6 @@ from src.infrastructure.config.env_validator import (
 from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
     start_handler,
-    panel_handler,
     calendar_handler,
     birthday_handlers,
     responsible_handlers,
@@ -123,7 +122,6 @@ async def start_bot():
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)
-    dp.include_router(panel_handler.router)
     dp.include_router(calendar_handler.router)
     dp.include_router(birthday_handlers.router)
     dp.include_router(responsible_handlers.router)

@@ -20,16 +20,6 @@ class GreetingForm(StatesGroup):
     waiting_for_qr_url = State()
 
 
-@router.callback_query(lambda c: c.data == "panel_greetings")
-async def panel_greetings_callback(callback: CallbackQuery):
-    """Меню генерации поздравлений."""
-    await callback.message.edit_text(
-        "Генерация поздравлений и открыток",
-        reply_markup=get_greeting_options_keyboard(),
-    )
-    await callback.answer()
-
-
 @router.callback_query(lambda c: c.data == "greeting_manual")
 async def greeting_manual_start(callback: CallbackQuery, state: FSMContext):
     """Начать ручной ввод текста."""
