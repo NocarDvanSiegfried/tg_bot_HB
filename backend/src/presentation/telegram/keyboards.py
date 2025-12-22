@@ -192,15 +192,33 @@ def get_calendar_navigation_keyboard(year: int, month: int) -> InlineKeyboardMar
 
 
 def get_birthday_management_keyboard() -> InlineKeyboardMarkup:
-    """Меню управления ДР."""
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="➕ Добавить ДР", callback_data="birthday_add")],
-            [InlineKeyboardButton(text="✏️ Редактировать ДР", callback_data="birthday_edit")],
-            [InlineKeyboardButton(text="🗑️ Удалить ДР", callback_data="birthday_delete")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")],
-        ]
+    """
+    Меню управления ДР.
+    
+    КРИТИЧНО: CRUD-операции (добавление, редактирование, удаление) 
+    выполняются исключительно через Telegram Mini App (панель управления).
+    Командный интерфейс бота больше не содержит CRUD-логики.
+    """
+    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
+    inline_keyboard = []
+    
+    # Добавляем кнопку Mini App, если URL настроен
+    if is_webapp_url_configured(webapp_url):
+        app_version = _get_app_version()
+        panel_webapp_url = _add_version_query_param(webapp_url, version=app_version)
+        
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text="🌐 Открыть панель управления",
+                web_app=WebAppInfo(url=panel_webapp_url, start_param="panel")
+            )]
+        )
+    
+    inline_keyboard.append(
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")]
     )
+    
+    keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard
 
 

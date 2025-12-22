@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 
 from aiogram import Router
@@ -8,7 +9,10 @@ from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
-from src.presentation.telegram.keyboards import get_birthday_management_keyboard
+from src.presentation.telegram.keyboards import (
+    get_birthday_management_keyboard,
+    is_webapp_url_configured,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +29,32 @@ class BirthdayForm(StatesGroup):
 
 @router.callback_query(lambda c: c.data == "panel_birthdays")
 async def panel_birthdays_callback(callback: CallbackQuery):
-    """Меню управления ДР."""
+    """
+    Меню управления ДР.
+    
+    КРИТИЧНО: CRUD-операции (добавление, редактирование, удаление дней рождения) 
+    выполняются исключительно через Telegram Mini App (панель управления).
+    Командный интерфейс бота больше не содержит CRUD-логики.
+    """
+    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
+    
+    if is_webapp_url_configured(webapp_url):
+        message_text = (
+            "🎂 Управление днями рождения\n\n"
+            "Управление днями рождения (добавление, редактирование, удаление) "
+            "доступно только через панель управления в Mini App.\n\n"
+            "Нажмите кнопку ниже, чтобы открыть панель управления."
+        )
+    else:
+        message_text = (
+            "🎂 Управление днями рождения\n\n"
+            "Управление днями рождения (добавление, редактирование, удаление) "
+            "доступно только через панель управления в Mini App.\n\n"
+            "Для использования панели управления необходимо настроить TELEGRAM_WEBAPP_URL."
+        )
+    
     await callback.message.edit_text(
-        "Управление днями рождения",
+        message_text,
         reply_markup=get_birthday_management_keyboard(),
     )
     await callback.answer()
@@ -35,74 +62,94 @@ async def panel_birthdays_callback(callback: CallbackQuery):
 
 @router.callback_query(lambda c: c.data == "birthday_add")
 async def birthday_add_start(callback: CallbackQuery, state: FSMContext):
-    """Начать добавление ДР."""
-    await state.set_state(BirthdayForm.waiting_for_full_name)
-    await callback.message.answer("Введите ФИО:")
-    await callback.answer()
+    """
+    Обработчик кнопки добавления ДР (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    Этот handler больше не выполняет добавление, а только информирует пользователя.
+    """
+    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
+    
+    if is_webapp_url_configured(webapp_url):
+        message_text = (
+            "Управление днями рождения доступно только через панель управления.\n\n"
+            "Нажмите кнопку ниже, чтобы открыть панель управления в Mini App."
+        )
+    else:
+        message_text = (
+            "Управление днями рождения доступно только через панель управления.\n\n"
+            "Для использования панели управления необходимо настроить TELEGRAM_WEBAPP_URL."
+        )
+    
+    await callback.message.answer(message_text)
+    await callback.answer("Используйте панель управления для добавления ДР")
 
+
+# КРИТИЧНО: Все FSM handlers для добавления ДР удалены.
+# CRUD-операции выполняются исключительно через Telegram Mini App.
+# Следующие handlers больше не используются, но оставлены для совместимости
+# (если пользователь случайно попадет в FSM состояние):
 
 @router.message(BirthdayForm.waiting_for_full_name)
 async def process_full_name(message: Message, state: FSMContext):
-    """Обработать ФИО."""
-    await state.update_data(full_name=message.text)
-    await state.set_state(BirthdayForm.waiting_for_company)
-    await message.answer("Введите компанию:")
+    """
+    Обработчик FSM состояния (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    """
+    await state.clear()
+    await message.answer(
+        "Управление днями рождения доступно только через панель управления в Mini App."
+    )
 
 
 @router.message(BirthdayForm.waiting_for_company)
 async def process_company(message: Message, state: FSMContext):
-    """Обработать компанию."""
-    await state.update_data(company=message.text)
-    await state.set_state(BirthdayForm.waiting_for_position)
-    await message.answer("Введите должность:")
+    """
+    Обработчик FSM состояния (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    """
+    await state.clear()
+    await message.answer(
+        "Управление днями рождения доступно только через панель управления в Mini App."
+    )
 
 
 @router.message(BirthdayForm.waiting_for_position)
 async def process_position(message: Message, state: FSMContext):
-    """Обработать должность."""
-    await state.update_data(position=message.text)
-    await state.set_state(BirthdayForm.waiting_for_birth_date)
-    await message.answer("Введите дату рождения (формат: ДД.ММ.ГГГГ):")
+    """
+    Обработчик FSM состояния (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    """
+    await state.clear()
+    await message.answer(
+        "Управление днями рождения доступно только через панель управления в Mini App."
+    )
 
 
 @router.message(BirthdayForm.waiting_for_birth_date)
 async def process_birth_date(message: Message, state: FSMContext, session: AsyncSession):
-    """Обработать дату рождения."""
-    try:
-        birth_date = datetime.strptime(message.text, "%d.%m.%Y").date()
-    except ValueError:
-        await message.answer("Неверный формат даты. Используйте ДД.ММ.ГГГГ")
-        return
-
-    await state.update_data(birth_date=birth_date)
-    await state.set_state(BirthdayForm.waiting_for_comment)
-    await message.answer("Введите комментарий (или отправьте '-' для пропуска):")
+    """
+    Обработчик FSM состояния (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    """
+    await state.clear()
+    await message.answer(
+        "Управление днями рождения доступно только через панель управления в Mini App."
+    )
 
 
 @router.message(BirthdayForm.waiting_for_comment)
 async def process_comment(message: Message, state: FSMContext, session: AsyncSession):
-    """Обработать комментарий и создать ДР."""
-    data = await state.get_data()
-    comment = message.text if message.text != "-" else None
-
-    factory = UseCaseFactory(session)
-    use_cases = factory.create_birthday_use_cases()
-    use_case = use_cases["create"]
-
-    try:
-        birthday = await use_case.execute(
-            full_name=data["full_name"],
-            company=data["company"],
-            position=data["position"],
-            birth_date=data["birth_date"],
-            comment=comment,
-        )
-        await session.commit()
-        logger.info(f"День рождения создан: ID={birthday.id}, ФИО={birthday.full_name}")
-        await message.answer(f"День рождения добавлен! ID: {birthday.id}")
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Ошибка при создании дня рождения: {type(e).__name__}: {e}")
-        await message.answer(f"Ошибка: {str(e)}")
-
+    """
+    Обработчик FSM состояния (обезврежен).
+    
+    КРИТИЧНО: CRUD-операции выполняются исключительно через Telegram Mini App.
+    """
     await state.clear()
+    await message.answer(
+        "Управление днями рождения доступно только через панель управления в Mini App."
+    )
