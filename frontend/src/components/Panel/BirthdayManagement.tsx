@@ -18,6 +18,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editFormData, setEditFormData] = useState<Partial<Birthday>>({})
   const [error, setError] = useState<string | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     company: '',
@@ -67,6 +68,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       setCreating(true)
       await api.createBirthday(formData)
       setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '' })
+      setShowAddForm(false) // Закрываем форму после успешного добавления
       await loadBirthdays()
     } catch (error) {
       logger.error('Failed to create birthday:', error)
@@ -436,7 +438,38 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         </div>
       )}
 
-      <form className="panel-form" onSubmit={handleSubmit}>
+      <div style={{ marginBottom: '20px' }}>
+        <button
+          type="button"
+          onClick={() => {
+            if (showAddForm) {
+              // При закрытии формы очищаем данные
+              setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '' })
+              setError(null)
+            }
+            setShowAddForm(!showAddForm)
+          }}
+          style={{
+            padding: '12px 20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          disabled={creating || editingId !== null}
+        >
+          {showAddForm ? '✖️ Отменить' : '➕ Добавить'}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <form className="panel-form" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="ФИО"
@@ -478,6 +511,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
           {creating ? '⏳ Добавление...' : 'Добавить'}
         </button>
       </form>
+      )}
 
       {loading ? (
         <p>Загрузка...</p>
@@ -504,38 +538,38 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     }}
                     style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
                   >
-                    <input
+                      <input
                       type="text"
                       placeholder="ФИО"
                       value={editFormData.full_name || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, full_name: e.target.value })}
-                      disabled={updating === bd.id}
+                      disabled={updating === bd.id || showAddForm}
                     />
                     <input
                       type="text"
                       placeholder="Компания"
                       value={editFormData.company || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, company: e.target.value })}
-                      disabled={updating === bd.id}
+                      disabled={updating === bd.id || showAddForm}
                     />
                     <input
                       type="text"
                       placeholder="Должность"
                       value={editFormData.position || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
-                      disabled={updating === bd.id}
+                      disabled={updating === bd.id || showAddForm}
                     />
                     <input
                       type="date"
                       value={editFormData.birth_date || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, birth_date: e.target.value })}
-                      disabled={updating === bd.id}
+                      disabled={updating === bd.id || showAddForm}
                     />
                     <textarea
                       placeholder="Комментарий (необязательно)"
                       value={editFormData.comment || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, comment: e.target.value })}
-                      disabled={updating === bd.id}
+                      disabled={updating === bd.id || showAddForm}
                     />
                     {error && (
                       <div style={{ 
@@ -553,10 +587,10 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       </div>
                     )}
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <button type="submit" disabled={updating === bd.id}>
+                      <button type="submit" disabled={updating === bd.id || showAddForm}>
                         {updating === bd.id ? '⏳ Сохранение...' : 'Сохранить'}
                       </button>
-                      <button type="button" onClick={handleCancelEdit} disabled={updating === bd.id}>
+                      <button type="button" onClick={handleCancelEdit} disabled={updating === bd.id || showAddForm}>
                         Отмена
                       </button>
                     </div>
@@ -569,12 +603,24 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     <br />
                     {bd.birth_date} {bd.comment && `(${bd.comment})`}
                   </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                       <button 
                         onClick={() => bd.id && handleEdit(bd.id)}
-                        disabled={deleting === bd.id || updating !== null}
+                        disabled={deleting === bd.id || updating !== null || editingId !== null || showAddForm}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#007bff',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
                       >
-                        Редактировать
+                        ✏️ Редактировать
                       </button>
                       <button 
                         onClick={() => {
@@ -586,9 +632,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                           // handleDelete уже обрабатывает ошибки и отображает их через setError
                           handleDelete(bd.id)
                         }}
-                        disabled={deleting === bd.id || updating !== null || editingId !== null}
+                        disabled={deleting === bd.id || updating !== null || editingId !== null || showAddForm}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
                       >
-                        {deleting === bd.id ? '⏳ Удаление...' : 'Удалить'}
+                        {deleting === bd.id ? '⏳ Удаление...' : '🗑️ Удалить'}
                       </button>
                     </div>
                 </>

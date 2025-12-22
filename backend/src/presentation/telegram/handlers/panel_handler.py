@@ -123,8 +123,14 @@ async def cmd_panel(message: Message, bot: Bot, session: AsyncSession):
     
     КРИТИЧНО: Использует единую функцию render_panel_menu().
     Никогда не создает дубликаты - только редактирует существующее или отправляет новое.
+    
+    ВАЖНО: Это ЕДИНСТВЕННЫЙ handler для команды /panel.
+    Никакие другие handlers не должны обрабатывать эту команду.
     """
     user_id = message.from_user.id
+    chat_id = message.chat.id
+    
+    logger.info(f"[Panel] Команда /panel получена от пользователя {user_id} в чате {chat_id}")
     
     # Записываем доступ к панели через use-case
     factory = UseCaseFactory(session)
@@ -141,11 +147,14 @@ async def cmd_panel(message: Message, bot: Bot, session: AsyncSession):
         # Пользователь все равно получит меню панели
 
     # КРИТИЧНО: Используем единую функцию рендеринга панели
+    # Это ЕДИНСТВЕННОЕ место, где вызывается render_panel_menu для команды /panel
     await render_panel_menu(
         bot=bot,
-        chat_id=message.chat.id,
+        chat_id=chat_id,
         user_id=user_id,
     )
+    
+    logger.info(f"[Panel] Команда /panel обработана для пользователя {user_id}")
 
 
 @router.callback_query(lambda c: c.data == "panel_main")
