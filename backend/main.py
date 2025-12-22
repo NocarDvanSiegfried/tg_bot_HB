@@ -15,7 +15,6 @@ from src.infrastructure.config.env_validator import (
 from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
     start_handler,
-    calendar_handler,
 )
 from src.presentation.telegram.middleware.database_middleware import DatabaseMiddleware
 from src.presentation.web.app import app as web_app
@@ -119,7 +118,6 @@ async def start_bot():
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)
-    dp.include_router(calendar_handler.router)
 
     # Запуск polling с обработкой ошибок
     # Обработчик конфликтов уже зарегистрирован через @dp.errors() выше

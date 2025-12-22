@@ -139,17 +139,5 @@ def get_calendar_keyboard() -> InlineKeyboardMarkup:
     return keyboard
 
 
-def get_calendar_navigation_keyboard(year: int, month: int) -> InlineKeyboardMarkup:
-    """Навигация по календарю."""
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="◀️", callback_data=f"cal_prev_{year}_{month}"),
-                InlineKeyboardButton(text=f"{year}-{month:02d}", callback_data="cal_info"),
-                InlineKeyboardButton(text="▶️", callback_data=f"cal_next_{year}_{month}"),
-            ],
-        ]
-    )
-    return keyboard
 
 

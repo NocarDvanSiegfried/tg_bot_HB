@@ -6,7 +6,6 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
-    calendar_handler,
     start_handler,
 )
 
@@ -33,7 +32,6 @@ async def main():
 
     # Регистрация роутеров
     dp.include_router(start_handler.router)
-    dp.include_router(calendar_handler.router)
 
     # Запуск polling
     await dp.start_polling(bot)
