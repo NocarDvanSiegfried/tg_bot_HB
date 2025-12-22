@@ -131,20 +131,23 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
 
 
 def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
-    """Меню панели управления."""
+    """
+    Меню панели управления.
+    
+    КРИТИЧНО: Mini App-first UX - только одна кнопка для открытия Mini App.
+    Все CRUD-операции выполняются исключительно внутри Mini App.
+    ReplyKeyboardMarkup не используется для избежания дублирования кнопок.
+    """
     webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
     inline_keyboard = []
 
-    # Добавляем кнопку Mini App в начало, если URL настроен (для лучшей видимости)
+    # КРИТИЧНО: Только одна кнопка - открытие Mini App
     # Передаем start_param="panel" для открытия Mini App в режиме панели управления
-    # КРИТИЧНО: Добавляем query-параметр версии для обхода кэша Telegram
-    # Telegram кэширует Mini App по URL, изменение query-параметра заставляет обновить кэш
-    # Версия берётся автоматически из переменных окружения (APP_VERSION, GIT_COMMIT_HASH, или BUILD_TIMESTAMP)
+    # Добавляем query-параметр версии для обхода кэша Telegram
     if is_webapp_url_configured(webapp_url):
         # Получаем версию автоматически из конфига/env
         app_version = _get_app_version()
         # Добавляем query-параметр версии к URL для обхода кэша
-        # Это архитектурное решение для гарантии актуальной версии панели
         panel_webapp_url = _add_version_query_param(webapp_url, version=app_version)
         
         inline_keyboard.append(
@@ -160,18 +163,6 @@ def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
             "Кнопка Mini App не будет отображаться в панели управления. "
             "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
         )
-
-    # Остальные кнопки меню
-    inline_keyboard.extend([
-        [InlineKeyboardButton(text="🎂 Управление ДР", callback_data="panel_birthdays")],
-        [
-            InlineKeyboardButton(
-                text="👤 Управление ответственными", callback_data="panel_responsible"
-            )
-        ],
-        [InlineKeyboardButton(text="🎉 Генерация поздравлений", callback_data="panel_greetings")],
-        [InlineKeyboardButton(text="📅 Календарь", callback_data="panel_calendar")],
-    ])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return keyboard
