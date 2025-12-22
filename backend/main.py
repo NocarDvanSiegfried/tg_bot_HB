@@ -16,9 +16,6 @@ from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
     start_handler,
     calendar_handler,
-    birthday_handlers,
-    responsible_handlers,
-    greeting_handlers,
 )
 from src.presentation.telegram.middleware.database_middleware import DatabaseMiddleware
 from src.presentation.web.app import app as web_app
@@ -123,9 +120,6 @@ async def start_bot():
     # Регистрация роутеров
     dp.include_router(start_handler.router)
     dp.include_router(calendar_handler.router)
-    dp.include_router(birthday_handlers.router)
-    dp.include_router(responsible_handlers.router)
-    dp.include_router(greeting_handlers.router)
 
     # Запуск polling с обработкой ошибок
     # Обработчик конфликтов уже зарегистрирован через @dp.errors() выше

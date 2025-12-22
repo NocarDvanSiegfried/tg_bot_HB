@@ -5,8 +5,6 @@ from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
     WebAppInfo,
 )
 
@@ -105,69 +103,6 @@ def _add_version_query_param(url: str, version: str) -> str:
         return result_url
 
 
-def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
-    """Главное меню - кнопка Календарь и Mini App."""
-    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    buttons = [[KeyboardButton(text="📅 Календарь")]]
-
-    # Добавляем кнопку Mini App, если URL настроен
-    if is_webapp_url_configured(webapp_url):
-        buttons.append(
-            [KeyboardButton(text="🌐 Открыть Mini App", web_app=WebAppInfo(url=webapp_url))]
-        )
-    else:
-        # Логируем предупреждение, если URL не настроен
-        logger.warning(
-            "TELEGRAM_WEBAPP_URL не настроен или использует значение по умолчанию. "
-            "Кнопка Mini App не будет отображаться. "
-            "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
-        )
-
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=buttons,
-        resize_keyboard=True,
-    )
-    return keyboard
-
-
-def get_panel_menu_keyboard() -> InlineKeyboardMarkup:
-    """
-    Меню панели управления.
-    
-    КРИТИЧНО: Mini App-first UX - только одна кнопка для открытия Mini App.
-    Все CRUD-операции выполняются исключительно внутри Mini App.
-    ReplyKeyboardMarkup не используется для избежания дублирования кнопок.
-    """
-    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    inline_keyboard = []
-
-    # КРИТИЧНО: Только одна кнопка - открытие Mini App
-    # Передаем start_param="panel" для открытия Mini App в режиме панели управления
-    # Добавляем query-параметр версии для обхода кэша Telegram
-    if is_webapp_url_configured(webapp_url):
-        # Получаем версию автоматически из конфига/env
-        app_version = _get_app_version()
-        # Добавляем query-параметр версии к URL для обхода кэша
-        panel_webapp_url = _add_version_query_param(webapp_url, version=app_version)
-        
-        inline_keyboard.append(
-            [InlineKeyboardButton(
-                text="🌐 Открыть панель управления",
-                web_app=WebAppInfo(url=panel_webapp_url, start_param="panel")
-            )]
-        )
-    else:
-        # Логируем предупреждение, если URL не настроен
-        logger.warning(
-            "TELEGRAM_WEBAPP_URL не настроен или использует значение по умолчанию. "
-            "Кнопка Mini App не будет отображаться в панели управления. "
-            "Установите TELEGRAM_WEBAPP_URL в переменных окружения (должен быть HTTPS URL)."
-        )
-
-    keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-    return keyboard
-
-
 def get_calendar_keyboard() -> InlineKeyboardMarkup:
     """
     Клавиатура для открытия календаря дней рождения.
@@ -218,72 +153,3 @@ def get_calendar_navigation_keyboard(year: int, month: int) -> InlineKeyboardMar
     return keyboard
 
 
-def get_birthday_management_keyboard() -> InlineKeyboardMarkup:
-    """
-    Меню управления ДР.
-    
-    КРИТИЧНО: CRUD-операции (добавление, редактирование, удаление) 
-    выполняются исключительно через Telegram Mini App (панель управления).
-    Командный интерфейс бота больше не содержит CRUD-логики.
-    """
-    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    inline_keyboard = []
-    
-    # Добавляем кнопку Mini App, если URL настроен
-    if is_webapp_url_configured(webapp_url):
-        app_version = _get_app_version()
-        panel_webapp_url = _add_version_query_param(webapp_url, version=app_version)
-        
-        inline_keyboard.append(
-            [InlineKeyboardButton(
-                text="🌐 Открыть панель управления",
-                web_app=WebAppInfo(url=panel_webapp_url, start_param="panel")
-            )]
-        )
-    
-    
-    keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-    return keyboard
-
-
-def get_responsible_management_keyboard() -> InlineKeyboardMarkup:
-    """Меню управления ответственными."""
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="➕ Добавить ответственного", callback_data="responsible_add"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="✏️ Редактировать ответственного", callback_data="responsible_edit"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🗑️ Удалить ответственного", callback_data="responsible_delete"
-                )
-            ],
-            [InlineKeyboardButton(text="📅 Назначить на дату", callback_data="responsible_assign")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")],
-        ]
-    )
-    return keyboard
-
-
-def get_greeting_options_keyboard() -> InlineKeyboardMarkup:
-    """Меню генерации поздравлений."""
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="✏️ Написать вручную", callback_data="greeting_manual")],
-            [
-                InlineKeyboardButton(
-                    text="🤖 Сгенерировать через DeepSeek", callback_data="greeting_generate"
-                )
-            ],
-            [InlineKeyboardButton(text="🖼️ Создать открытку", callback_data="greeting_card")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="panel_main")],
-        ]
-    )
-    return keyboard
