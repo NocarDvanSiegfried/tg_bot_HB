@@ -1,14 +1,13 @@
 import logging
-import os
 from typing import Dict, Optional
 
 from aiogram import Bot, Router
 from aiogram.filters import Command
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
+from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
-from src.presentation.telegram.keyboards import get_panel_menu_keyboard, is_webapp_url_configured
+from src.presentation.telegram.keyboards import get_panel_menu_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -29,20 +28,10 @@ def _get_panel_menu_text() -> str:
     Returns:
         Текст меню панели управления
     """
-    webapp_url = os.getenv("TELEGRAM_WEBAPP_URL", "")
-    
-    if is_webapp_url_configured(webapp_url):
-        return (
-            "🎛️ Панель управления\n\n"
-            "Здесь вы можете управлять днями рождения, ответственными лицами и генерировать поздравления.\n\n"
-            "Нажмите кнопку ниже, чтобы открыть панель управления в Mini App."
-        )
-    else:
-        return (
-            "🎛️ Панель управления\n\n"
-            "Здесь вы можете управлять днями рождения, ответственными лицами и генерировать поздравления.\n\n"
-            "Используйте кнопки ниже для управления."
-        )
+    return (
+        "🎛️ Панель управления\n\n"
+        "Управление днями рождения, ответственными лицами и генерация поздравлений."
+    )
 
 
 async def render_panel_menu(
@@ -54,11 +43,10 @@ async def render_panel_menu(
     """
     Рендерит меню панели управления.
     
-    КРИТИЧНО: Это единственная функция, которая создает/редактирует панель управления.
-    - Если есть existing_message_id или сохраненный message_id - редактирует существующее сообщение
-    - Если нет - отправляет новое сообщение
-    - Никогда не создает дубликаты
-    - КРИТИЧНО: Гарантированно удаляет ReplyKeyboardMarkup через ReplyKeyboardRemove()
+    КРИТИЧНО: Mini App-first архитектура - только InlineKeyboard, без ReplyKeyboard.
+    - Использует только InlineKeyboardMarkup с одной кнопкой WebApp
+    - При повторном вызове редактирует существующее сообщение
+    - Никогда не создает дубликаты - в чате всегда одно сообщение панели
     
     Args:
         bot: Экземпляр бота
@@ -72,44 +60,18 @@ async def render_panel_menu(
     message_text = _get_panel_menu_text()
     keyboard = get_panel_menu_keyboard()
     
-    # КРИТИЧНО: Гарантированно удаляем старую ReplyKeyboardMarkup
-    # Telegram может кешировать старую клавиатуру, поэтому явно удаляем её
-    reply_keyboard_remove = ReplyKeyboardRemove(remove_keyboard=True)
-    
     # Определяем message_id для редактирования
     message_id_to_edit = existing_message_id or _panel_menu_messages.get(user_id)
     
     if message_id_to_edit:
         # Пытаемся отредактировать существующее сообщение
         try:
-            # КРИТИЧНО: Сначала удаляем ReplyKeyboard, затем редактируем сообщение
-            # Это гарантирует, что старая клавиатура будет удалена
-            remove_message = None
-            try:
-                remove_message = await bot.send_message(
-                    chat_id=chat_id,
-                    text="",  # Пустое сообщение для удаления клавиатуры
-                    reply_markup=reply_keyboard_remove,
-                )
-            except Exception:
-                # Игнорируем ошибки при удалении клавиатуры (может быть уже удалена)
-                pass
-            
             await bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id_to_edit,
                 text=message_text,
                 reply_markup=keyboard,
             )
-            
-            # Удаляем пустое сообщение с ReplyKeyboardRemove, если оно было отправлено
-            if remove_message:
-                try:
-                    await bot.delete_message(chat_id=chat_id, message_id=remove_message.message_id)
-                except Exception:
-                    # Игнорируем ошибки при удалении (сообщение может быть уже удалено)
-                    pass
-            
             # Сохраняем message_id в хранилище
             _panel_menu_messages[user_id] = message_id_to_edit
             logger.info(
@@ -126,33 +88,12 @@ async def render_panel_menu(
             )
             _panel_menu_messages.pop(user_id, None)
     
-    # КРИТИЧНО: Сначала удаляем ReplyKeyboard, затем отправляем сообщение с меню
-    # Это гарантирует, что старая клавиатура будет удалена даже если Telegram её кешировал
-    remove_message = None
-    try:
-        remove_message = await bot.send_message(
-            chat_id=chat_id,
-            text="",  # Пустое сообщение для удаления клавиатуры
-            reply_markup=reply_keyboard_remove,
-        )
-    except Exception:
-        # Игнорируем ошибки при удалении клавиатуры (может быть уже удалена)
-        pass
-    
     # Отправляем новое сообщение с меню панели
     sent_message = await bot.send_message(
         chat_id=chat_id,
         text=message_text,
         reply_markup=keyboard,
     )
-    
-    # Удаляем пустое сообщение с ReplyKeyboardRemove, если оно было отправлено
-    if remove_message:
-        try:
-            await bot.delete_message(chat_id=chat_id, message_id=remove_message.message_id)
-        except Exception:
-            # Игнорируем ошибки при удалении (сообщение может быть уже удалено)
-            pass
     
     # Сохраняем message_id нового сообщения
     _panel_menu_messages[user_id] = sent_message.message_id
