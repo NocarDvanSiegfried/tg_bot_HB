@@ -34,6 +34,18 @@ export function useTelegram() {
         setIsReady(true)
         initializedRef.current = true
         
+        // КРИТИЧНО: Отключаем системное меню Mini App (Menu Button)
+        // Это предотвращает дублирование элементов управления в чате
+        // Управление выполняется только через собственный UI приложения
+        if (typeof tg.setupMenuButton === 'function') {
+          try {
+            tg.setupMenuButton({ is_visible: false })
+            logger.info('[useTelegram] Menu Button отключен (setupMenuButton)')
+          } catch (error) {
+            logger.warn('[useTelegram] Не удалось отключить Menu Button:', error)
+          }
+        }
+        
         // Очищаем интервалы если они были установлены
         if (checkIntervalRef.current) {
           clearInterval(checkIntervalRef.current)
@@ -64,6 +76,17 @@ export function useTelegram() {
               setInitData(tg.initData || null)
               setIsReady(true)
               initializedRef.current = true
+              
+              // КРИТИЧНО: Отключаем системное меню Mini App (Menu Button)
+              // Это предотвращает дублирование элементов управления в чате
+              if (typeof tg.setupMenuButton === 'function') {
+                try {
+                  tg.setupMenuButton({ is_visible: false })
+                  logger.info('[useTelegram] Menu Button отключен (setupMenuButton, delayed)')
+                } catch (error) {
+                  logger.warn('[useTelegram] Не удалось отключить Menu Button (delayed):', error)
+                }
+              }
               
               if (checkIntervalRef.current) {
                 clearInterval(checkIntervalRef.current)
