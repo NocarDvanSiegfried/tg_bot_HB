@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Dict, Optional
 
 from aiogram import Bot, Router
@@ -16,6 +17,10 @@ router = Router()
 # КРИТИЧНО: Хранилище последних message_id с меню панели для каждого пользователя
 # Ключ: user_id, Значение: message_id последнего сообщения с меню панели
 _panel_menu_messages: Dict[int, int] = {}
+
+# КРИТИЧНО: Защита от повторных вызовов обработчика /panel
+# Ключ: (user_id, chat_id), Значение: timestamp последнего вызова
+_panel_processing: Dict[tuple[int, int], float] = {}
 
 
 def _get_panel_menu_text() -> str:
@@ -115,9 +120,34 @@ async def cmd_panel(message: Message, bot: Bot, session: AsyncSession):
     
     ВАЖНО: Это ЕДИНСТВЕННЫЙ handler для команды /panel.
     Никакие другие handlers не должны обрабатывать эту команду.
+    
+    КРИТИЧНО: Защита от повторных вызовов - предотвращает дублирование сообщений.
     """
     user_id = message.from_user.id
     chat_id = message.chat.id
+    key = (user_id, chat_id)
+    current_time = time.time()
+    
+    # КРИТИЧНО: Защита от повторных вызовов в течение 1 секунды
+    # Это предотвращает обработку команды несколько раз подряд
+    if key in _panel_processing:
+        time_since_last = current_time - _panel_processing[key]
+        if time_since_last < 1.0:  # Защита от повторных вызовов в течение 1 секунды
+            logger.warning(
+                f"[Panel] Игнорируем повторный вызов /panel для пользователя {user_id} "
+                f"в чате {chat_id} (прошло {time_since_last:.2f} секунд)"
+            )
+            return  # Прерываем обработку, чтобы избежать дублирования
+    
+    # Сохраняем время текущего вызова
+    _panel_processing[key] = current_time
+    
+    # Очищаем старые записи (старше 5 секунд) для экономии памяти
+    if len(_panel_processing) > 1000:  # Если слишком много записей
+        cutoff_time = current_time - 5.0
+        keys_to_remove = [k for k, v in _panel_processing.items() if v <= cutoff_time]
+        for k in keys_to_remove:
+            _panel_processing.pop(k, None)
     
     logger.info(f"[Panel] Команда /panel получена от пользователя {user_id} в чате {chat_id}")
     

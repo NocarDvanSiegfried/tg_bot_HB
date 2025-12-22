@@ -1,6 +1,7 @@
 import logging
 
 from aiogram import Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
@@ -38,25 +39,37 @@ async def responsible_add_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(ResponsibleForm.waiting_for_full_name)
+@router.message(ResponsibleForm.waiting_for_full_name, ~Command())
 async def process_full_name(message: Message, state: FSMContext):
-    """Обработать ФИО."""
+    """
+    Обработать ФИО.
+    
+    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
+    """
     await state.update_data(full_name=message.text)
     await state.set_state(ResponsibleForm.waiting_for_company)
     await message.answer("Введите компанию:")
 
 
-@router.message(ResponsibleForm.waiting_for_company)
+@router.message(ResponsibleForm.waiting_for_company, ~Command())
 async def process_company(message: Message, state: FSMContext):
-    """Обработать компанию."""
+    """
+    Обработать компанию.
+    
+    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
+    """
     await state.update_data(company=message.text)
     await state.set_state(ResponsibleForm.waiting_for_position)
     await message.answer("Введите должность:")
 
 
-@router.message(ResponsibleForm.waiting_for_position)
+@router.message(ResponsibleForm.waiting_for_position, ~Command())
 async def process_position(message: Message, state: FSMContext, session: AsyncSession):
-    """Обработать должность и создать ответственного."""
+    """
+    Обработать должность и создать ответственного.
+    
+    КРИТИЧНО: Фильтр ~Command() предотвращает перехват команд (например, /panel).
+    """
     data = await state.get_data()
 
     factory = UseCaseFactory(session)
