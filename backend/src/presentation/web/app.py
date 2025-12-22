@@ -28,19 +28,22 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Используем централизованную функцию для определения allowed_origins
 allowed_origins = get_allowed_origins()
 
-# Сжатие ответов (gzip) для уменьшения размера передаваемых данных
-app.add_middleware(GZipMiddleware, minimum_size=1000)  # Сжимать ответы больше 1KB
-
-# Убедиться, что CORS middleware правильно настроен
+# КРИТИЧНО: CORS middleware должен быть добавлен ПЕРВЫМ (до других middleware и роутов)
+# Это гарантирует, что CORS заголовки применяются ко всем запросам и ответам
+# Порядок важен: middleware выполняются в обратном порядке при ответе
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],  # Явно указать методы
-    allow_headers=["Content-Type", "X-Init-Data", "Authorization", "Accept"],  # Явно указать заголовки
-    expose_headers=["*"],
-    max_age=3600,
+    allow_origins=allowed_origins,  # Только https://miniapp.micro-tab.ru:4443
+    allow_credentials=True,  # Разрешить cookies и credentials
+    allow_methods=["*"],  # Разрешить все HTTP-методы (GET, POST, PUT, DELETE, OPTIONS, PATCH и т.д.)
+    allow_headers=["*"],  # Разрешить все заголовки (Content-Type, X-Init-Data, Authorization и т.д.)
+    expose_headers=["*"],  # Разрешить клиенту читать все заголовки ответа
+    max_age=3600,  # Кэшировать preflight ответы на 1 час
 )
+
+# Сжатие ответов (gzip) для уменьшения размера передаваемых данных
+# Добавляется ПОСЛЕ CORS, чтобы CORS заголовки были в финальном ответе
+app.add_middleware(GZipMiddleware, minimum_size=1000)  # Сжимать ответы больше 1KB
 
 # Экспортируем allowed_origins для использования в других модулях
 __all__ = ["app", "allowed_origins"]
@@ -131,20 +134,9 @@ async def root():
     return {"message": "Telegram Birthday Calendar API"}
 
 
-@app.options("/")
-async def root_options():
-    """Обработка OPTIONS запросов для корневого endpoint (CORS preflight)."""
-    # FastAPI CORS middleware должен обработать это автоматически,
-    # но явная обработка гарантирует правильный ответ
-    from fastapi.responses import Response
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",  # CORS middleware переопределит это
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, X-Init-Data, Authorization, Accept",
-        }
-    )
+# КРИТИЧНО: Явный обработчик OPTIONS не нужен
+# CORSMiddleware автоматически обрабатывает все OPTIONS запросы (preflight)
+# Удаляем явный обработчик, чтобы избежать конфликтов с middleware
 
 
 @app.get("/health")
