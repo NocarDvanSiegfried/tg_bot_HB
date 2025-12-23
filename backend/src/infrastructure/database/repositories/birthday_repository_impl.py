@@ -29,6 +29,7 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
             position=model.position,
             birth_date=model.birth_date,
             comment=model.comment,
+            responsible=model.responsible,
         )
 
     def _to_model(self, entity: Birthday) -> BirthdayModel:
@@ -40,6 +41,7 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
             position=entity.position,
             birth_date=entity.birth_date,
             comment=entity.comment,
+            responsible=entity.responsible,
         )
 
     async def get_by_date(self, check_date: date) -> list[Birthday]:
@@ -98,6 +100,7 @@ class BirthdayRepositoryImpl(BaseRepositoryImpl[Birthday, BirthdayModel], Birthd
             model.position = birthday.position
             model.birth_date = birthday.birth_date
             model.comment = birthday.comment
+            model.responsible = birthday.responsible
 
             await self.session.flush()
             await self.session.refresh(model)
