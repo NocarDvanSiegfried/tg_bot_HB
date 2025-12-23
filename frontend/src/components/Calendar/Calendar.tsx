@@ -8,7 +8,9 @@ import isToday from 'date-fns/isToday'
 import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'
+import BirthdayManagement from '../Panel/BirthdayManagement'
 import './Calendar.css'
+import '../Panel/Panel.css'
 
 /**
  * Calendar - компонент для просмотра календаря дней рождения
@@ -32,6 +34,7 @@ export default function Calendar() {
   const [renderError, setRenderError] = useState<string | null>(null)
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
+  const [showManagement, setShowManagement] = useState(false) // Состояние для переключения между календарем и управлением
 
   // Логирование для отладки
   useEffect(() => {
@@ -155,6 +158,19 @@ export default function Calendar() {
     setCalendarData(null)
   }
 
+  // Обработчик возврата из управления днями рождения
+  const handleBackFromManagement = () => {
+    setShowManagement(false)
+    // Обновить календарь для отображения изменений (новые/измененные/удаленные дни рождения)
+    // Изменение currentDate заставит useEffect перезапуститься и загрузить актуальные данные
+    setCurrentDate(new Date(currentDate.getTime()))
+  }
+
+  // Если открыто управление, показываем компонент управления
+  if (showManagement) {
+    return <BirthdayManagement onBack={handleBackFromManagement} />
+  }
+
   // Если есть ошибка рендеринга, показываем сообщение
   if (renderError) {
     return (
@@ -189,6 +205,13 @@ export default function Calendar() {
         <button onClick={handlePrevMonth}>◀️</button>
         <h2>{format(currentDate, 'MMMM yyyy')}</h2>
         <button onClick={handleNextMonth}>▶️</button>
+        <button
+          onClick={() => setShowManagement(true)}
+          className="management-button"
+          title="Управление днями рождения"
+        >
+          ➕ Управление
+        </button>
       </div>
 
       <div className="calendar-grid">
