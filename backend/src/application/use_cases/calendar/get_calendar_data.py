@@ -38,6 +38,7 @@ class GetCalendarDataUseCase:
                     "position": b.position,
                     "age": b.calculate_age(check_date),
                     "comment": b.comment,
+                    "responsible": b.responsible,
                 }
                 for b in birthdays
             ],

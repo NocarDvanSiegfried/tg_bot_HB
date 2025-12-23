@@ -5,5 +5,6 @@ export interface Birthday {
   position: string
   birth_date: string
   comment?: string
+  responsible?: string
 }
 

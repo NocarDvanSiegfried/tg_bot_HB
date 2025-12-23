@@ -81,6 +81,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         position: birthday.position || '',
         birth_date: normalizedBirthDate || '',
         comment: birthday.comment || '',
+        responsible: birthday.responsible || '',
       }
     } catch (error) {
       logger.error(`[BirthdayManagement] Error in normalizeBirthday:`, error)
@@ -91,6 +92,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         position: birthday.position || '',
         birth_date: birthday.birth_date || '',
         comment: birthday.comment || '',
+        responsible: birthday.responsible || '',
       }
     }
   }
@@ -126,6 +128,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         position: data.position!,
         birth_date: data.birth_date!,
         comment: data.comment,
+        responsible: data.responsible,
       }
       return api.createBirthday(birthdayData)
     },
@@ -255,6 +258,13 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
             disabled={creating}
           />
+          <input
+            type="text"
+            placeholder="Ответственное лицо (необязательно)"
+            value={(formData.responsible as string) || ''}
+            onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+            disabled={creating}
+          />
           <button type="submit" disabled={creating}>
             {creating ? '⏳ Добавление...' : 'Добавить'}
           </button>
@@ -341,6 +351,13 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       placeholder="Комментарий (необязательно)"
                       value={(editFormData.comment as string) || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, comment: e.target.value })}
+                      disabled={updating === bd.id || showAddForm}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ответственное лицо (необязательно)"
+                      value={(editFormData.responsible as string) || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, responsible: e.target.value })}
                       disabled={updating === bd.id || showAddForm}
                     />
                     {error && (

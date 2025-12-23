@@ -40,6 +40,7 @@ class BirthdayCreate(BaseModel):
     position: str = Field(..., min_length=1, max_length=200, description="Должность")
     birth_date: date = Field(..., description="Дата рождения")
     comment: str | None = Field(None, max_length=1000, description="Комментарий")
+    responsible: str | None = Field(None, max_length=255, description="Ответственное лицо")
 
     @field_validator("full_name", "company", "position")
     @classmethod
@@ -56,6 +57,7 @@ class BirthdayUpdate(BaseModel):
     position: str | None = Field(None, min_length=1, max_length=200, description="Должность")
     birth_date: date | None = Field(None, description="Дата рождения")
     comment: str | None = Field(None, max_length=1000, description="Комментарий")
+    responsible: str | None = Field(None, max_length=255, description="Ответственное лицо")
 
     @field_validator("full_name", "company", "position")
     @classmethod
@@ -435,6 +437,7 @@ async def list_birthdays_user(
             "position": b.position,
             "birth_date": b.birth_date.isoformat(),
             "comment": b.comment,
+            "responsible": b.responsible,
         }
         for b in birthdays
     ]
@@ -460,6 +463,7 @@ async def create_birthday_user(
         position=data.position,
         birth_date=data.birth_date,
         comment=data.comment,
+        responsible=data.responsible,
     )
     await session.commit()
     return {
@@ -469,6 +473,7 @@ async def create_birthday_user(
         "position": birthday.position,
         "birth_date": birthday.birth_date.isoformat(),
         "comment": birthday.comment,
+        "responsible": birthday.responsible,
     }
 
 
@@ -494,6 +499,7 @@ async def update_birthday_user(
         position=data.position,
         birth_date=data.birth_date,
         comment=data.comment,
+        responsible=data.responsible,
     )
     await session.commit()
     return {
@@ -503,6 +509,7 @@ async def update_birthday_user(
         "position": birthday.position,
         "birth_date": birthday.birth_date.isoformat(),
         "comment": birthday.comment,
+        "responsible": birthday.responsible,
     }
 
 
@@ -563,6 +570,7 @@ async def list_birthdays(
             "position": b.position,
             "birth_date": b.birth_date.isoformat(),
             "comment": b.comment,
+            "responsible": b.responsible,
         }
         for b in birthdays
     ]
@@ -588,6 +596,7 @@ async def create_birthday(
         position=data.position,
         birth_date=data.birth_date,
         comment=data.comment,
+        responsible=data.responsible,
     )
     await session.commit()
     return {
@@ -597,6 +606,7 @@ async def create_birthday(
         "position": birthday.position,
         "birth_date": birthday.birth_date.isoformat(),
         "comment": birthday.comment,
+        "responsible": birthday.responsible,
     }
 
 
@@ -620,7 +630,7 @@ async def update_birthday(
     
     # Логирование после получения данных из Pydantic
     logger.info(f"[API] [STEP 1] Pydantic validation passed")
-    logger.info(f"[API] [STEP 1] Received data: birthday_id={birthday_id}, full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}")
+    logger.info(f"[API] [STEP 1] Received data: birthday_id={birthday_id}, full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}, responsible={data.responsible}")
     
     # Аутентификация и проверка доступа к панели
     logger.info(f"[API] [STEP 2] Starting authentication and access check")
@@ -641,7 +651,7 @@ async def update_birthday(
 
     try:
         logger.info(f"[API] [STEP 4] Executing update use case for birthday_id={birthday_id}")
-        logger.info(f"[API] [STEP 4] Update data: full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}")
+        logger.info(f"[API] [STEP 4] Update data: full_name={data.full_name}, company={data.company}, position={data.position}, birth_date={data.birth_date}, comment={data.comment}, responsible={data.responsible}")
         birthday = await use_case.execute(
             birthday_id=birthday_id,
             full_name=data.full_name,
@@ -649,6 +659,7 @@ async def update_birthday(
             position=data.position,
             birth_date=data.birth_date,
             comment=data.comment,
+            responsible=data.responsible,
         )
         logger.info(f"[API] [STEP 4] Use case executed successfully, birthday: id={birthday.id}, full_name={birthday.full_name}")
         
@@ -679,6 +690,7 @@ async def update_birthday(
         "position": birthday.position,
         "birth_date": birthday.birth_date.isoformat(),
         "comment": birthday.comment,
+        "responsible": birthday.responsible,
     }
 
 

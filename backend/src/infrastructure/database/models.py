@@ -16,6 +16,7 @@ class BirthdayModel(Base):
     position = Column(String(255), nullable=False, index=True)
     birth_date = Column(Date, nullable=False, index=True)
     comment = Column(Text, nullable=True)
+    responsible = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

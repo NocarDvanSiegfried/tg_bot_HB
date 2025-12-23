@@ -14,6 +14,7 @@ export interface CalendarData {
     position: string
     age: number
     comment?: string
+    responsible?: string
   }>
   holidays: Array<{
     id: number

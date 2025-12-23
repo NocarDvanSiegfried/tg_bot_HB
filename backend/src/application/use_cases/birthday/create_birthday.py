@@ -15,6 +15,7 @@ class CreateBirthdayUseCase:
         position: str,
         birth_date: date,
         comment: str | None = None,
+        responsible: str | None = None,
     ) -> Birthday:
         """Создать новый день рождения."""
         birthday = Birthday(
@@ -24,5 +25,6 @@ class CreateBirthdayUseCase:
             position=position,
             birth_date=birth_date,
             comment=comment,
+            responsible=responsible,
         )
         return await self.birthday_repository.create(birthday)

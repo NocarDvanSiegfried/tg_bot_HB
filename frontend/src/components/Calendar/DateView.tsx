@@ -81,6 +81,7 @@ function DateView({ date, data, loading, error }: DateViewProps) {
               <p>{bd.company}, {bd.position}</p>
               <p>Исполняется {bd.age} лет</p>
               {bd.comment && <p className="comment">Комментарий: {bd.comment}</p>}
+              {bd.responsible && <p className="responsible">Ответственное лицо: {bd.responsible}</p>}
             </div>
           ))
         ) : (

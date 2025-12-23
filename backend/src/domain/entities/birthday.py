@@ -10,6 +10,7 @@ class Birthday:
     position: str
     birth_date: date
     comment: str | None
+    responsible: str | None
 
     def calculate_age(self, reference_date: date) -> int:
         """Вычисляет возраст на указанную дату."""
