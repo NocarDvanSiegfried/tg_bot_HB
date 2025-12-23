@@ -14,6 +14,7 @@ from src.infrastructure.config.env_validator import (
 )
 from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
+    migration_guard_handler,
     start_handler,
 )
 from src.presentation.telegram.middleware.database_middleware import DatabaseMiddleware
@@ -117,7 +118,12 @@ async def start_bot():
         return False  # Не обработано, пробрасываем дальше
 
     # Регистрация роутеров
+    # КРИТИЧНО: Порядок важен - start_handler должен быть первым
     dp.include_router(start_handler.router)
+    # Временный migration-guard handler для старых callback'ов
+    # Регистрируется ПОСЛЕ всех специализированных handlers
+    # Ловит только те callback'и, которые не обработаны другими handlers
+    dp.include_router(migration_guard_handler.router)
 
     # Запуск polling с обработкой ошибок
     # Обработчик конфликтов уже зарегистрирован через @dp.errors() выше

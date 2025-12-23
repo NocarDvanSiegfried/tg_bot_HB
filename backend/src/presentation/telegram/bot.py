@@ -6,6 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from src.infrastructure.database.database_factory import get_database
 from src.presentation.telegram.handlers import (
+    migration_guard_handler,
     start_handler,
 )
 
@@ -31,7 +32,12 @@ async def main():
     await db.create_tables()
 
     # Регистрация роутеров
+    # КРИТИЧНО: Порядок важен - start_handler должен быть первым
     dp.include_router(start_handler.router)
+    # Временный migration-guard handler для старых callback'ов
+    # Регистрируется ПОСЛЕ всех специализированных handlers
+    # Ловит только те callback'и, которые не обработаны другими handlers
+    dp.include_router(migration_guard_handler.router)
 
     # Запуск polling
     await dp.start_polling(bot)

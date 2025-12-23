@@ -21,11 +21,9 @@ async def cmd_start(message: Message, bot: Bot):
     
     МИГРАЦИЯ:
     - Все старые callback handlers (birthday_*, panel_*, responsible_*, greeting_*) удалены
-    - Если пользователь видит BOT_RESPONSE_TIMEOUT при нажатии на старые кнопки:
-      → Это устаревшие UI-артефакты в истории чата
-      → Решение: пользователь должен удалить старые сообщения вручную
-      → НЕ добавлять catch-all handler (нарушает архитектуру)
-      → См. MIGRATION_GUIDE.md для деталей
+    - Временный migration_guard_handler добавлен для предотвращения BOT_RESPONSE_TIMEOUT
+    - Migration guard обрабатывает старые callback'и без бизнес-логики
+    - Может быть удален через N недель после полной миграции пользователей
     """
     keyboard = get_calendar_keyboard()
     await message.answer(
