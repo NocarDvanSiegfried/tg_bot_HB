@@ -145,16 +145,6 @@ async def verify_telegram_auth(x_init_data: str | None = Header(None, alias="X-I
     try:
         user_data = await use_case.execute(x_init_data)
         logger.info(f"[AUTH] User authenticated: user_id={user_data.get('id')}")
-        
-        # Извлекаем start_param из initData для определения режима
-        # start_param передается в initData как параметр start_param
-        import urllib.parse
-        parsed_data = urllib.parse.parse_qs(x_init_data)
-        start_param = parsed_data.get("start_param", [None])[0]
-        if start_param:
-            user_data["start_param"] = start_param
-            logger.info(f"[AUTH] Start param detected: {start_param}")
-        
         return user_data
     except ValueError as e:
         logger.warning(f"[AUTH] Invalid initData: {e}")
@@ -258,33 +248,20 @@ async def require_panel_access(
 
     Проверяет:
     1. Авторизацию через Telegram (verify_telegram_auth)
-    2. Режим panel в start_param (Mini App должен быть открыт через /panel)
-    3. Наличие прав доступа к панели (check_panel_access)
+    2. Наличие прав доступа к панели (check_panel_access)
 
     Raises:
         HTTPException 401: Если пользователь не авторизован или нет user_id
-        HTTPException 403: Если Mini App открыт не в режиме panel или нет доступа к панели
+        HTTPException 403: Если нет доступа к панели
     """
     # ЛОГИРОВАНИЕ В САМОМ НАЧАЛЕ ДО ВСЕХ ПРОВЕРОК
     logger.info(f"[AUTH] ===== require_panel_access CALLED =====")
-    logger.info(f"[AUTH] User data received: user_id={user.get('id')}, start_param={user.get('start_param')}")
+    logger.info(f"[AUTH] User data received: user_id={user.get('id')}")
     
     user_id = user.get("id")
     if not user_id:
         logger.warning("[AUTH] User ID not found in initData")
         raise HTTPException(status_code=401, detail="User ID not found in initData")
-
-    # Проверяем, что Mini App открыт в режиме panel
-    start_param = user.get("start_param")
-    if start_param != "panel":
-        logger.warning(
-            f"[AUTH] Panel mode required but start_param={start_param}. "
-            f"Mini App must be opened via /panel command."
-        )
-        raise HTTPException(
-            status_code=403,
-            detail="Panel mode required. Please open Mini App using /panel command."
-        )
 
     # Проверяем доступ к панели
     use_case = factory.create_panel_access_use_case()
@@ -296,7 +273,7 @@ async def require_panel_access(
             status_code=403, detail="Access denied. You don't have permission to access the panel."
         )
 
-    logger.info(f"[AUTH] Panel access granted for user_id={user_id} (panel mode)")
+    logger.info(f"[AUTH] Panel access granted for user_id={user_id}")
     return user
 
 
