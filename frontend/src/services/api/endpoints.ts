@@ -23,13 +23,13 @@ export const API_ENDPOINTS = {
   CALENDAR_MONTH: (year: number, month: number) => `/api/calendar/month/${year}/${month}`,
 
   /**
-   * Endpoints для управления днями рождения
+   * Endpoints для управления днями рождения (USER API для Mini App)
    */
   BIRTHDAYS: {
     /** Список всех дней рождения */
-    LIST: '/api/panel/birthdays',
+    LIST: '/api/birthdays',
     /** Конкретный день рождения по ID */
-    BY_ID: (id: number) => `/api/panel/birthdays/${id}`,
+    BY_ID: (id: number) => `/api/birthdays/${id}`,
   },
 
   /**

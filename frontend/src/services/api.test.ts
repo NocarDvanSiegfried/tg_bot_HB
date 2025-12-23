@@ -72,7 +72,7 @@ describe('API Client', () => {
       // Assert
       expect(result).toEqual(expectedResponse)
       expect(window.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/api/panel/birthdays/${birthdayId}`,
+        `${API_BASE_URL}/api/birthdays/${birthdayId}`,
         expect.objectContaining({
           method: 'PUT',
           headers: expect.objectContaining({
@@ -287,7 +287,7 @@ describe('API Client', () => {
 
       // Assert
       expect(window.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/api/panel/birthdays/${birthdayId}`,
+        `${API_BASE_URL}/api/birthdays/${birthdayId}`,
         expect.objectContaining({
           method: 'DELETE',
           headers: expect.objectContaining({

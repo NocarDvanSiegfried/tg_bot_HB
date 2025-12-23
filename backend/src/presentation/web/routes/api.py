@@ -415,6 +415,116 @@ async def get_calendar_month(
     }
 
 
+# User API endpoints (для Mini App - только Telegram auth)
+@router.get("/api/birthdays")
+@limiter.limit(READ_LIMIT)
+async def list_birthdays_user(
+    request: Request,
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth, без panel access
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
+    """Список всех ДР (для Mini App)."""
+    use_cases = factory.create_birthday_use_cases()
+    use_case = use_cases["get_all"]
+    birthdays = await use_case.execute()
+    return [
+        {
+            "id": b.id,
+            "full_name": b.full_name,
+            "company": b.company,
+            "position": b.position,
+            "birth_date": b.birth_date.isoformat(),
+            "comment": b.comment,
+        }
+        for b in birthdays
+    ]
+
+
+@router.post("/api/birthdays")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def create_birthday_user(
+    request: Request,
+    data: BirthdayCreate,
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Создать ДР (для Mini App)."""
+    use_cases = factory.create_birthday_use_cases()
+    use_case = use_cases["create"]
+
+    birthday = await use_case.execute(
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+        birth_date=data.birth_date,
+        comment=data.comment,
+    )
+    await session.commit()
+    return {
+        "id": birthday.id,
+        "full_name": birthday.full_name,
+        "company": birthday.company,
+        "position": birthday.position,
+        "birth_date": birthday.birth_date.isoformat(),
+        "comment": birthday.comment,
+    }
+
+
+@router.put("/api/birthdays/{birthday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def update_birthday_user(
+    request: Request,
+    birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
+    data: BirthdayUpdate = Body(..., description="Данные для обновления дня рождения"),
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Обновить ДР (для Mini App)."""
+    use_cases = factory.create_birthday_use_cases()
+    use_case = use_cases["update"]
+
+    birthday = await use_case.execute(
+        birthday_id=birthday_id,
+        full_name=data.full_name,
+        company=data.company,
+        position=data.position,
+        birth_date=data.birth_date,
+        comment=data.comment,
+    )
+    await session.commit()
+    return {
+        "id": birthday.id,
+        "full_name": birthday.full_name,
+        "company": birthday.company,
+        "position": birthday.position,
+        "birth_date": birthday.birth_date.isoformat(),
+        "comment": birthday.comment,
+    }
+
+
+@router.delete("/api/birthdays/{birthday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def delete_birthday_user(
+    request: Request,
+    birthday_id: int = Path(..., gt=0, description="ID дня рождения"),
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Удалить ДР (для Mini App)."""
+    use_cases = factory.create_birthday_use_cases()
+    use_case = use_cases["delete"]
+
+    await use_case.execute(birthday_id)
+    await session.commit()
+    return {"status": "deleted"}
+
+
 # Panel endpoints
 @router.get("/api/panel/check-access")
 @limiter.limit(ACCESS_CHECK_LIMIT)

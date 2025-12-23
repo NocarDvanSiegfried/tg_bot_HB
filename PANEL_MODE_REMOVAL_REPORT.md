@@ -167,3 +167,4 @@ return user_data
 - **Mini App = application**: Все CRUD операции выполняются внутри Mini App
 - **REST API**: Endpoints работают независимо от способа открытия Mini App
 
+
