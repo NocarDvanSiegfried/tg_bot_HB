@@ -1,5 +1,5 @@
 .panel-container {
-  padding: 20px;
+  padding: var(--spacing-xl);
   max-width: 800px;
   margin: 0 auto;
 }
@@ -93,20 +93,20 @@
 .panel-form textarea {
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
 }
 
 .panel-form button {
   padding: 10px;
-  background-color: #007bff;
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
 }
 
 .panel-form button:hover {
-  background-color: #0056b3;
+  background-color: var(--color-primary-dark);
 }
 
 .panel-list {
@@ -127,24 +127,24 @@
 .panel-list-item button {
   padding: 5px 10px;
   margin-left: 10px;
-  background-color: #dc3545;
+  background-color: var(--color-danger);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
 }
 
 .panel-list-item button:hover {
-  background-color: #c82333;
+  background-color: var(--color-danger-hover);
 }
 
 .back-button {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-xl);
   padding: 10px;
   background-color: #6c757d;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
 }
 

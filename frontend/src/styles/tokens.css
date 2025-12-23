@@ -1,0 +1,31 @@
+/**
+ * Design Tokens - CSS переменные для цветов, размеров и отступов
+ * 
+ * Используется для централизованного управления дизайном приложения.
+ * Все хардкод значения должны быть заменены на эти переменные.
+ */
+
+:root {
+  /* Цвета */
+  --color-primary: #007bff;
+  --color-primary-dark: #0056b3;
+  --color-success: #28a745;
+  --color-success-hover: #218838;
+  --color-danger: #dc3545;
+  --color-danger-hover: #c82333;
+  --color-warning: #ffc107;
+  
+  /* Spacing tokens */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
+  
+  /* Sizing tokens */
+  --size-calendar-max-width: 600px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+}
+

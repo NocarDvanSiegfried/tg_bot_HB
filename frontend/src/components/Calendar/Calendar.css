@@ -1,13 +1,13 @@
 .calendar-container {
-  padding: 20px;
-  max-width: 600px;
+  padding: var(--spacing-xl);
+  max-width: var(--size-calendar-max-width);
   margin: 0 auto;
 }
 
 .calendar-header {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-xl);
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -24,11 +24,11 @@
 
 /* Стили для кнопки управления */
 .calendar-header .management-button {
-  padding: 8px 16px;
-  background-color: #28a745;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-success);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
@@ -38,7 +38,7 @@
 }
 
 .calendar-header .management-button:hover {
-  background-color: #218838;
+  background-color: var(--color-success-hover);
 }
 
 .calendar-header .management-button:active {
@@ -57,8 +57,8 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  margin-bottom: 20px;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
 }
 
 .calendar-day-header {
@@ -85,25 +85,25 @@
 
 .calendar-day:hover {
   background-color: #f0f0f0;
-  border-color: #007bff;
+  border-color: var(--color-primary);
   transform: scale(1.05);
 }
 
 .calendar-day.selected {
-  background-color: #007bff;
+  background-color: var(--color-primary);
   color: white;
-  border-color: #0056b3;
+  border-color: var(--color-primary-dark);
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
   font-weight: bold;
 }
 
 .calendar-day.selected:hover {
-  background-color: #0056b3;
+  background-color: var(--color-primary-dark);
   transform: scale(1.05);
 }
 
 .calendar-day.has-birthday {
-  border-color: #ffc107;
+  border-color: var(--color-warning);
   background: linear-gradient(to bottom, #fff9e6 0%, #ffffff 100%);
 }
 
@@ -113,12 +113,12 @@
 }
 
 .calendar-day.selected.has-birthday {
-  background: linear-gradient(to bottom, #0056b3 0%, #007bff 100%);
+  background: linear-gradient(to bottom, var(--color-primary-dark) 0%, var(--color-primary) 100%);
   border-color: #004085;
 }
 
 .calendar-day.today {
-  border-color: #28a745;
+  border-color: var(--color-success);
   border-width: 3px;
   font-weight: bold;
 }
@@ -129,11 +129,11 @@
 
 .calendar-day.today.has-birthday:not(.selected) {
   background: linear-gradient(to bottom, #fff3cd 0%, #d4edda 50%, #ffffff 100%);
-  border-color: #ffc107;
+  border-color: var(--color-warning);
 }
 
 .calendar-day.today.selected {
-  border-color: #0056b3;
+  border-color: var(--color-primary-dark);
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4), 0 0 0 2px rgba(40, 167, 69, 0.3);
 }
 
@@ -153,10 +153,10 @@
 }
 
 .date-view {
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-xl);
   background-color: #f9f9f9;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
 }
 
 .date-view h3 {
@@ -194,11 +194,11 @@
 }
 
 .error-message {
-  padding: 20px;
+  padding: var(--spacing-xl);
   text-align: center;
   background-color: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 8px;
+  border: 1px solid var(--color-warning);
+  border-radius: var(--border-radius-md);
   color: #856404;
 }
 

@@ -185,7 +185,7 @@ export default function Calendar() {
             style={{
               marginTop: '10px',
               padding: '10px 20px',
-              background: '#007bff',
+              background: 'var(--color-primary)',
               color: 'white',
               border: 'none',
               borderRadius: '4px',

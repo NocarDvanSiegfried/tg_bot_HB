@@ -66,7 +66,7 @@ class ErrorBoundary extends Component<Props, State> {
             borderRadius: '8px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           }}>
-            <h1 style={{ fontSize: '24px', marginBottom: '20px', color: '#dc3545' }}>
+            <h1 style={{ fontSize: '24px', marginBottom: '20px', color: 'var(--color-danger)' }}>
               ⚠️ Произошла ошибка
             </h1>
             <p style={{ marginBottom: '20px', color: '#666' }}>
@@ -89,7 +89,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <pre style={{
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
-                  color: '#dc3545',
+                  color: 'var(--color-danger)',
                 }}>
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
@@ -101,7 +101,7 @@ class ErrorBoundary extends Component<Props, State> {
               style={{
                 padding: '12px 24px',
                 fontSize: '16px',
-                backgroundColor: '#007bff',
+                backgroundColor: 'var(--color-primary)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',

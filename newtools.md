@@ -1,609 +1,2771 @@
---vh: 12.7px;
-    --unread-messages-text: "Unread Messages";
-    --primary-color: #3390ec;
-    --primary-color-rgb: 51, 144, 236;
-    --light-primary-color: rgba(51, 144, 236, 0.08);
-    --light-filled-primary-color: #eef6fd;
-    --dark-primary-color: hsl(209.83783783783787, 82.95964125560539%, 52.27450980392157%);
-    --saved-color: #3390ec;
-    --light-filled-saved-color: #7cb7f2;
-    --message-out-background-color: #e3fee0;
-    --message-out-background-color-rgb: 227, 254, 224;
-    --light-message-out-background-color: rgba(227, 254, 224, 0.12);
-    --light-filled-message-out-background-color: #fbfefb;
-    --dark-message-out-background-color: hsl(114.00000000000001, 93.75000000000003%, 81.72549019607843%);
-    --message-out-primary-color: #5ca853;
-    --message-out-primary-color-rgb: 92, 168, 83;
-    --light-filled-message-out-primary-color: #d8f7d4;
-    --surface-color: #ffffff;
-    --surface-color-rgb: 255, 255, 255;
-    --danger-color: #df3f40;
-    --danger-color-rgb: 223, 63, 64;
-    --light-danger-color: rgba(223, 63, 64, 0.08);
-    --dark-danger-color: hsl(359.625, 71.42857142857143%, 48.07843137254902%);
-    --primary-text-color: #000000;
-    --primary-text-color-rgb: 0, 0, 0;
-    --secondary-text-color: #707579;
-    --secondary-text-color-rgb: 112, 117, 121;
-    --light-secondary-text-color: rgba(112, 117, 121, 0.08);
-    --light-filled-secondary-text-color: #f3f3f4;
-    --message-background-color: #ffffff;
-    --light-message-background-color: rgba(255, 255, 255, 0.08);
-    --light-filled-message-background-color: #ffffff;
-    --dark-message-background-color: hsl(0, 0%, 92%);
-    --green-color: #70b768;
-    --message-highlighting-color: hsla(86.4, 43.846153%, 45.117647%, .4);
-    --message-highlighting-color-rgb: 121, 165, 65;
-    --message-highlighting-alpha: 0.4;
-    --messages-text-size: 16px;
-    --left-column-width: 424px;
-    --peer-0-color-rgb: 204, 80, 73;
-    --peer-1-color-rgb: 214, 119, 34;
-    --peer-2-color-rgb: 149, 92, 219;
-    --peer-3-color-rgb: 64, 169, 32;
-    --peer-4-color-rgb: 48, 158, 186;
-    --peer-5-color-rgb: 54, 138, 209;
-    --peer-6-color-rgb: 199, 80, 139;
-    --peer-7-color-rgb: 225, 80, 82;
-    --peer-7-border-background: repeating-linear-gradient(-45deg, #f9ae63 0px, #f9ae63 5px, #e15052 5px, #e15052 10px);
-    --peer-8-color-rgb: 224, 128, 43;
-    --peer-8-border-background: repeating-linear-gradient(-45deg, #fac534 0px, #fac534 5px, #e0802b 5px, #e0802b 10px);
-Показать все свойства (ещё 32)
+var $e = Object.defineProperty
+  , Se = Object.defineProperties;
+var Ee = Object.getOwnPropertyDescriptors;
+var se = Object.getOwnPropertySymbols;
+var Oe = Object.prototype.hasOwnProperty
+  , ke = Object.prototype.propertyIsEnumerable;
+var ne = (r, e, t) => e in r ? $e(r, e, {
+    enumerable: !0,
+    configurable: !0,
+    writable: !0,
+    value: t
+}) : r[e] = t
+  , ie = (r, e) => {
+    for (var t in e || (e = {}))
+        Oe.call(e, t) && ne(r, t, e[t]);
+    if (se)
+        for (var t of se(e))
+            ke.call(e, t) && ne(r, t, e[t]);
+    return r
 }
-:root {
-    --folders-sidebar-item-color: #717579;
+  , ue = (r, e) => Se(r, Ee(e));
+var le = (r, e, t) => (ne(r, typeof e != "symbol" ? e + "" : e, t),
+t);
+var b = (r, e, t) => new Promise( (a, n) => {
+    var i = l => {
+        try {
+            d(t.next(l))
+        } catch (c) {
+            n(c)
+        }
+    }
+      , o = l => {
+        try {
+            d(t.throw(l))
+        } catch (c) {
+            n(c)
+        }
+    }
+      , d = l => l.done ? a(l.value) : Promise.resolve(l.value).then(i, o);
+    d((t = t.apply(r, e)).next())
 }
-:root {
-    --sidebar-collapsed-width: 80px;
-    --sidebar-max-width: 420px;
+);
+import {l as s, r as k, j as u} from "./index.b6f58f40.js";
+function Z(r) {
+    "@babel/helpers - typeof";
+    return Z = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(e) {
+        return typeof e
+    }
+    : function(e) {
+        return e && typeof Symbol == "function" && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e
+    }
+    ,
+    Z(r)
 }
-:root {
-    --body-background-color: #fff;
-    --body-background-color-rgb: 255, 255, 255;
-    --background-color-true: #f4f4f5;
-    --background-color: var(--background-color-true);
-    --border-color: #dfe1e5;
-    --scrollbar-color: rgba(0, 0, 0, .2);
-    --section-box-shadow-color: rgba(0, 0, 0, .06);
-    --menu-box-shadow-color: rgba(0, 0, 0, .15);
-    --input-search-background-color: #fff;
-    --input-search-border-color: #dfe1e5;
-    --secondary-color: #c4c9cc;
-    --warning-color: #fed85a;
-    --green-color: #3ba748;
-    --green-color-rgb: 59, 167, 72;
-    --avatar-online-color: var(--primary-color);
-    --chatlist-status-color: var(--avatar-online-color);
-    --chatlist-pinned-color: #a2abb2;
-    --badge-text-color: #fff;
-    --link-color: #00488f;
-    --ripple-color: rgba(0, 0, 0, .08);
-    --skeleton-color: rgba(0, 0, 0, .12);
-    --poll-circle-color: var(--border-color);
-    --spoiler-background-color: #e3e5e8;
-    --spoiler-draft-background-color: #d9d9d9;
-    --monospace-text-color: var(--danger-color);
-    --backdrop-opacity: .85;
-    --menu-background-color: rgba(var(--surface-color-rgb), var(--backdrop-opacity));
-    --rlottie-vector-fill: rgba(0, 0, 0, .08);
-    --limit-line-empty-background: #F1F3F5;
-    --old-input-background-color: #F1F3F5;
-    --premium-color: #9275ff;
-    --gc-background-color: #212121;
-    --gc-button-leave-color: rgba(255, 89, 90, .3);
-    --gc-button-unmuted-color: rgba(1, 200, 80, .2);
-    --gc-button-muted-color: rgba(60, 135, 247, .2);
-    --gc-button-hand-color: rgba(223, 68, 184, .2);
-    --gc-button-unmuted-fill-color: #195530;
-    --gc-button-muted-fill-color: #3C87F7;
-    --gc-green-color: #195530;
-    --gc-blue-color: #3C87F7;
-    --gc-red-color: #643333;
-    --gc-primary-text-color: #fff;
-    --gc-secondary-text-color: #aaaaaa;
-    --gc-green-text-color: #5CC85E;
-    --gc-blue-text-color: #3390ec;
-    --gc-red-text-color: #ff595a;
-    --gc-right-column-width: 26.25rem;
+function y(r, e) {
+    if (e.length < r)
+        throw new TypeError(r + " argument" + (r > 1 ? "s" : "") + " required, but only " + e.length + " present")
 }
-@media only screen and (min-width: 601px) {
-    :root {
-        --right-column-width: 420px;
-        --chat-input-size: 3.375rem;
-        --chat-input-padding: .8125rem;
-        --chat-input-inner-padding: .5rem;
+function Ne(r) {
+    return y(1, arguments),
+    r instanceof Date || Z(r) === "object" && Object.prototype.toString.call(r) === "[object Date]"
+}
+function T(r) {
+    y(1, arguments);
+    var e = Object.prototype.toString.call(r);
+    return r instanceof Date || Z(r) === "object" && e === "[object Date]" ? new Date(r.getTime()) : typeof r == "number" || e === "[object Number]" ? new Date(r) : ((typeof r == "string" || e === "[object String]") && typeof console != "undefined" && (console.warn("Starting with v2.0.0-beta.1 date-fns doesn't accept strings as date arguments. Please use `parseISO` to parse strings. See: https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#string-arguments"),
+    console.warn(new Error().stack)),
+    new Date(NaN))
+}
+function We(r) {
+    if (y(1, arguments),
+    !Ne(r) && typeof r != "number")
+        return !1;
+    var e = T(r);
+    return !isNaN(Number(e))
+}
+function B(r) {
+    if (r === null || r === !0 || r === !1)
+        return NaN;
+    var e = Number(r);
+    return isNaN(e) ? e : e < 0 ? Math.ceil(e) : Math.floor(e)
+}
+function Ie(r, e) {
+    y(2, arguments);
+    var t = T(r).getTime()
+      , a = B(e);
+    return new Date(t + a)
+}
+function je(r, e) {
+    y(2, arguments);
+    var t = B(e);
+    return Ie(r, -t)
+}
+var _e = 864e5;
+function Ae(r) {
+    y(1, arguments);
+    var e = T(r)
+      , t = e.getTime();
+    e.setUTCMonth(0, 1),
+    e.setUTCHours(0, 0, 0, 0);
+    var a = e.getTime()
+      , n = t - a;
+    return Math.floor(n / _e) + 1
+}
+function ee(r) {
+    y(1, arguments);
+    var e = 1
+      , t = T(r)
+      , a = t.getUTCDay()
+      , n = (a < e ? 7 : 0) + a - e;
+    return t.setUTCDate(t.getUTCDate() - n),
+    t.setUTCHours(0, 0, 0, 0),
+    t
+}
+function be(r) {
+    y(1, arguments);
+    var e = T(r)
+      , t = e.getUTCFullYear()
+      , a = new Date(0);
+    a.setUTCFullYear(t + 1, 0, 4),
+    a.setUTCHours(0, 0, 0, 0);
+    var n = ee(a)
+      , i = new Date(0);
+    i.setUTCFullYear(t, 0, 4),
+    i.setUTCHours(0, 0, 0, 0);
+    var o = ee(i);
+    return e.getTime() >= n.getTime() ? t + 1 : e.getTime() >= o.getTime() ? t : t - 1
+}
+function Ue(r) {
+    y(1, arguments);
+    var e = be(r)
+      , t = new Date(0);
+    t.setUTCFullYear(e, 0, 4),
+    t.setUTCHours(0, 0, 0, 0);
+    var a = ee(t);
+    return a
+}
+var Ge = 6048e5;
+function Ye(r) {
+    y(1, arguments);
+    var e = T(r)
+      , t = ee(e).getTime() - Ue(e).getTime();
+    return Math.round(t / Ge) + 1
+}
+var Re = {};
+function te() {
+    return Re
+}
+function H(r, e) {
+    var t, a, n, i, o, d, l, c;
+    y(1, arguments);
+    var p = te()
+      , f = B((t = (a = (n = (i = e == null ? void 0 : e.weekStartsOn) !== null && i !== void 0 ? i : e == null || (o = e.locale) === null || o === void 0 || (d = o.options) === null || d === void 0 ? void 0 : d.weekStartsOn) !== null && n !== void 0 ? n : p.weekStartsOn) !== null && a !== void 0 ? a : (l = p.locale) === null || l === void 0 || (c = l.options) === null || c === void 0 ? void 0 : c.weekStartsOn) !== null && t !== void 0 ? t : 0);
+    if (!(f >= 0 && f <= 6))
+        throw new RangeError("weekStartsOn must be between 0 and 6 inclusively");
+    var h = T(r)
+      , g = h.getUTCDay()
+      , P = (g < f ? 7 : 0) + g - f;
+    return h.setUTCDate(h.getUTCDate() - P),
+    h.setUTCHours(0, 0, 0, 0),
+    h
+}
+function Pe(r, e) {
+    var t, a, n, i, o, d, l, c;
+    y(1, arguments);
+    var p = T(r)
+      , f = p.getUTCFullYear()
+      , h = te()
+      , g = B((t = (a = (n = (i = e == null ? void 0 : e.firstWeekContainsDate) !== null && i !== void 0 ? i : e == null || (o = e.locale) === null || o === void 0 || (d = o.options) === null || d === void 0 ? void 0 : d.firstWeekContainsDate) !== null && n !== void 0 ? n : h.firstWeekContainsDate) !== null && a !== void 0 ? a : (l = h.locale) === null || l === void 0 || (c = l.options) === null || c === void 0 ? void 0 : c.firstWeekContainsDate) !== null && t !== void 0 ? t : 1);
+    if (!(g >= 1 && g <= 7))
+        throw new RangeError("firstWeekContainsDate must be between 1 and 7 inclusively");
+    var P = new Date(0);
+    P.setUTCFullYear(f + 1, 0, g),
+    P.setUTCHours(0, 0, 0, 0);
+    var F = H(P, e)
+      , N = new Date(0);
+    N.setUTCFullYear(f, 0, g),
+    N.setUTCHours(0, 0, 0, 0);
+    var U = H(N, e);
+    return p.getTime() >= F.getTime() ? f + 1 : p.getTime() >= U.getTime() ? f : f - 1
+}
+function Be(r, e) {
+    var t, a, n, i, o, d, l, c;
+    y(1, arguments);
+    var p = te()
+      , f = B((t = (a = (n = (i = e == null ? void 0 : e.firstWeekContainsDate) !== null && i !== void 0 ? i : e == null || (o = e.locale) === null || o === void 0 || (d = o.options) === null || d === void 0 ? void 0 : d.firstWeekContainsDate) !== null && n !== void 0 ? n : p.firstWeekContainsDate) !== null && a !== void 0 ? a : (l = p.locale) === null || l === void 0 || (c = l.options) === null || c === void 0 ? void 0 : c.firstWeekContainsDate) !== null && t !== void 0 ? t : 1)
+      , h = Pe(r, e)
+      , g = new Date(0);
+    g.setUTCFullYear(h, 0, f),
+    g.setUTCHours(0, 0, 0, 0);
+    var P = H(g, e);
+    return P
+}
+var Fe = 6048e5;
+function Le(r, e) {
+    y(1, arguments);
+    var t = T(r)
+      , a = H(t, e).getTime() - Be(t, e).getTime();
+    return Math.round(a / Fe) + 1
+}
+function v(r, e) {
+    for (var t = r < 0 ? "-" : "", a = Math.abs(r).toString(); a.length < e; )
+        a = "0" + a;
+    return t + a
+}
+var qe = {
+    y: function(e, t) {
+        var a = e.getUTCFullYear()
+          , n = a > 0 ? a : 1 - a;
+        return v(t === "yy" ? n % 100 : n, t.length)
+    },
+    M: function(e, t) {
+        var a = e.getUTCMonth();
+        return t === "M" ? String(a + 1) : v(a + 1, 2)
+    },
+    d: function(e, t) {
+        return v(e.getUTCDate(), t.length)
+    },
+    a: function(e, t) {
+        var a = e.getUTCHours() / 12 >= 1 ? "pm" : "am";
+        switch (t) {
+        case "a":
+        case "aa":
+            return a.toUpperCase();
+        case "aaa":
+            return a;
+        case "aaaaa":
+            return a[0];
+        case "aaaa":
+        default:
+            return a === "am" ? "a.m." : "p.m."
+        }
+    },
+    h: function(e, t) {
+        return v(e.getUTCHours() % 12 || 12, t.length)
+    },
+    H: function(e, t) {
+        return v(e.getUTCHours(), t.length)
+    },
+    m: function(e, t) {
+        return v(e.getUTCMinutes(), t.length)
+    },
+    s: function(e, t) {
+        return v(e.getUTCSeconds(), t.length)
+    },
+    S: function(e, t) {
+        var a = t.length
+          , n = e.getUTCMilliseconds()
+          , i = Math.floor(n * Math.pow(10, a - 3));
+        return v(i, t.length)
+    }
+};
+const _ = qe;
+var L = {
+    am: "am",
+    pm: "pm",
+    midnight: "midnight",
+    noon: "noon",
+    morning: "morning",
+    afternoon: "afternoon",
+    evening: "evening",
+    night: "night"
+}
+  , He = {
+    G: function(e, t, a) {
+        var n = e.getUTCFullYear() > 0 ? 1 : 0;
+        switch (t) {
+        case "G":
+        case "GG":
+        case "GGG":
+            return a.era(n, {
+                width: "abbreviated"
+            });
+        case "GGGGG":
+            return a.era(n, {
+                width: "narrow"
+            });
+        case "GGGG":
+        default:
+            return a.era(n, {
+                width: "wide"
+            })
+        }
+    },
+    y: function(e, t, a) {
+        if (t === "yo") {
+            var n = e.getUTCFullYear()
+              , i = n > 0 ? n : 1 - n;
+            return a.ordinalNumber(i, {
+                unit: "year"
+            })
+        }
+        return _.y(e, t)
+    },
+    Y: function(e, t, a, n) {
+        var i = Pe(e, n)
+          , o = i > 0 ? i : 1 - i;
+        if (t === "YY") {
+            var d = o % 100;
+            return v(d, 2)
+        }
+        return t === "Yo" ? a.ordinalNumber(o, {
+            unit: "year"
+        }) : v(o, t.length)
+    },
+    R: function(e, t) {
+        var a = be(e);
+        return v(a, t.length)
+    },
+    u: function(e, t) {
+        var a = e.getUTCFullYear();
+        return v(a, t.length)
+    },
+    Q: function(e, t, a) {
+        var n = Math.ceil((e.getUTCMonth() + 1) / 3);
+        switch (t) {
+        case "Q":
+            return String(n);
+        case "QQ":
+            return v(n, 2);
+        case "Qo":
+            return a.ordinalNumber(n, {
+                unit: "quarter"
+            });
+        case "QQQ":
+            return a.quarter(n, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "QQQQQ":
+            return a.quarter(n, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "QQQQ":
+        default:
+            return a.quarter(n, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    q: function(e, t, a) {
+        var n = Math.ceil((e.getUTCMonth() + 1) / 3);
+        switch (t) {
+        case "q":
+            return String(n);
+        case "qq":
+            return v(n, 2);
+        case "qo":
+            return a.ordinalNumber(n, {
+                unit: "quarter"
+            });
+        case "qqq":
+            return a.quarter(n, {
+                width: "abbreviated",
+                context: "standalone"
+            });
+        case "qqqqq":
+            return a.quarter(n, {
+                width: "narrow",
+                context: "standalone"
+            });
+        case "qqqq":
+        default:
+            return a.quarter(n, {
+                width: "wide",
+                context: "standalone"
+            })
+        }
+    },
+    M: function(e, t, a) {
+        var n = e.getUTCMonth();
+        switch (t) {
+        case "M":
+        case "MM":
+            return _.M(e, t);
+        case "Mo":
+            return a.ordinalNumber(n + 1, {
+                unit: "month"
+            });
+        case "MMM":
+            return a.month(n, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "MMMMM":
+            return a.month(n, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "MMMM":
+        default:
+            return a.month(n, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    L: function(e, t, a) {
+        var n = e.getUTCMonth();
+        switch (t) {
+        case "L":
+            return String(n + 1);
+        case "LL":
+            return v(n + 1, 2);
+        case "Lo":
+            return a.ordinalNumber(n + 1, {
+                unit: "month"
+            });
+        case "LLL":
+            return a.month(n, {
+                width: "abbreviated",
+                context: "standalone"
+            });
+        case "LLLLL":
+            return a.month(n, {
+                width: "narrow",
+                context: "standalone"
+            });
+        case "LLLL":
+        default:
+            return a.month(n, {
+                width: "wide",
+                context: "standalone"
+            })
+        }
+    },
+    w: function(e, t, a, n) {
+        var i = Le(e, n);
+        return t === "wo" ? a.ordinalNumber(i, {
+            unit: "week"
+        }) : v(i, t.length)
+    },
+    I: function(e, t, a) {
+        var n = Ye(e);
+        return t === "Io" ? a.ordinalNumber(n, {
+            unit: "week"
+        }) : v(n, t.length)
+    },
+    d: function(e, t, a) {
+        return t === "do" ? a.ordinalNumber(e.getUTCDate(), {
+            unit: "date"
+        }) : _.d(e, t)
+    },
+    D: function(e, t, a) {
+        var n = Ae(e);
+        return t === "Do" ? a.ordinalNumber(n, {
+            unit: "dayOfYear"
+        }) : v(n, t.length)
+    },
+    E: function(e, t, a) {
+        var n = e.getUTCDay();
+        switch (t) {
+        case "E":
+        case "EE":
+        case "EEE":
+            return a.day(n, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "EEEEE":
+            return a.day(n, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "EEEEEE":
+            return a.day(n, {
+                width: "short",
+                context: "formatting"
+            });
+        case "EEEE":
+        default:
+            return a.day(n, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    e: function(e, t, a, n) {
+        var i = e.getUTCDay()
+          , o = (i - n.weekStartsOn + 8) % 7 || 7;
+        switch (t) {
+        case "e":
+            return String(o);
+        case "ee":
+            return v(o, 2);
+        case "eo":
+            return a.ordinalNumber(o, {
+                unit: "day"
+            });
+        case "eee":
+            return a.day(i, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "eeeee":
+            return a.day(i, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "eeeeee":
+            return a.day(i, {
+                width: "short",
+                context: "formatting"
+            });
+        case "eeee":
+        default:
+            return a.day(i, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    c: function(e, t, a, n) {
+        var i = e.getUTCDay()
+          , o = (i - n.weekStartsOn + 8) % 7 || 7;
+        switch (t) {
+        case "c":
+            return String(o);
+        case "cc":
+            return v(o, t.length);
+        case "co":
+            return a.ordinalNumber(o, {
+                unit: "day"
+            });
+        case "ccc":
+            return a.day(i, {
+                width: "abbreviated",
+                context: "standalone"
+            });
+        case "ccccc":
+            return a.day(i, {
+                width: "narrow",
+                context: "standalone"
+            });
+        case "cccccc":
+            return a.day(i, {
+                width: "short",
+                context: "standalone"
+            });
+        case "cccc":
+        default:
+            return a.day(i, {
+                width: "wide",
+                context: "standalone"
+            })
+        }
+    },
+    i: function(e, t, a) {
+        var n = e.getUTCDay()
+          , i = n === 0 ? 7 : n;
+        switch (t) {
+        case "i":
+            return String(i);
+        case "ii":
+            return v(i, t.length);
+        case "io":
+            return a.ordinalNumber(i, {
+                unit: "day"
+            });
+        case "iii":
+            return a.day(n, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "iiiii":
+            return a.day(n, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "iiiiii":
+            return a.day(n, {
+                width: "short",
+                context: "formatting"
+            });
+        case "iiii":
+        default:
+            return a.day(n, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    a: function(e, t, a) {
+        var n = e.getUTCHours()
+          , i = n / 12 >= 1 ? "pm" : "am";
+        switch (t) {
+        case "a":
+        case "aa":
+            return a.dayPeriod(i, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "aaa":
+            return a.dayPeriod(i, {
+                width: "abbreviated",
+                context: "formatting"
+            }).toLowerCase();
+        case "aaaaa":
+            return a.dayPeriod(i, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "aaaa":
+        default:
+            return a.dayPeriod(i, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    b: function(e, t, a) {
+        var n = e.getUTCHours(), i;
+        switch (n === 12 ? i = L.noon : n === 0 ? i = L.midnight : i = n / 12 >= 1 ? "pm" : "am",
+        t) {
+        case "b":
+        case "bb":
+            return a.dayPeriod(i, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "bbb":
+            return a.dayPeriod(i, {
+                width: "abbreviated",
+                context: "formatting"
+            }).toLowerCase();
+        case "bbbbb":
+            return a.dayPeriod(i, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "bbbb":
+        default:
+            return a.dayPeriod(i, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    B: function(e, t, a) {
+        var n = e.getUTCHours(), i;
+        switch (n >= 17 ? i = L.evening : n >= 12 ? i = L.afternoon : n >= 4 ? i = L.morning : i = L.night,
+        t) {
+        case "B":
+        case "BB":
+        case "BBB":
+            return a.dayPeriod(i, {
+                width: "abbreviated",
+                context: "formatting"
+            });
+        case "BBBBB":
+            return a.dayPeriod(i, {
+                width: "narrow",
+                context: "formatting"
+            });
+        case "BBBB":
+        default:
+            return a.dayPeriod(i, {
+                width: "wide",
+                context: "formatting"
+            })
+        }
+    },
+    h: function(e, t, a) {
+        if (t === "ho") {
+            var n = e.getUTCHours() % 12;
+            return n === 0 && (n = 12),
+            a.ordinalNumber(n, {
+                unit: "hour"
+            })
+        }
+        return _.h(e, t)
+    },
+    H: function(e, t, a) {
+        return t === "Ho" ? a.ordinalNumber(e.getUTCHours(), {
+            unit: "hour"
+        }) : _.H(e, t)
+    },
+    K: function(e, t, a) {
+        var n = e.getUTCHours() % 12;
+        return t === "Ko" ? a.ordinalNumber(n, {
+            unit: "hour"
+        }) : v(n, t.length)
+    },
+    k: function(e, t, a) {
+        var n = e.getUTCHours();
+        return n === 0 && (n = 24),
+        t === "ko" ? a.ordinalNumber(n, {
+            unit: "hour"
+        }) : v(n, t.length)
+    },
+    m: function(e, t, a) {
+        return t === "mo" ? a.ordinalNumber(e.getUTCMinutes(), {
+            unit: "minute"
+        }) : _.m(e, t)
+    },
+    s: function(e, t, a) {
+        return t === "so" ? a.ordinalNumber(e.getUTCSeconds(), {
+            unit: "second"
+        }) : _.s(e, t)
+    },
+    S: function(e, t) {
+        return _.S(e, t)
+    },
+    X: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = i.getTimezoneOffset();
+        if (o === 0)
+            return "Z";
+        switch (t) {
+        case "X":
+            return ce(o);
+        case "XXXX":
+        case "XX":
+            return R(o);
+        case "XXXXX":
+        case "XXX":
+        default:
+            return R(o, ":")
+        }
+    },
+    x: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = i.getTimezoneOffset();
+        switch (t) {
+        case "x":
+            return ce(o);
+        case "xxxx":
+        case "xx":
+            return R(o);
+        case "xxxxx":
+        case "xxx":
+        default:
+            return R(o, ":")
+        }
+    },
+    O: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = i.getTimezoneOffset();
+        switch (t) {
+        case "O":
+        case "OO":
+        case "OOO":
+            return "GMT" + de(o, ":");
+        case "OOOO":
+        default:
+            return "GMT" + R(o, ":")
+        }
+    },
+    z: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = i.getTimezoneOffset();
+        switch (t) {
+        case "z":
+        case "zz":
+        case "zzz":
+            return "GMT" + de(o, ":");
+        case "zzzz":
+        default:
+            return "GMT" + R(o, ":")
+        }
+    },
+    t: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = Math.floor(i.getTime() / 1e3);
+        return v(o, t.length)
+    },
+    T: function(e, t, a, n) {
+        var i = n._originalDate || e
+          , o = i.getTime();
+        return v(o, t.length)
+    }
+};
+function de(r, e) {
+    var t = r > 0 ? "-" : "+"
+      , a = Math.abs(r)
+      , n = Math.floor(a / 60)
+      , i = a % 60;
+    if (i === 0)
+        return t + String(n);
+    var o = e || "";
+    return t + String(n) + o + v(i, 2)
+}
+function ce(r, e) {
+    if (r % 60 === 0) {
+        var t = r > 0 ? "-" : "+";
+        return t + v(Math.abs(r) / 60, 2)
+    }
+    return R(r, e)
+}
+function R(r, e) {
+    var t = e || ""
+      , a = r > 0 ? "-" : "+"
+      , n = Math.abs(r)
+      , i = v(Math.floor(n / 60), 2)
+      , o = v(n % 60, 2);
+    return a + i + t + o
+}
+const Xe = He;
+var fe = function(e, t) {
+    switch (e) {
+    case "P":
+        return t.date({
+            width: "short"
+        });
+    case "PP":
+        return t.date({
+            width: "medium"
+        });
+    case "PPP":
+        return t.date({
+            width: "long"
+        });
+    case "PPPP":
+    default:
+        return t.date({
+            width: "full"
+        })
     }
 }
-@media only screen and (max-width: 925px) {
-    :root {
-        --ripple-duration: .4s;
-        --ripple-start-scale: .27;
+  , Te = function(e, t) {
+    switch (e) {
+    case "p":
+        return t.time({
+            width: "short"
+        });
+    case "pp":
+        return t.time({
+            width: "medium"
+        });
+    case "ppp":
+        return t.time({
+            width: "long"
+        });
+    case "pppp":
+    default:
+        return t.time({
+            width: "full"
+        })
     }
 }
-:root {
-    --vh: 1vh;
-    --z-below: -1;
-    --hover-alpha: .08;
-    --reflect: 1;
-    --transition-standard-easing: cubic-bezier(.4, 0, .2, 1);
-    --transition-standard-in-time: .3s;
-    --transition-standard-out-time: .25s;
-    --transition-standard-in: var(--transition-standard-in-time) var(--transition-standard-easing);
-    --transition-standard-out: var(--transition-standard-out-time) var(--transition-standard-easing);
-    --transform-origin-inline-start: left;
-    --transform-origin-inline-end: right;
-    --transform-origin-left-center: left center;
-    --transform-origin-right-center: right center;
-    --pm-transition: .2s ease-in-out;
-    --layer-transition: .2s cubic-bezier(.4, 0, .2, 1);
-    --slide-header-transition: .4s ease-in-out;
-    --tabs-transition: .2s ease-in-out;
-    --btn-menu-transition: .2s cubic-bezier(.4, 0, .2, 1);
-    --esg-transition: var(--btn-menu-transition);
-    --input-transition: .2s ease-out;
-    --input-placeholder-transition: .15s ease-out;
-    --reaction-paid-transition: .2s ease-in-out;
-    --sticker-viewer-open-transition-in: .2s var(--transition-standard-easing);
-    --sticker-viewer-open-transition-out: .2s var(--transition-standard-easing);
-    --sticker-viewer-switch-transition: .2s cubic-bezier(.12, 1.1, .56, 1.2);
-    --popup-transition-function: cubic-bezier(.4, 0, .2, 1);
-    --popup-transition-time: .15s;
-    --popup-transition: var(--popup-transition-time) var(--popup-transition-function);
-    --btn-corner-transition: .2s cubic-bezier(.34, 1.56, .64, 1);
-    --chatlist-badge-transition-in: .25s cubic-bezier(.35, .35, .47, 1.34);
-    --chatlist-badge-transition-out: .25s cubic-bezier(.35, .35, .7, 1);
-    --message-handhelds-margin: 5.5625rem;
-    --message-beside-button-size: 2.375rem;
-    --message-beside-button-margin: calc((var(--message-beside-button-size) + .5rem) * -1);
-    --message-time-background: rgba(0, 0, 0, .35);
-    --messages-container-width: 728px;
-    --messages-text-size: 16px;
-    --messages-line-height: 1.3125;
-    --messages-secondary-text-size: calc(var(--messages-text-size) - 2px);
-    --messages-secondary-line-height: calc(var(--messages-secondary-text-size) + 4px);
-    --messages-time-text-size: calc(var(--messages-text-size) - 4px);
-    --messages-service-text-size: calc(var(--messages-text-size) - 1px);
-    --messages-custom-emoji-size: calc(var(--messages-text-size) + 4px);
-    --bubble-transition-in: transform var(--transition-standard-in), opacity var(--transition-standard-in);
-    --bubble-transition-out: transform var(--transition-standard-out), opacity var(--transition-standard-out);
-    --line-height-24: 30px;
-    --line-height-20: 26px;
-    --line-height-18: 24px;
-    --line-height-16: 21px;
-    --line-height-15: 20px;
-Показать все свойства (ещё 78)
+  , Ve = function(e, t) {
+    var a = e.match(/(P+)(p+)?/) || []
+      , n = a[1]
+      , i = a[2];
+    if (!i)
+        return fe(e, t);
+    var o;
+    switch (n) {
+    case "P":
+        o = t.dateTime({
+            width: "short"
+        });
+        break;
+    case "PP":
+        o = t.dateTime({
+            width: "medium"
+        });
+        break;
+    case "PPP":
+        o = t.dateTime({
+            width: "long"
+        });
+        break;
+    case "PPPP":
+    default:
+        o = t.dateTime({
+            width: "full"
+        });
+        break
+    }
+    return o.replace("{{date}}", fe(n, t)).replace("{{time}}", Te(i, t))
 }
-button, input, optgroup, select, textarea, html {
-    font-family: var(--font-regular);
+  , Qe = {
+    p: Te,
+    P: Ve
+};
+const Je = Qe;
+function ze(r) {
+    var e = new Date(Date.UTC(r.getFullYear(), r.getMonth(), r.getDate(), r.getHours(), r.getMinutes(), r.getSeconds(), r.getMilliseconds()));
+    return e.setUTCFullYear(r.getFullYear()),
+    r.getTime() - e.getTime()
 }
-html {
+var Ke = ["D", "DD"]
+  , Ze = ["YY", "YYYY"];
+function et(r) {
+    return Ke.indexOf(r) !== -1
+}
+function tt(r) {
+    return Ze.indexOf(r) !== -1
+}
+function he(r, e, t) {
+    if (r === "YYYY")
+        throw new RangeError("Use `yyyy` instead of `YYYY` (in `".concat(e, "`) for formatting years to the input `").concat(t, "`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md"));
+    if (r === "YY")
+        throw new RangeError("Use `yy` instead of `YY` (in `".concat(e, "`) for formatting years to the input `").concat(t, "`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md"));
+    if (r === "D")
+        throw new RangeError("Use `d` instead of `D` (in `".concat(e, "`) for formatting days of the month to the input `").concat(t, "`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md"));
+    if (r === "DD")
+        throw new RangeError("Use `dd` instead of `DD` (in `".concat(e, "`) for formatting days of the month to the input `").concat(t, "`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md"))
+}
+var rt = {
+    lessThanXSeconds: {
+        one: "less than a second",
+        other: "less than {{count}} seconds"
+    },
+    xSeconds: {
+        one: "1 second",
+        other: "{{count}} seconds"
+    },
+    halfAMinute: "half a minute",
+    lessThanXMinutes: {
+        one: "less than a minute",
+        other: "less than {{count}} minutes"
+    },
+    xMinutes: {
+        one: "1 minute",
+        other: "{{count}} minutes"
+    },
+    aboutXHours: {
+        one: "about 1 hour",
+        other: "about {{count}} hours"
+    },
+    xHours: {
+        one: "1 hour",
+        other: "{{count}} hours"
+    },
+    xDays: {
+        one: "1 day",
+        other: "{{count}} days"
+    },
+    aboutXWeeks: {
+        one: "about 1 week",
+        other: "about {{count}} weeks"
+    },
+    xWeeks: {
+        one: "1 week",
+        other: "{{count}} weeks"
+    },
+    aboutXMonths: {
+        one: "about 1 month",
+        other: "about {{count}} months"
+    },
+    xMonths: {
+        one: "1 month",
+        other: "{{count}} months"
+    },
+    aboutXYears: {
+        one: "about 1 year",
+        other: "about {{count}} years"
+    },
+    xYears: {
+        one: "1 year",
+        other: "{{count}} years"
+    },
+    overXYears: {
+        one: "over 1 year",
+        other: "over {{count}} years"
+    },
+    almostXYears: {
+        one: "almost 1 year",
+        other: "almost {{count}} years"
+    }
+}
+  , at = function(e, t, a) {
+    var n, i = rt[e];
+    return typeof i == "string" ? n = i : t === 1 ? n = i.one : n = i.other.replace("{{count}}", t.toString()),
+    a != null && a.addSuffix ? a.comparison && a.comparison > 0 ? "in " + n : n + " ago" : n
+};
+const nt = at;
+function q(r) {
+    return function() {
+        var e = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {}
+          , t = e.width ? String(e.width) : r.defaultWidth
+          , a = r.formats[t] || r.formats[r.defaultWidth];
+        return a
+    }
+}
+var it = {
+    full: "EEEE, MMMM do, y",
+    long: "MMMM do, y",
+    medium: "MMM d, y",
+    short: "MM/dd/yyyy"
+}
+  , ot = {
+    full: "h:mm:ss a zzzz",
+    long: "h:mm:ss a z",
+    medium: "h:mm:ss a",
+    short: "h:mm a"
+}
+  , st = {
+    full: "{{date}} 'at' {{time}}",
+    long: "{{date}} 'at' {{time}}",
+    medium: "{{date}}, {{time}}",
+    short: "{{date}}, {{time}}"
+}
+  , ut = {
+    date: q({
+        formats: it,
+        defaultWidth: "full"
+    }),
+    time: q({
+        formats: ot,
+        defaultWidth: "full"
+    }),
+    dateTime: q({
+        formats: st,
+        defaultWidth: "full"
+    })
+};
+const lt = ut;
+var dt = {
+    lastWeek: "'last' eeee 'at' p",
+    yesterday: "'yesterday at' p",
+    today: "'today at' p",
+    tomorrow: "'tomorrow at' p",
+    nextWeek: "eeee 'at' p",
+    other: "P"
+}
+  , ct = function(e, t, a, n) {
+    return dt[e]
+};
+const ft = ct;
+function W(r) {
+    return function(e, t) {
+        var a = t != null && t.context ? String(t.context) : "standalone", n;
+        if (a === "formatting" && r.formattingValues) {
+            var i = r.defaultFormattingWidth || r.defaultWidth
+              , o = t != null && t.width ? String(t.width) : i;
+            n = r.formattingValues[o] || r.formattingValues[i]
+        } else {
+            var d = r.defaultWidth
+              , l = t != null && t.width ? String(t.width) : r.defaultWidth;
+            n = r.values[l] || r.values[d]
+        }
+        var c = r.argumentCallback ? r.argumentCallback(e) : e;
+        return n[c]
+    }
+}
+var ht = {
+    narrow: ["B", "A"],
+    abbreviated: ["BC", "AD"],
+    wide: ["Before Christ", "Anno Domini"]
+}
+  , mt = {
+    narrow: ["1", "2", "3", "4"],
+    abbreviated: ["Q1", "Q2", "Q3", "Q4"],
+    wide: ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"]
+}
+  , vt = {
+    narrow: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+    abbreviated: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    wide: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+}
+  , gt = {
+    narrow: ["S", "M", "T", "W", "T", "F", "S"],
+    short: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    abbreviated: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    wide: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+}
+  , yt = {
+    narrow: {
+        am: "a",
+        pm: "p",
+        midnight: "mi",
+        noon: "n",
+        morning: "morning",
+        afternoon: "afternoon",
+        evening: "evening",
+        night: "night"
+    },
+    abbreviated: {
+        am: "AM",
+        pm: "PM",
+        midnight: "midnight",
+        noon: "noon",
+        morning: "morning",
+        afternoon: "afternoon",
+        evening: "evening",
+        night: "night"
+    },
+    wide: {
+        am: "a.m.",
+        pm: "p.m.",
+        midnight: "midnight",
+        noon: "noon",
+        morning: "morning",
+        afternoon: "afternoon",
+        evening: "evening",
+        night: "night"
+    }
+}
+  , pt = {
+    narrow: {
+        am: "a",
+        pm: "p",
+        midnight: "mi",
+        noon: "n",
+        morning: "in the morning",
+        afternoon: "in the afternoon",
+        evening: "in the evening",
+        night: "at night"
+    },
+    abbreviated: {
+        am: "AM",
+        pm: "PM",
+        midnight: "midnight",
+        noon: "noon",
+        morning: "in the morning",
+        afternoon: "in the afternoon",
+        evening: "in the evening",
+        night: "at night"
+    },
+    wide: {
+        am: "a.m.",
+        pm: "p.m.",
+        midnight: "midnight",
+        noon: "noon",
+        morning: "in the morning",
+        afternoon: "in the afternoon",
+        evening: "in the evening",
+        night: "at night"
+    }
+}
+  , wt = function(e, t) {
+    var a = Number(e)
+      , n = a % 100;
+    if (n > 20 || n < 10)
+        switch (n % 10) {
+        case 1:
+            return a + "st";
+        case 2:
+            return a + "nd";
+        case 3:
+            return a + "rd"
+        }
+    return a + "th"
+}
+  , bt = {
+    ordinalNumber: wt,
+    era: W({
+        values: ht,
+        defaultWidth: "wide"
+    }),
+    quarter: W({
+        values: mt,
+        defaultWidth: "wide",
+        argumentCallback: function(e) {
+            return e - 1
+        }
+    }),
+    month: W({
+        values: vt,
+        defaultWidth: "wide"
+    }),
+    day: W({
+        values: gt,
+        defaultWidth: "wide"
+    }),
+    dayPeriod: W({
+        values: yt,
+        defaultWidth: "wide",
+        formattingValues: pt,
+        defaultFormattingWidth: "wide"
+    })
+};
+const Pt = bt;
+function I(r) {
+    return function(e) {
+        var t = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}
+          , a = t.width
+          , n = a && r.matchPatterns[a] || r.matchPatterns[r.defaultMatchWidth]
+          , i = e.match(n);
+        if (!i)
+            return null;
+        var o = i[0], d = a && r.parsePatterns[a] || r.parsePatterns[r.defaultParseWidth], l = Array.isArray(d) ? Dt(d, function(f) {
+            return f.test(o)
+        }) : Tt(d, function(f) {
+            return f.test(o)
+        }), c;
+        c = r.valueCallback ? r.valueCallback(l) : l,
+        c = t.valueCallback ? t.valueCallback(c) : c;
+        var p = e.slice(o.length);
+        return {
+            value: c,
+            rest: p
+        }
+    }
+}
+function Tt(r, e) {
+    for (var t in r)
+        if (r.hasOwnProperty(t) && e(r[t]))
+            return t
+}
+function Dt(r, e) {
+    for (var t = 0; t < r.length; t++)
+        if (e(r[t]))
+            return t
+}
+function De(r) {
+    return function(e) {
+        var t = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}
+          , a = e.match(r.matchPattern);
+        if (!a)
+            return null;
+        var n = a[0]
+          , i = e.match(r.parsePattern);
+        if (!i)
+            return null;
+        var o = r.valueCallback ? r.valueCallback(i[0]) : i[0];
+        o = t.valueCallback ? t.valueCallback(o) : o;
+        var d = e.slice(n.length);
+        return {
+            value: o,
+            rest: d
+        }
+    }
+}
+var Ct = /^(\d+)(th|st|nd|rd)?/i
+  , Mt = /\d+/i
+  , xt = {
+    narrow: /^(b|a)/i,
+    abbreviated: /^(b\.?\s?c\.?|b\.?\s?c\.?\s?e\.?|a\.?\s?d\.?|c\.?\s?e\.?)/i,
+    wide: /^(before christ|before common era|anno domini|common era)/i
+}
+  , $t = {
+    any: [/^b/i, /^(a|c)/i]
+}
+  , St = {
+    narrow: /^[1234]/i,
+    abbreviated: /^q[1234]/i,
+    wide: /^[1234](th|st|nd|rd)? quarter/i
+}
+  , Et = {
+    any: [/1/i, /2/i, /3/i, /4/i]
+}
+  , Ot = {
+    narrow: /^[jfmasond]/i,
+    abbreviated: /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i,
+    wide: /^(january|february|march|april|may|june|july|august|september|october|november|december)/i
+}
+  , kt = {
+    narrow: [/^j/i, /^f/i, /^m/i, /^a/i, /^m/i, /^j/i, /^j/i, /^a/i, /^s/i, /^o/i, /^n/i, /^d/i],
+    any: [/^ja/i, /^f/i, /^mar/i, /^ap/i, /^may/i, /^jun/i, /^jul/i, /^au/i, /^s/i, /^o/i, /^n/i, /^d/i]
+}
+  , Nt = {
+    narrow: /^[smtwf]/i,
+    short: /^(su|mo|tu|we|th|fr|sa)/i,
+    abbreviated: /^(sun|mon|tue|wed|thu|fri|sat)/i,
+    wide: /^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)/i
+}
+  , Wt = {
+    narrow: [/^s/i, /^m/i, /^t/i, /^w/i, /^t/i, /^f/i, /^s/i],
+    any: [/^su/i, /^m/i, /^tu/i, /^w/i, /^th/i, /^f/i, /^sa/i]
+}
+  , It = {
+    narrow: /^(a|p|mi|n|(in the|at) (morning|afternoon|evening|night))/i,
+    any: /^([ap]\.?\s?m\.?|midnight|noon|(in the|at) (morning|afternoon|evening|night))/i
+}
+  , jt = {
+    any: {
+        am: /^a/i,
+        pm: /^p/i,
+        midnight: /^mi/i,
+        noon: /^no/i,
+        morning: /morning/i,
+        afternoon: /afternoon/i,
+        evening: /evening/i,
+        night: /night/i
+    }
+}
+  , _t = {
+    ordinalNumber: De({
+        matchPattern: Ct,
+        parsePattern: Mt,
+        valueCallback: function(e) {
+            return parseInt(e, 10)
+        }
+    }),
+    era: I({
+        matchPatterns: xt,
+        defaultMatchWidth: "wide",
+        parsePatterns: $t,
+        defaultParseWidth: "any"
+    }),
+    quarter: I({
+        matchPatterns: St,
+        defaultMatchWidth: "wide",
+        parsePatterns: Et,
+        defaultParseWidth: "any",
+        valueCallback: function(e) {
+            return e + 1
+        }
+    }),
+    month: I({
+        matchPatterns: Ot,
+        defaultMatchWidth: "wide",
+        parsePatterns: kt,
+        defaultParseWidth: "any"
+    }),
+    day: I({
+        matchPatterns: Nt,
+        defaultMatchWidth: "wide",
+        parsePatterns: Wt,
+        defaultParseWidth: "any"
+    }),
+    dayPeriod: I({
+        matchPatterns: It,
+        defaultMatchWidth: "any",
+        parsePatterns: jt,
+        defaultParseWidth: "any"
+    })
+};
+const At = _t;
+var Ut = {
+    code: "en-US",
+    formatDistance: nt,
+    formatLong: lt,
+    formatRelative: ft,
+    localize: Pt,
+    match: At,
+    options: {
+        weekStartsOn: 0,
+        firstWeekContainsDate: 1
+    }
+};
+const Gt = Ut;
+var Yt = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g
+  , Rt = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g
+  , Bt = /^'([^]*?)'?$/
+  , Ft = /''/g
+  , Lt = /[a-zA-Z]/;
+function A(r, e, t) {
+    var a, n, i, o, d, l, c, p, f, h, g, P, F, N, U, X, V, Q;
+    y(2, arguments);
+    var re = String(e)
+      , G = te()
+      , m = (a = (n = t == null ? void 0 : t.locale) !== null && n !== void 0 ? n : G.locale) !== null && a !== void 0 ? a : Gt
+      , w = B((i = (o = (d = (l = t == null ? void 0 : t.firstWeekContainsDate) !== null && l !== void 0 ? l : t == null || (c = t.locale) === null || c === void 0 || (p = c.options) === null || p === void 0 ? void 0 : p.firstWeekContainsDate) !== null && d !== void 0 ? d : G.firstWeekContainsDate) !== null && o !== void 0 ? o : (f = G.locale) === null || f === void 0 || (h = f.options) === null || h === void 0 ? void 0 : h.firstWeekContainsDate) !== null && i !== void 0 ? i : 1);
+    if (!(w >= 1 && w <= 7))
+        throw new RangeError("firstWeekContainsDate must be between 1 and 7 inclusively");
+    var S = B((g = (P = (F = (N = t == null ? void 0 : t.weekStartsOn) !== null && N !== void 0 ? N : t == null || (U = t.locale) === null || U === void 0 || (X = U.options) === null || X === void 0 ? void 0 : X.weekStartsOn) !== null && F !== void 0 ? F : G.weekStartsOn) !== null && P !== void 0 ? P : (V = G.locale) === null || V === void 0 || (Q = V.options) === null || Q === void 0 ? void 0 : Q.weekStartsOn) !== null && g !== void 0 ? g : 0);
+    if (!(S >= 0 && S <= 6))
+        throw new RangeError("weekStartsOn must be between 0 and 6 inclusively");
+    if (!m.localize)
+        throw new RangeError("locale must contain localize property");
+    if (!m.formatLong)
+        throw new RangeError("locale must contain formatLong property");
+    var O = T(r);
+    if (!We(O))
+        throw new RangeError("Invalid time value");
+    var ae = ze(O)
+      , Ce = je(O, ae)
+      , Me = {
+        firstWeekContainsDate: w,
+        weekStartsOn: S,
+        locale: m,
+        _originalDate: O
+    }
+      , xe = re.match(Rt).map(function($) {
+        var j = $[0];
+        if (j === "p" || j === "P") {
+            var z = Je[j];
+            return z($, m.formatLong)
+        }
+        return $
+    }).join("").match(Yt).map(function($) {
+        if ($ === "''")
+            return "'";
+        var j = $[0];
+        if (j === "'")
+            return qt($);
+        var z = Xe[j];
+        if (z)
+            return !(t != null && t.useAdditionalWeekYearTokens) && tt($) && he($, e, String(r)),
+            !(t != null && t.useAdditionalDayOfYearTokens) && et($) && he($, e, String(r)),
+            z(Ce, $, m.localize, Me);
+        if (j.match(Lt))
+            throw new RangeError("Format string contains an unescaped latin alphabet character `" + j + "`");
+        return $
+    }).join("");
+    return xe
+}
+function qt(r) {
+    var e = r.match(Bt);
+    return e ? e[1].replace(Ft, "'") : r
+}
+function Ht(r) {
+    y(1, arguments);
+    var e = T(r);
+    return e.setDate(1),
+    e.setHours(0, 0, 0, 0),
+    e
+}
+function Xt(r) {
+    y(1, arguments);
+    var e = T(r)
+      , t = e.getMonth();
+    return e.setFullYear(e.getFullYear(), t + 1, 0),
+    e.setHours(23, 59, 59, 999),
+    e
+}
+function Vt(r, e) {
+    var t;
+    y(1, arguments);
+    var a = r || {}
+      , n = T(a.start)
+      , i = T(a.end)
+      , o = i.getTime();
+    if (!(n.getTime() <= o))
+        throw new RangeError("Invalid interval");
+    var d = []
+      , l = n;
+    l.setHours(0, 0, 0, 0);
+    var c = Number((t = e == null ? void 0 : e.step) !== null && t !== void 0 ? t : 1);
+    if (c < 1 || isNaN(c))
+        throw new RangeError("`options.step` must be a number greater than 1");
+    for (; l.getTime() <= o; )
+        d.push(T(l)),
+        l.setDate(l.getDate() + c),
+        l.setHours(0, 0, 0, 0);
+    return d
+}
+function me(r) {
+    y(1, arguments);
+    var e = T(r);
+    return e.setHours(0, 0, 0, 0),
+    e
+}
+function Qt(r, e) {
+    y(2, arguments);
+    var t = me(r)
+      , a = me(e);
+    return t.getTime() === a.getTime()
+}
+function Jt(r) {
+    return y(1, arguments),
+    Qt(r, Date.now())
+}
+const zt = "https://api.micro-tab.ru:9443"
+  , Kt = Number({}.VITE_API_TIMEOUT_MS) || 3e4
+  , D = zt;
+class Zt {
+    constructor() {
+        le(this, "cache", new Map)
+    }
+    get(e) {
+        const t = this.cache.get(e);
+        return t ? Date.now() - t.timestamp > t.ttl ? (this.cache.delete(e),
+        null) : t.data : null
+    }
+    set(e, t, a) {
+        this.cache.set(e, {
+            data: t,
+            timestamp: Date.now(),
+            ttl: a
+        })
+    }
+    delete(e) {
+        this.cache.delete(e)
+    }
+    clear() {
+        this.cache.clear()
+    }
+    invalidatePattern(e) {
+        const t = new RegExp(e);
+        for (const a of this.cache.keys())
+            t.test(a) && this.cache.delete(a)
+    }
+}
+const E = new Zt
+  , Y = {
+    birthdays: "birthdays:all",
+    calendarMonth: (r, e) => `calendar:${r}:${e}`,
+    birthday: r => `birthday:${r}`,
+    responsibles: "responsibles:all",
+    responsible: r => `responsible:${r}`
+}
+  , ve = {
+    birthdays: 5 * 60 * 1e3,
+    calendarMonth: 60 * 60 * 1e3,
+    birthday: 5 * 60 * 1e3,
+    responsibles: 5 * 60 * 1e3,
+    responsible: 5 * 60 * 1e3
+};
+function K() {
+    var r;
+    return typeof window != "undefined" && ((r = window.Telegram) != null && r.WebApp) && window.Telegram.WebApp.initData || null
+}
+function C(r={}) {
+    const e = ie({
+        "Content-Type": "application/json"
+    }, r)
+      , t = K();
+    return t && (e["X-Init-Data"] = t),
+    e
+}
+function M(t) {
+    return b(this, arguments, function*(r, e={}) {
+        const a = e.method || "GET";
+        s.info("[API] Request options:", {
+            method: a,
+            headers: e.headers,
+            body: e.body ? typeof e.body == "string" ? e.body.substring(0, 200) + "..." : "[...]" : void 0
+        });
+        try {
+            const n = new AbortController
+              , i = setTimeout( () => n.abort(), Kt);
+            s.info(`[API] Sending ${a} request to ${r}...`);
+            const o = yield fetch(r, ue(ie({}, e), {
+                signal: n.signal
+            }));
+            if (clearTimeout(i),
+            s.info(`[API] Response received: ${o.status} ${o.statusText}`),
+            !o.ok) {
+                if (o.status === 0)
+                    throw new Error("CORS error: запрос заблокирован браузером");
+                const d = o.clone();
+                let l = `HTTP ${o.status}: ${o.statusText}`
+                  , c = null;
+                try {
+                    c = yield d.json(),
+                    c.detail ? typeof c.detail == "string" ? l = c.detail : Array.isArray(c.detail) && (l = `Ошибка валидации: ${c.detail.map(f => {
+                        const h = f.loc ? f.loc.slice(1).join(".") : "unknown"
+                          , g = h === "full_name" ? "ФИО" : h === "company" ? "Компания" : h === "position" ? "Должность" : h === "birth_date" ? "Дата рождения" : h === "comment" ? "Комментарий" : h
+                          , P = f.msg || f.message || "Ошибка валидации";
+                        return `${g}: ${P}`
+                    }
+                    ).join("; ")}`) : c.errors && (l = `Ошибка валидации: ${c.errors.map(f => {
+                        const h = f.loc ? f.loc.slice(1).join(".") : "unknown"
+                          , g = h === "full_name" ? "ФИО" : h === "company" ? "Компания" : h === "position" ? "Должность" : h === "birth_date" ? "Дата рождения" : h === "comment" ? "Комментарий" : h
+                          , P = f.msg || f.message || "Ошибка валидации";
+                        return `${g}: ${P}`
+                    }
+                    ).join("; ")}`),
+                    o.status === 401 ? l = l || "Ошибка авторизации. Пожалуйста, обновите страницу." : o.status === 403 ? l = l || "Доступ запрещен. У вас нет прав для выполнения этого действия." : o.status === 404 ? l = l || "Ресурс не найден. Возможно, он был удален." : o.status === 422 ? l = l || "Ошибка валидации данных. Проверьте введенные данные." : o.status >= 500 && (l = "Ошибка сервера. Пожалуйста, попробуйте позже."),
+                    s.error(`[API] Error response for ${a} ${r}:`, c)
+                } catch (p) {
+                    s.error(`[API] Error response for ${a} ${r}: ${o.status} ${o.statusText}`)
+                }
+                throw new Error(l)
+            }
+            return o
+        } catch (n) {
+            throw s.error(`[API] ===== Fetch ERROR for ${a} ${r} =====`),
+            s.error(`[API] Error type: ${ninstanceof Error ? n.constructor.name : typeof n}`),
+            s.error(`[API] Error message: ${ninstanceof Error ? n.message : String(n)}`),
+            s.error(`[API] Error stack: ${ninstanceof Error ? n.stack : "N/A"}`),
+            n instanceof Error ? n.name === "AbortError" ? new Error("Request timeout: сервер не отвечает") : n.message.includes("Failed to fetch") || n.message.includes("NetworkError") ? (s.error(`[API] Network error - возможно CORS или сеть: ${n.message}`),
+            new Error("Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API.")) : n.message.includes("CORS") || n.message.includes("Cross-Origin") ? new Error("Ошибка CORS: проверьте настройки сервера") : n : new Error("Unknown error occurred")
+        }
+    })
+}
+const ge = {
+    getCalendar(r) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/calendar/${r}`, {
+                headers: C()
+            })).json()
+        })
+    },
+    getCalendarMonth(r, e) {
+        return b(this, null, function*() {
+            const t = Y.calendarMonth(r, e)
+              , a = E.get(t);
+            if (a)
+                return a;
+            const i = yield(yield M(`${D}/api/calendar/month/${r}/${e}`, {
+                headers: C()
+            })).json();
+            return E.set(t, i, ve.calendarMonth),
+            i
+        })
+    },
+    getBirthdays() {
+        return b(this, null, function*() {
+            const r = Y.birthdays
+              , e = E.get(r);
+            if (e)
+                return e;
+            const a = yield(yield M(`${D}/api/panel/birthdays`, {
+                headers: C()
+            })).json();
+            return E.set(r, a, ve.birthdays),
+            a
+        })
+    },
+    createBirthday(r) {
+        return b(this, null, function*() {
+            const e = `${D}/api/panel/birthdays`
+              , t = C()
+              , a = K();
+            s.info(`[API] initData length: ${a ? a.length : 0}`),
+            s.info("[API] Headers:", {
+                "Content-Type": t["Content-Type"],
+                "X-Init-Data": t["X-Init-Data"] ? `${t["X-Init-Data"].substring(0, 20)}...` : "missing"
+            });
+            const n = yield M(e, {
+                method: "POST",
+                headers: t,
+                body: JSON.stringify(r)
+            });
+            s.info(`[API] createBirthday response received, status: ${n.status}`);
+            const i = yield n.json();
+            return E.delete(Y.birthdays),
+            E.invalidatePattern("^calendar:"),
+            i
+        })
+    },
+    updateBirthday(r, e) {
+        return b(this, null, function*() {
+            const t = `${D}/api/panel/birthdays/${r}`
+              , a = C();
+            a["Content-Type"] = "application/json";
+            const n = K();
+            s.info(`[API] initData length: ${n ? n.length : 0}`),
+            s.info("[API] updateBirthday headers:", {
+                "Content-Type": a["Content-Type"],
+                "X-Init-Data": a["X-Init-Data"] ? `${a["X-Init-Data"].substring(0, 20)}...` : "missing"
+            }),
+            s.info("[API] Request body:", JSON.stringify(e));
+            try {
+                s.info(`[API] Sending PUT request to ${t}...`);
+                const i = yield M(t, {
+                    method: "PUT",
+                    headers: a,
+                    body: JSON.stringify(e)
+                });
+                if (s.info(`[API] updateBirthday response received, status: ${i.status}`),
+                s.info("[API] updateBirthday response headers:", Object.fromEntries(i.headers.entries())),
+                s.info("[API] ===== updateBirthday RESPONSE RECEIVED ====="),
+                !i.ok)
+                    throw s.error(`[API] updateBirthday received non-ok status: ${i.status} ${i.statusText}`),
+                    new Error(`HTTP ${i.status}: ${i.statusText}`);
+                if (i.status === 204 || i.status === 205)
+                    throw s.warn(`[API] updateBirthday received ${i.status} status with no body`),
+                    new Error("Сервер вернул ответ без данных");
+                if (i.headers.get("Content-Length") === "0")
+                    throw s.warn("[API] updateBirthday received response with Content-Length: 0"),
+                    new Error("Сервер вернул пустой ответ");
+                s.info("[API] updateBirthday reading response body");
+                const d = yield i.json();
+                if (s.info("[API] updateBirthday response data:", d),
+                !d || typeof d != "object")
+                    throw s.error("[API] updateBirthday received invalid response data:", d),
+                    new Error("Сервер вернул невалидные данные");
+                if (!d.id || !d.full_name)
+                    throw s.error("[API] updateBirthday response missing required fields:", d),
+                    new Error("Сервер вернул неполные данные");
+                return s.info(`[API] updateBirthday success: id=${d.id}, full_name=${d.full_name}`),
+                s.info("[API] ===== updateBirthday SUCCESS ====="),
+                E.delete(Y.birthdays),
+                E.delete(Y.birthday(r)),
+                E.invalidatePattern("^calendar:"),
+                d
+            } catch (i) {
+                throw s.error("[API] ===== updateBirthday ERROR ====="),
+                s.error("[API] updateBirthday error:", i),
+                s.error(`[API] Error type: ${iinstanceof Error ? i.constructor.name : typeof i}`),
+                s.error(`[API] Error message: ${iinstanceof Error ? i.message : String(i)}`),
+                i instanceof Error && i.stack && s.error("[API] Error stack:", i.stack),
+                i
+            }
+        })
+    },
+    deleteBirthday(r) {
+        return b(this, null, function*() {
+            const e = `${D}/api/panel/birthdays/${r}`
+              , t = C()
+              , a = K();
+            s.info(`[API] initData length: ${a ? a.length : 0}`),
+            s.info("[API] deleteBirthday headers:", {
+                "Content-Type": t["Content-Type"],
+                "X-Init-Data": t["X-Init-Data"] ? `${t["X-Init-Data"].substring(0, 20)}...` : "missing"
+            });
+            try {
+                s.info(`[API] Sending DELETE request to ${e}...`);
+                const n = yield M(e, {
+                    method: "DELETE",
+                    headers: t
+                });
+                if (s.info(`[API] deleteBirthday response received, status: ${n.status}`),
+                s.info("[API] deleteBirthday response headers:", Object.fromEntries(n.headers.entries())),
+                s.info("[API] ===== deleteBirthday RESPONSE RECEIVED ====="),
+                !n.ok)
+                    throw s.error(`[API] deleteBirthday received non-ok status: ${n.status} ${n.statusText}`),
+                    new Error(`HTTP ${n.status}: ${n.statusText}`);
+                if (n.status === 204 || n.status === 205) {
+                    s.info(`[API] deleteBirthday received ${n.status} status (no body expected)`),
+                    s.info(`[API] deleteBirthday success: birthday ${r} deleted`);
+                    return
+                }
+                const i = n.headers.get("Content-Length");
+                if (i && i !== "0") {
+                    s.info("[API] deleteBirthday reading response body");
+                    const o = yield n.json();
+                    s.info("[API] deleteBirthday response data:", o)
+                } else if (i === "0") {
+                    s.info("[API] deleteBirthday received response with Content-Length: 0");
+                    return
+                }
+                s.info(`[API] deleteBirthday success: birthday ${r} deleted`),
+                s.info("[API] ===== deleteBirthday SUCCESS ====="),
+                E.delete(Y.birthdays),
+                E.delete(Y.birthday(r)),
+                E.invalidatePattern("^calendar:"),
+                s.info("[API] deleteBirthday completed successfully")
+            } catch (n) {
+                throw s.error("[API] ===== deleteBirthday ERROR ====="),
+                s.error("[API] deleteBirthday error:", n),
+                s.error(`[API] Error type: ${ninstanceof Error ? n.constructor.name : typeof n}`),
+                s.error(`[API] Error message: ${ninstanceof Error ? n.message : String(n)}`),
+                n instanceof Error && n.stack && s.error("[API] Error stack:", n.stack),
+                n
+            }
+        })
+    },
+    getResponsible() {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/responsible`, {
+                headers: C()
+            })).json()
+        })
+    },
+    createResponsible(r) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/responsible`, {
+                method: "POST",
+                headers: C(),
+                body: JSON.stringify(r)
+            })).json()
+        })
+    },
+    updateResponsible(r, e) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/responsible/${r}`, {
+                method: "PUT",
+                headers: C(),
+                body: JSON.stringify(e)
+            })).json()
+        })
+    },
+    deleteResponsible(r) {
+        return b(this, null, function*() {
+            yield M(`${D}/api/panel/responsible/${r}`, {
+                method: "DELETE",
+                headers: C()
+            })
+        })
+    },
+    assignResponsible(r, e) {
+        return b(this, null, function*() {
+            yield M(`${D}/api/panel/assign-responsible`, {
+                method: "POST",
+                headers: C(),
+                body: JSON.stringify({
+                    responsible_id: r,
+                    date: e
+                })
+            })
+        })
+    },
+    searchPeople(r) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/search?q=${encodeURIComponent(r)}`, {
+                headers: C()
+            })).json()
+        })
+    },
+    generateGreeting(r, e, t, a) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/generate-greeting`, {
+                method: "POST",
+                headers: C(),
+                body: JSON.stringify({
+                    birthday_id: r,
+                    style: e,
+                    length: t,
+                    theme: a
+                })
+            })).json()
+        })
+    },
+    createCard(r, e, t) {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/create-card`, {
+                method: "POST",
+                headers: C(),
+                body: JSON.stringify({
+                    birthday_id: r,
+                    greeting_text: e,
+                    qr_url: t
+                })
+            })).blob()
+        })
+    },
+    checkPanelAccess() {
+        return b(this, null, function*() {
+            return (yield M(`${D}/api/panel/check-access`, {
+                headers: C()
+            })).json()
+        })
+    }
+};
+function J(r, e) {
+    if (r.one !== void 0 && e === 1)
+        return r.one;
+    var t = e % 10
+      , a = e % 100;
+    return t === 1 && a !== 11 ? r.singularNominative.replace("{{count}}", String(e)) : t >= 2 && t <= 4 && (a < 10 || a > 20) ? r.singularGenitive.replace("{{count}}", String(e)) : r.pluralGenitive.replace("{{count}}", String(e))
+}
+function x(r) {
+    return function(e, t) {
+        return t != null && t.addSuffix ? t.comparison && t.comparison > 0 ? r.future ? J(r.future, e) : "через " + J(r.regular, e) : r.past ? J(r.past, e) : J(r.regular, e) + " назад" : J(r.regular, e)
+    }
+}
+var er = {
+    lessThanXSeconds: x({
+        regular: {
+            one: "меньше секунды",
+            singularNominative: "меньше {{count}} секунды",
+            singularGenitive: "меньше {{count}} секунд",
+            pluralGenitive: "меньше {{count}} секунд"
+        },
+        future: {
+            one: "меньше, чем через секунду",
+            singularNominative: "меньше, чем через {{count}} секунду",
+            singularGenitive: "меньше, чем через {{count}} секунды",
+            pluralGenitive: "меньше, чем через {{count}} секунд"
+        }
+    }),
+    xSeconds: x({
+        regular: {
+            singularNominative: "{{count}} секунда",
+            singularGenitive: "{{count}} секунды",
+            pluralGenitive: "{{count}} секунд"
+        },
+        past: {
+            singularNominative: "{{count}} секунду назад",
+            singularGenitive: "{{count}} секунды назад",
+            pluralGenitive: "{{count}} секунд назад"
+        },
+        future: {
+            singularNominative: "через {{count}} секунду",
+            singularGenitive: "через {{count}} секунды",
+            pluralGenitive: "через {{count}} секунд"
+        }
+    }),
+    halfAMinute: function(e, t) {
+        return t != null && t.addSuffix ? t.comparison && t.comparison > 0 ? "через полминуты" : "полминуты назад" : "полминуты"
+    },
+    lessThanXMinutes: x({
+        regular: {
+            one: "меньше минуты",
+            singularNominative: "меньше {{count}} минуты",
+            singularGenitive: "меньше {{count}} минут",
+            pluralGenitive: "меньше {{count}} минут"
+        },
+        future: {
+            one: "меньше, чем через минуту",
+            singularNominative: "меньше, чем через {{count}} минуту",
+            singularGenitive: "меньше, чем через {{count}} минуты",
+            pluralGenitive: "меньше, чем через {{count}} минут"
+        }
+    }),
+    xMinutes: x({
+        regular: {
+            singularNominative: "{{count}} минута",
+            singularGenitive: "{{count}} минуты",
+            pluralGenitive: "{{count}} минут"
+        },
+        past: {
+            singularNominative: "{{count}} минуту назад",
+            singularGenitive: "{{count}} минуты назад",
+            pluralGenitive: "{{count}} минут назад"
+        },
+        future: {
+            singularNominative: "через {{count}} минуту",
+            singularGenitive: "через {{count}} минуты",
+            pluralGenitive: "через {{count}} минут"
+        }
+    }),
+    aboutXHours: x({
+        regular: {
+            singularNominative: "около {{count}} часа",
+            singularGenitive: "около {{count}} часов",
+            pluralGenitive: "около {{count}} часов"
+        },
+        future: {
+            singularNominative: "приблизительно через {{count}} час",
+            singularGenitive: "приблизительно через {{count}} часа",
+            pluralGenitive: "приблизительно через {{count}} часов"
+        }
+    }),
+    xHours: x({
+        regular: {
+            singularNominative: "{{count}} час",
+            singularGenitive: "{{count}} часа",
+            pluralGenitive: "{{count}} часов"
+        }
+    }),
+    xDays: x({
+        regular: {
+            singularNominative: "{{count}} день",
+            singularGenitive: "{{count}} дня",
+            pluralGenitive: "{{count}} дней"
+        }
+    }),
+    aboutXWeeks: x({
+        regular: {
+            singularNominative: "около {{count}} недели",
+            singularGenitive: "около {{count}} недель",
+            pluralGenitive: "около {{count}} недель"
+        },
+        future: {
+            singularNominative: "приблизительно через {{count}} неделю",
+            singularGenitive: "приблизительно через {{count}} недели",
+            pluralGenitive: "приблизительно через {{count}} недель"
+        }
+    }),
+    xWeeks: x({
+        regular: {
+            singularNominative: "{{count}} неделя",
+            singularGenitive: "{{count}} недели",
+            pluralGenitive: "{{count}} недель"
+        }
+    }),
+    aboutXMonths: x({
+        regular: {
+            singularNominative: "около {{count}} месяца",
+            singularGenitive: "около {{count}} месяцев",
+            pluralGenitive: "около {{count}} месяцев"
+        },
+        future: {
+            singularNominative: "приблизительно через {{count}} месяц",
+            singularGenitive: "приблизительно через {{count}} месяца",
+            pluralGenitive: "приблизительно через {{count}} месяцев"
+        }
+    }),
+    xMonths: x({
+        regular: {
+            singularNominative: "{{count}} месяц",
+            singularGenitive: "{{count}} месяца",
+            pluralGenitive: "{{count}} месяцев"
+        }
+    }),
+    aboutXYears: x({
+        regular: {
+            singularNominative: "около {{count}} года",
+            singularGenitive: "около {{count}} лет",
+            pluralGenitive: "около {{count}} лет"
+        },
+        future: {
+            singularNominative: "приблизительно через {{count}} год",
+            singularGenitive: "приблизительно через {{count}} года",
+            pluralGenitive: "приблизительно через {{count}} лет"
+        }
+    }),
+    xYears: x({
+        regular: {
+            singularNominative: "{{count}} год",
+            singularGenitive: "{{count}} года",
+            pluralGenitive: "{{count}} лет"
+        }
+    }),
+    overXYears: x({
+        regular: {
+            singularNominative: "больше {{count}} года",
+            singularGenitive: "больше {{count}} лет",
+            pluralGenitive: "больше {{count}} лет"
+        },
+        future: {
+            singularNominative: "больше, чем через {{count}} год",
+            singularGenitive: "больше, чем через {{count}} года",
+            pluralGenitive: "больше, чем через {{count}} лет"
+        }
+    }),
+    almostXYears: x({
+        regular: {
+            singularNominative: "почти {{count}} год",
+            singularGenitive: "почти {{count}} года",
+            pluralGenitive: "почти {{count}} лет"
+        },
+        future: {
+            singularNominative: "почти через {{count}} год",
+            singularGenitive: "почти через {{count}} года",
+            pluralGenitive: "почти через {{count}} лет"
+        }
+    })
+}
+  , tr = function(e, t, a) {
+    return er[e](t, a)
+};
+const rr = tr;
+var ar = {
+    full: "EEEE, d MMMM y 'г.'",
+    long: "d MMMM y 'г.'",
+    medium: "d MMM y 'г.'",
+    short: "dd.MM.y"
+}
+  , nr = {
+    full: "H:mm:ss zzzz",
+    long: "H:mm:ss z",
+    medium: "H:mm:ss",
+    short: "H:mm"
+}
+  , ir = {
+    any: "{{date}}, {{time}}"
+}
+  , or = {
+    date: q({
+        formats: ar,
+        defaultWidth: "full"
+    }),
+    time: q({
+        formats: nr,
+        defaultWidth: "full"
+    }),
+    dateTime: q({
+        formats: ir,
+        defaultWidth: "any"
+    })
+};
+const sr = or;
+function ye(r, e, t) {
+    y(2, arguments);
+    var a = H(r, t)
+      , n = H(e, t);
+    return a.getTime() === n.getTime()
+}
+var oe = ["воскресенье", "понедельник", "вторник", "среду", "четверг", "пятницу", "субботу"];
+function ur(r) {
+    var e = oe[r];
+    switch (r) {
+    case 0:
+        return "'в прошлое " + e + " в' p";
+    case 1:
+    case 2:
+    case 4:
+        return "'в прошлый " + e + " в' p";
+    case 3:
+    case 5:
+    case 6:
+        return "'в прошлую " + e + " в' p"
+    }
+}
+function pe(r) {
+    var e = oe[r];
+    return r === 2 ? "'во " + e + " в' p" : "'в " + e + " в' p"
+}
+function lr(r) {
+    var e = oe[r];
+    switch (r) {
+    case 0:
+        return "'в следующее " + e + " в' p";
+    case 1:
+    case 2:
+    case 4:
+        return "'в следующий " + e + " в' p";
+    case 3:
+    case 5:
+    case 6:
+        return "'в следующую " + e + " в' p"
+    }
+}
+var dr = {
+    lastWeek: function(e, t, a) {
+        var n = e.getUTCDay();
+        return ye(e, t, a) ? pe(n) : ur(n)
+    },
+    yesterday: "'вчера в' p",
+    today: "'сегодня в' p",
+    tomorrow: "'завтра в' p",
+    nextWeek: function(e, t, a) {
+        var n = e.getUTCDay();
+        return ye(e, t, a) ? pe(n) : lr(n)
+    },
+    other: "P"
+}
+  , cr = function(e, t, a, n) {
+    var i = dr[e];
+    return typeof i == "function" ? i(t, a, n) : i
+};
+const fr = cr;
+var hr = {
+    narrow: ["до н.э.", "н.э."],
+    abbreviated: ["до н. э.", "н. э."],
+    wide: ["до нашей эры", "нашей эры"]
+}
+  , mr = {
+    narrow: ["1", "2", "3", "4"],
+    abbreviated: ["1-й кв.", "2-й кв.", "3-й кв.", "4-й кв."],
+    wide: ["1-й квартал", "2-й квартал", "3-й квартал", "4-й квартал"]
+}
+  , vr = {
+    narrow: ["Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д"],
+    abbreviated: ["янв.", "фев.", "март", "апр.", "май", "июнь", "июль", "авг.", "сент.", "окт.", "нояб.", "дек."],
+    wide: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
+}
+  , gr = {
+    narrow: ["Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д"],
+    abbreviated: ["янв.", "фев.", "мар.", "апр.", "мая", "июн.", "июл.", "авг.", "сент.", "окт.", "нояб.", "дек."],
+    wide: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+}
+  , yr = {
+    narrow: ["В", "П", "В", "С", "Ч", "П", "С"],
+    short: ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
+    abbreviated: ["вск", "пнд", "втр", "срд", "чтв", "птн", "суб"],
+    wide: ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"]
+}
+  , pr = {
+    narrow: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полн.",
+        noon: "полд.",
+        morning: "утро",
+        afternoon: "день",
+        evening: "веч.",
+        night: "ночь"
+    },
+    abbreviated: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полн.",
+        noon: "полд.",
+        morning: "утро",
+        afternoon: "день",
+        evening: "веч.",
+        night: "ночь"
+    },
+    wide: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полночь",
+        noon: "полдень",
+        morning: "утро",
+        afternoon: "день",
+        evening: "вечер",
+        night: "ночь"
+    }
+}
+  , wr = {
+    narrow: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полн.",
+        noon: "полд.",
+        morning: "утра",
+        afternoon: "дня",
+        evening: "веч.",
+        night: "ночи"
+    },
+    abbreviated: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полн.",
+        noon: "полд.",
+        morning: "утра",
+        afternoon: "дня",
+        evening: "веч.",
+        night: "ночи"
+    },
+    wide: {
+        am: "ДП",
+        pm: "ПП",
+        midnight: "полночь",
+        noon: "полдень",
+        morning: "утра",
+        afternoon: "дня",
+        evening: "вечера",
+        night: "ночи"
+    }
+}
+  , br = function(e, t) {
+    var a = Number(e), n = t == null ? void 0 : t.unit, i;
+    return n === "date" ? i = "-е" : n === "week" || n === "minute" || n === "second" ? i = "-я" : i = "-й",
+    a + i
+}
+  , Pr = {
+    ordinalNumber: br,
+    era: W({
+        values: hr,
+        defaultWidth: "wide"
+    }),
+    quarter: W({
+        values: mr,
+        defaultWidth: "wide",
+        argumentCallback: function(e) {
+            return e - 1
+        }
+    }),
+    month: W({
+        values: vr,
+        defaultWidth: "wide",
+        formattingValues: gr,
+        defaultFormattingWidth: "wide"
+    }),
+    day: W({
+        values: yr,
+        defaultWidth: "wide"
+    }),
+    dayPeriod: W({
+        values: pr,
+        defaultWidth: "any",
+        formattingValues: wr,
+        defaultFormattingWidth: "wide"
+    })
+};
+const Tr = Pr;
+var Dr = /^(\d+)(-?(е|я|й|ое|ье|ая|ья|ый|ой|ий|ый))?/i
+  , Cr = /\d+/i
+  , Mr = {
+    narrow: /^((до )?н\.?\s?э\.?)/i,
+    abbreviated: /^((до )?н\.?\s?э\.?)/i,
+    wide: /^(до нашей эры|нашей эры|наша эра)/i
+}
+  , xr = {
+    any: [/^д/i, /^н/i]
+}
+  , $r = {
+    narrow: /^[1234]/i,
+    abbreviated: /^[1234](-?[ыои]?й?)? кв.?/i,
+    wide: /^[1234](-?[ыои]?й?)? квартал/i
+}
+  , Sr = {
+    any: [/1/i, /2/i, /3/i, /4/i]
+}
+  , Er = {
+    narrow: /^[яфмаисонд]/i,
+    abbreviated: /^(янв|фев|март?|апр|ма[йя]|июн[ья]?|июл[ья]?|авг|сент?|окт|нояб?|дек)\.?/i,
+    wide: /^(январ[ья]|феврал[ья]|марта?|апрел[ья]|ма[йя]|июн[ья]|июл[ья]|августа?|сентябр[ья]|октябр[ья]|октябр[ья]|ноябр[ья]|декабр[ья])/i
+}
+  , Or = {
+    narrow: [/^я/i, /^ф/i, /^м/i, /^а/i, /^м/i, /^и/i, /^и/i, /^а/i, /^с/i, /^о/i, /^н/i, /^я/i],
+    any: [/^я/i, /^ф/i, /^мар/i, /^ап/i, /^ма[йя]/i, /^июн/i, /^июл/i, /^ав/i, /^с/i, /^о/i, /^н/i, /^д/i]
+}
+  , kr = {
+    narrow: /^[впсч]/i,
+    short: /^(вс|во|пн|по|вт|ср|чт|че|пт|пя|сб|су)\.?/i,
+    abbreviated: /^(вск|вос|пнд|пон|втр|вто|срд|сре|чтв|чет|птн|пят|суб).?/i,
+    wide: /^(воскресень[ея]|понедельника?|вторника?|сред[аы]|четверга?|пятниц[аы]|суббот[аы])/i
+}
+  , Nr = {
+    narrow: [/^в/i, /^п/i, /^в/i, /^с/i, /^ч/i, /^п/i, /^с/i],
+    any: [/^в[ос]/i, /^п[он]/i, /^в/i, /^ср/i, /^ч/i, /^п[ят]/i, /^с[уб]/i]
+}
+  , Wr = {
+    narrow: /^([дп]п|полн\.?|полд\.?|утр[оа]|день|дня|веч\.?|ноч[ьи])/i,
+    abbreviated: /^([дп]п|полн\.?|полд\.?|утр[оа]|день|дня|веч\.?|ноч[ьи])/i,
+    wide: /^([дп]п|полночь|полдень|утр[оа]|день|дня|вечера?|ноч[ьи])/i
+}
+  , Ir = {
+    any: {
+        am: /^дп/i,
+        pm: /^пп/i,
+        midnight: /^полн/i,
+        noon: /^полд/i,
+        morning: /^у/i,
+        afternoon: /^д[ен]/i,
+        evening: /^в/i,
+        night: /^н/i
+    }
+}
+  , jr = {
+    ordinalNumber: De({
+        matchPattern: Dr,
+        parsePattern: Cr,
+        valueCallback: function(e) {
+            return parseInt(e, 10)
+        }
+    }),
+    era: I({
+        matchPatterns: Mr,
+        defaultMatchWidth: "wide",
+        parsePatterns: xr,
+        defaultParseWidth: "any"
+    }),
+    quarter: I({
+        matchPatterns: $r,
+        defaultMatchWidth: "wide",
+        parsePatterns: Sr,
+        defaultParseWidth: "any",
+        valueCallback: function(e) {
+            return e + 1
+        }
+    }),
+    month: I({
+        matchPatterns: Er,
+        defaultMatchWidth: "wide",
+        parsePatterns: Or,
+        defaultParseWidth: "any"
+    }),
+    day: I({
+        matchPatterns: kr,
+        defaultMatchWidth: "wide",
+        parsePatterns: Nr,
+        defaultParseWidth: "any"
+    }),
+    dayPeriod: I({
+        matchPatterns: Wr,
+        defaultMatchWidth: "wide",
+        parsePatterns: Ir,
+        defaultParseWidth: "any"
+    })
+};
+const _r = jr;
+var Ar = {
+    code: "ru",
+    formatDistance: rr,
+    formatLong: sr,
+    formatRelative: fr,
+    localize: Tr,
+    match: _r,
+    options: {
+        weekStartsOn: 1,
+        firstWeekContainsDate: 1
+    }
+};
+const we = Ar;
+function Ur({date: r, data: e, loading: t, error: a}) {
+    if (t)
+        return u.jsx("div", {
+            className: "date-view",
+            children: "Загрузка..."
+        });
+    const n = i => {
+        const o = A(i, "d MMMM yyyy", {
+            locale: we
+        })
+          , d = A(i, "EEEE", {
+            locale: we
+        });
+        return `${o}, ${d}`
+    }
+    ;
+    return a ? u.jsxs("div", {
+        className: "date-view",
+        children: [u.jsx("h3", {
+            children: n(r)
+        }), u.jsxs("div", {
+            className: "error-message",
+            children: [u.jsx("p", {
+                children: "⚠️ Ошибка загрузки данных"
+            }), u.jsx("p", {
+                children: a
+            }), u.jsx("p", {
+                className: "error-hint",
+                children: "Проверьте подключение к интернету и настройки API."
+            })]
+        })]
+    }) : e ? u.jsxs("div", {
+        className: "date-view",
+        children: [u.jsx("h3", {
+            children: n(r)
+        }), u.jsxs("div", {
+            className: "date-section",
+            children: [u.jsx("h4", {
+                children: "🎂 Дни рождения"
+            }), e.birthdays.length > 0 ? e.birthdays.map(i => u.jsxs("div", {
+                className: "birthday-item",
+                children: [u.jsx("p", {
+                    children: u.jsx("strong", {
+                        children: i.full_name
+                    })
+                }), u.jsxs("p", {
+                    children: [i.company, ", ", i.position]
+                }), u.jsxs("p", {
+                    children: ["Исполняется ", i.age, " лет"]
+                }), i.comment && u.jsxs("p", {
+                    className: "comment",
+                    children: ["Комментарий: ", i.comment]
+                })]
+            }, i.id)) : u.jsx("p", {
+                style: {
+                    color: "#666",
+                    fontStyle: "italic"
+                },
+                children: "Нет дней рождения на эту дату"
+            })]
+        }), u.jsxs("div", {
+            className: "date-section",
+            children: [u.jsx("h4", {
+                children: "🎉 Профессиональные праздники"
+            }), e.holidays.length > 0 ? e.holidays.map(i => u.jsxs("div", {
+                className: "holiday-item",
+                children: [u.jsx("p", {
+                    children: u.jsx("strong", {
+                        children: i.name
+                    })
+                }), i.description && u.jsx("p", {
+                    children: i.description
+                })]
+            }, i.id)) : u.jsx("p", {
+                style: {
+                    color: "#666",
+                    fontStyle: "italic"
+                },
+                children: "Нет профессиональных праздников"
+            })]
+        }), u.jsxs("div", {
+            className: "date-section",
+            children: [u.jsx("h4", {
+                children: "👤 Ответственное лицо"
+            }), e.responsible ? u.jsxs("div", {
+                className: "responsible-item",
+                children: [u.jsx("p", {
+                    children: u.jsx("strong", {
+                        children: e.responsible.full_name
+                    })
+                }), u.jsxs("p", {
+                    children: [e.responsible.company, ", ", e.responsible.position]
+                })]
+            }) : u.jsx("p", {
+                style: {
+                    color: "#666",
+                    fontStyle: "italic"
+                },
+                children: "Ответственный не назначен"
+            })]
+        })]
+    }) : u.jsxs("div", {
+        className: "date-view",
+        children: [u.jsx("h3", {
+            children: n(r)
+        }), u.jsx("p", {
+            children: "Нет данных для этой даты"
+        })]
+    })
+}
+const Gr = k.memo(Ur);
+function Br() {
+    const [r,e] = k.useState(new Date)
+      , [t,a] = k.useState(null)
+      , [n,i] = k.useState(null)
+      , [o,d] = k.useState(!1)
+      , [l,c] = k.useState(null)
+      , [p,f] = k.useState(null)
+      , [h,g] = k.useState(null)
+      , [,P] = k.useState(!1);
+    k.useEffect( () => {}
+    , []),
+    k.useEffect( () => {
+        ( () => b(this, null, function*() {
+            const w = r.getFullYear()
+              , S = r.getMonth() + 1;
+            P(!0);
+            try {
+                const O = yield ge.getCalendarMonth(w, S);
+                g(O)
+            } catch (O) {
+                s.error("[Calendar] Failed to load month birthdays:", O),
+                g(null)
+            } finally {
+                P(!1)
+            }
+        }))()
+    }
+    , [r]);
+    const N = ( () => {
+        try {
+            const m = Ht(r)
+              , w = Xt(r);
+            return Vt({
+                start: m,
+                end: w
+            })
+        } catch (m) {
+            return s.error("[Calendar] Error calculating month days:", m),
+            f("Ошибка при отображении календаря. Попробуйте обновить страницу."),
+            [new Date]
+        }
+    }
+    )()
+      , U = m => {
+        if (!h)
+            return !1;
+        const w = A(m, "yyyy-MM-dd");
+        return w in h.birthdays_by_date && h.birthdays_by_date[w].length > 0
+    }
+      , X = m => t ? A(m, "yyyy-MM-dd") === A(t, "yyyy-MM-dd") : !1
+      , V = m => Jt(m)
+      , Q = m => b(this, null, function*() {
+        try {
+            a(m),
+            d(!0),
+            c(null),
+            i(null);
+            const w = A(m, "yyyy-MM-dd")
+              , S = yield ge.getCalendar(w);
+            i(S),
+            c(null)
+        } catch (w) {
+            s.error("[Calendar] Failed to load calendar data:", w);
+            const S = w instanceof Error ? w.message : "Не удалось загрузить данные";
+            c(S),
+            i(null)
+        } finally {
+            d(!1)
+        }
+    })
+      , re = () => {
+        e(new Date(r.getFullYear(),r.getMonth() - 1,1)),
+        a(null),
+        i(null)
+    }
+      , G = () => {
+        e(new Date(r.getFullYear(),r.getMonth() + 1,1)),
+        a(null),
+        i(null)
+    }
+    ;
+    return p ? u.jsx("div", {
+        className: "calendar-container",
+        children: u.jsxs("div", {
+            className: "error-message",
+            style: {
+                padding: "20px",
+                textAlign: "center"
+            },
+            children: [u.jsxs("p", {
+                children: ["⚠️ ", p]
+            }), u.jsx("button", {
+                onClick: () => {
+                    f(null),
+                    e(new Date)
+                }
+                ,
+                style: {
+                    marginTop: "10px",
+                    padding: "10px 20px",
+                    background: "#007bff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                },
+                children: "Обновить календарь"
+            })]
+        })
+    }) : u.jsxs("div", {
+        className: "calendar-container",
+        children: [u.jsxs("div", {
+            className: "calendar-header",
+            children: [u.jsx("button", {
+                onClick: re,
+                children: "◀️"
+            }), u.jsx("h2", {
+                children: A(r, "MMMM yyyy")
+            }), u.jsx("button", {
+                onClick: G,
+                children: "▶️"
+            })]
+        }), u.jsxs("div", {
+            className: "calendar-grid",
+            children: [["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map(m => u.jsx("div", {
+                className: "calendar-day-header",
+                children: m
+            }, m)), N.length > 0 ? N.map(m => {
+                const w = U(m)
+                  , S = X(m)
+                  , O = V(m)
+                  , ae = ["calendar-day", S ? "selected" : "", O ? "today" : "", w ? "has-birthday" : ""].filter(Boolean).join(" ");
+                return u.jsxs("button", {
+                    className: ae,
+                    onClick: () => Q(m),
+                    title: w ? "Есть дни рождения" : O ? "Сегодня" : "",
+                    children: [u.jsx("span", {
+                        className: "day-number",
+                        children: A(m, "d")
+                    }), w && u.jsx("span", {
+                        className: "birthday-indicator",
+                        children: "🎂"
+                    })]
+                }, m.toISOString())
+            }
+            ) : u.jsx("div", {
+                style: {
+                    gridColumn: "1 / -1",
+                    textAlign: "center",
+                    padding: "20px"
+                },
+                children: u.jsx("p", {
+                    children: "Не удалось загрузить календарь"
+                })
+            })]
+        }), t && u.jsx(Gr, {
+            date: t,
+            data: n,
+            loading: o,
+            error: l
+        })]
+    })
+}
+export {Br as default};
+
+.calendar-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 15px
+}
+
+.calendar-header h2 {
+    font-size: 20px;
+    font-weight: 600
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 5px;
+    margin-bottom: 20px
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-weight: 600;
+    padding: 10px;
+    background-color: #f0f0f0
+}
+
+.calendar-day {
+    padding: 10px;
+    border: 2px solid #ddd;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    transition: all .2s ease
+}
+
+.calendar-day:hover {
+    background-color: #f0f0f0;
+    border-color: #007bff;
+    transform: scale(1.05)
+}
+
+.calendar-day.selected {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+    box-shadow: 0 2px 8px #007bff66;
+    font-weight: 700
+}
+
+.calendar-day.selected:hover {
+    background-color: #0056b3;
+    transform: scale(1.05)
+}
+
+.calendar-day.has-birthday {
+    border-color: #ffc107;
+    background: linear-gradient(to bottom,#fff9e6 0%,#ffffff 100%)
+}
+
+.calendar-day.has-birthday:hover {
+    background: linear-gradient(to bottom,#fff3cd 0%,#fff9e6 100%);
+    border-color: #ff9800
+}
+
+.calendar-day.selected.has-birthday {
+    background: linear-gradient(to bottom,#0056b3 0%,#007bff 100%);
+    border-color: #004085
+}
+
+.calendar-day.today {
+    border-color: #28a745;
+    border-width: 3px;
+    font-weight: 700
+}
+
+.calendar-day.today:not(.selected) {
+    background: linear-gradient(to bottom,#d4edda 0%,#ffffff 100%)
+}
+
+.calendar-day.today.has-birthday:not(.selected) {
+    background: linear-gradient(to bottom,#fff3cd 0%,#d4edda 50%,#ffffff 100%);
+    border-color: #ffc107
+}
+
+.calendar-day.today.selected {
+    border-color: #0056b3;
+    box-shadow: 0 2px 8px #007bff66,0 0 0 2px #28a7454d
+}
+
+.calendar-day .day-number {
     font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-@supports (padding: max(0px)) {
-    html {
-        padding: 0 min(16px, env(safe-area-inset-right)) 0 min(16px, env(safe-area-inset-left));
-    }
-}
-html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-html {
-    line-height: 1.5;
-    font-weight: 400;
-}
-html {
-    box-sizing: border-box;
-}
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-html[Стиль атрибутов] {
-    -webkit-locale: "en";
-    direction: ltr;
-}
-таблица стилей агента пользователя
-[dir="ltr" i] {
-    unicode-bidi: isolate;
-}
-таблица стилей агента пользователя
-:root {
-    view-transition-name: root;
-}
-таблица стилей агента пользователя
-html {
-    display: block;
-}
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-<style>
---stargift-backdrop-center-color {
-    syntax: "<color>";
-    inherits: true;
-    initial-value: white;
-}
-<style>
---stargift-backdrop-offset-y {
-    syntax: "<length>";
-    inherits: true;
-    initial-value: -100px;
-}
-<style>
---stargift-backdrop-edge-color {
-    syntax: "<color>";
-    inherits: true;
-    initial-value: black;
+    line-height: 1.2
 }
 
-<html lang="en" class="custom-scroll no-touch" dir="ltr" style="--vh: 12.7px; --unread-messages-text: &quot;Unread Messages&quot;; --primary-color: #3390ec; --primary-color-rgb: 51,144,236; --light-primary-color: rgba(51, 144, 236, 0.08); --light-filled-primary-color: #eef6fd; --dark-primary-color: hsl(209.83783783783787, 82.95964125560539%, 52.27450980392157%); --saved-color: #3390ec; --light-filled-saved-color: #7cb7f2; --message-out-background-color: #e3fee0; --message-out-background-color-rgb: 227,254,224; --light-message-out-background-color: rgba(227, 254, 224, 0.12); --light-filled-message-out-background-color: #fbfefb; --dark-message-out-background-color: hsl(114.00000000000001, 93.75000000000003%, 81.72549019607843%); --message-out-primary-color: #5ca853; --message-out-primary-color-rgb: 92,168,83; --light-filled-message-out-primary-color: #d8f7d4; --surface-color: #ffffff; --surface-color-rgb: 255,255,255; --danger-color: #df3f40; --danger-color-rgb: 223,63,64; --light-danger-color: rgba(223, 63, 64, 0.08); --dark-danger-color: hsl(359.625, 71.42857142857143%, 48.07843137254902%); --primary-text-color: #000000; --primary-text-color-rgb: 0,0,0; --secondary-text-color: #707579; --secondary-text-color-rgb: 112,117,121; --light-secondary-text-color: rgba(112, 117, 121, 0.08); --light-filled-secondary-text-color: #f3f3f4; --message-background-color: #ffffff; --light-message-background-color: rgba(255, 255, 255, 0.08); --light-filled-message-background-color: #ffffff; --dark-message-background-color: hsl(0, 0%, 92%); --green-color: #70b768; --message-highlighting-color: hsla(86.4, 43.846153%, 45.117647%, .4); --message-highlighting-color-rgb: 121,165,65; --message-highlighting-alpha: 0.4; --messages-text-size: 16px; --left-column-width: 424px; --peer-0-color-rgb: 204,80,73; --peer-1-color-rgb: 214,119,34; --peer-2-color-rgb: 149,92,219; --peer-3-color-rgb: 64,169,32; --peer-4-color-rgb: 48,158,186; --peer-5-color-rgb: 54,138,209; --peer-6-color-rgb: 199,80,139; --peer-7-color-rgb: 225,80,82; --peer-7-border-background: repeating-linear-gradient(-45deg, #f9ae63 0px, #f9ae63 5px, #e15052 5px, #e15052 10px); --peer-8-color-rgb: 224,128,43; --peer-8-border-background: repeating-linear-gradient(-45deg, #fac534 0px, #fac534 5px, #e0802b 5px, #e0802b 10px); --peer-9-color-rgb: 160,95,243; --peer-9-border-background: repeating-linear-gradient(-45deg, #f48fff 0px, #f48fff 5px, #a05ff3 5px, #a05ff3 10px); --peer-10-color-rgb: 39,169,16; --peer-10-border-background: repeating-linear-gradient(-45deg, #a7dc57 0px, #a7dc57 5px, #27a910 5px, #27a910 10px); --peer-11-color-rgb: 39,172,206; --peer-11-border-background: repeating-linear-gradient(-45deg, #82e8d6 0px, #82e8d6 5px, #27acce 5px, #27acce 10px); --peer-12-color-rgb: 51,145,212; --peer-12-border-background: repeating-linear-gradient(-45deg, #7dd3f0 0px, #7dd3f0 5px, #3391d4 5px, #3391d4 10px); --peer-13-color-rgb: 221,67,113; --peer-13-border-background: repeating-linear-gradient(-45deg, #ffbe9f 0px, #ffbe9f 5px, #dd4371 5px, #dd4371 10px); --peer-14-color-rgb: 36,123,237; --peer-14-border-background: repeating-linear-gradient(-45deg, #247bed 0px, #247bed 5px, #f04856 5px, #f04856 10px, #ffffff 10px, #ffffff 15px); --peer-15-color-rgb: 214,119,34; --peer-15-border-background: repeating-linear-gradient(-45deg, #d67722 0px, #d67722 5px, #1ea011 5px, #1ea011 10px, #ffffff 10px, #ffffff 15px); --peer-16-color-rgb: 23,158,66; --peer-16-border-background: repeating-linear-gradient(-45deg, #179e42 0px, #179e42 5px, #e84a3f 5px, #e84a3f 10px, #ffffff 10px, #ffffff 15px); --peer-17-color-rgb: 40,148,175; --peer-17-border-background: repeating-linear-gradient(-45deg, #2894af 0px, #2894af 5px, #6fc456 5px, #6fc456 10px, #ffffff 10px, #ffffff 15px); --peer-18-color-rgb: 12,154,179; --peer-18-border-background: repeating-linear-gradient(-45deg, #0c9ab3 0px, #0c9ab3 5px, #ffad95 5px, #ffad95 10px, #ffe6b5 10px, #ffe6b5 15px); --peer-19-color-rgb: 119,87,214; --peer-19-border-background: repeating-linear-gradient(-45deg, #7757d6 0px, #7757d6 5px, #f79610 5px, #f79610 10px, #ffde8e 10px, #ffde8e 15px); --peer-20-color-rgb: 21,133,207; --peer-20-border-background: repeating-linear-gradient(-45deg, #1585cf 0px, #1585cf 5px, #f2ab1d 5px, #f2ab1d 10px, #ffffff 10px, #ffffff 15px); --peer-border-background: var(--primary-color); --message-out-peer-border-background: var(--message-out-primary-color); --message-out-peer-1-border-background: var(--message-out-primary-color); --message-out-peer-2-border-background: repeating-linear-gradient(-45deg, var(--message-out-primary-color) 0px, var(--message-out-primary-color) 5px, rgba(var(--message-out-primary-color-rgb), .2) 5px, rgba(var(--message-out-primary-color-rgb), .2) 10px); --message-out-peer-3-border-background: repeating-linear-gradient(-45deg, rgba(var(--message-out-primary-color-rgb), .4) 0px, rgba(var(--message-out-primary-color-rgb), .4) 5px, rgba(var(--message-out-primary-color-rgb), .2) 5px, rgba(var(--message-out-primary-color-rgb), .2) 10px, var(--message-out-primary-color) 10px, var(--message-out-primary-color) 15px); --message-empty-peer-1-border-background: var(--message-empty-primary-color); --message-empty-peer-2-border-background: repeating-linear-gradient(-45deg, var(--message-empty-primary-color) 0px, var(--message-empty-primary-color) 5px, rgba(var(--message-empty-primary-color-rgb), .2) 5px, rgba(var(--message-empty-primary-color-rgb), .2) 10px); --message-empty-peer-3-border-background: repeating-linear-gradient(-45deg, rgba(var(--message-empty-primary-color-rgb), .4) 0px, rgba(var(--message-empty-primary-color-rgb), .4) 5px, rgba(var(--message-empty-primary-color-rgb), .2) 5px, rgba(var(--message-empty-primary-color-rgb), .2) 10px, var(--message-empty-primary-color) 10px, var(--message-empty-primary-color) 15px);"><head>
-    <meta charset="utf-8">
-    <title>Telegram Web</title>
-    <meta name="description" content="Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover"> 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-title" content="Telegram Web">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Telegram Web">
-    <meta name="application-name" content="Telegram Web">
-    <meta name="msapplication-TileColor" content="#2d89ef">
-    <meta name="msapplication-TileImage" content="assets/img/mstile-144x144.png?v=jw3mK7G9Ry">
-    <meta name="msapplication-config" content="browserconfig.xml?v=jw3mK7G9Ry">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="color-scheme" content="light">
-    <meta name="google" content="notranslate">
-    <!-- <meta name="robots" content="noindex"> -->
+.calendar-day .birthday-indicator {
+    font-size: 12px;
+    margin-top: 2px;
+    line-height: 1
+}
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://web.telegram.org/k/">
-    <meta property="og:title" content="Telegram Web">
-    <meta property="og:description" content="Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
-    <meta property="og:image" content="assets/img/android-chrome-192x192.png?v=jw3mK7G9Ry">
+.calendar-day.selected .birthday-indicator {
+    filter: brightness(0) invert(1)
+}
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://web.telegram.org/k/">
-    <meta property="twitter:title" content="Telegram Web">
-    <meta property="twitter:description" content="Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
-    <meta property="twitter:image" content="assets/img/android-chrome-192x192.png?v=jw3mK7G9Ry">
+.date-view {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px
+}
 
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png?v=jw3mK7G9Ry">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png?v=jw3mK7G9Ry">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png?v=jw3mK7G9Ry">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/android-chrome-192x192.png?v=jw3mK7G9Ry">
-    <link rel="alternate icon" href="assets/img/favicon.ico?v=jw3mK7G9Ry" type="image/x-icon">
-    <!-- <link rel="mask-icon" href="assets/img/logo_filled.svg?v=jw3mK7G9Ry" color="#3390ec"> -->
-    <link rel="canonical" href="https://web.telegram.org/">
+.date-view h3 {
+    margin-bottom: 15px;
+    font-size: 18px
+}
 
-    <link rel="manifest" id="manifest" href="site.webmanifest?v=jw3mK7G9Aq">
-    <script type="module" crossorigin="" src="./index-bLPCEswf.js"></script>
-    <link rel="stylesheet" crossorigin="" href="./index-Ce_P3CQE.css">
-  <style>.night {--primary-color: #8774e1; --primary-color-rgb: 135,116,225; --light-primary-color: rgba(135, 116, 225, 0.08); --light-filled-primary-color: #292730; --dark-primary-color: hsl(250.45871559633028, 64.49704142011832%, 62.86274509803921%); --saved-color: #8774e1; --light-filled-saved-color: #b2a6eb; --message-out-background-color: #8774e1; --message-out-background-color-rgb: 135,116,225; --light-message-out-background-color: rgba(135, 116, 225, 1); --light-filled-message-out-background-color: #8774e1; --dark-message-out-background-color: hsl(250.45871559633028, 64.49704142011832%, -33.13725490196079%); --message-out-primary-color: #ffffff; --message-out-primary-color-rgb: 255,255,255; --light-filled-message-out-primary-color: #907fe3; --surface-color: #212121; --surface-color-rgb: 33,33,33; --danger-color: #ff595a; --danger-color-rgb: 255,89,90; --light-danger-color: rgba(255, 89, 90, 0.08); --dark-danger-color: hsl(359.6385542168675, 100%, 59.450980392156865%); --primary-text-color: #ffffff; --primary-text-color-rgb: 255,255,255; --secondary-text-color: #aaaaaa; --secondary-text-color-rgb: 170,170,170; --light-secondary-text-color: rgba(170, 170, 170, 0.08); --light-filled-secondary-text-color: #2b2b2b; --message-background-color: #212121; --light-message-background-color: rgba(33, 33, 33, 0.08); --light-filled-message-background-color: #212121; --dark-message-background-color: hsl(0, 0%, 4.941176470588237%); --green-color: #5CC85E;}</style><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/pageIm-CPY-K0MU.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/page-DB0R-iJO.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/appDialogsManager-CNd4t2iE.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/index-bLPCEswf.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/avatar-CgeTjoeA.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/textToSvgURL-Cnw_Q8Rw.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/classNames-DkzuZPwY.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/htmlToSpan-DhAls8qz.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/_commonjsHelpers-Cpj98o6Y.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/iconTsx-D0YaG_ss.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/fastBlur-Co-79rP4.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/putPreloader-BRmpGxbj.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/countryInputField-CdgLxZ1M.js"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/chatBackground-ChJhVxbd.js"><link rel="stylesheet" href="https://web.telegram.org/k/chatBackground-DT3l-EOo.css"><link rel="modulepreload" as="script" crossorigin="" href="https://web.telegram.org/k/codeInputField-BpPfspUt.js"><link rel="stylesheet" href="https://web.telegram.org/k/appDialogsManager-CDuApuEh.css"></head>
-  <body class="animation-level-2 has-horizontal-folders has-pending-suggestion has-chat">
-    <!--[if IE]>
-      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-    <![endif]-->
-    <svg style="position: absolute; top: -10000px; left: -10000px;">
-      <defs id="svg-defs">
-        <clipPath id="tooltip-notch-clip">
-          <path d="M19 7C16.8992 7 13.59 3.88897 11.5003 1.67424C10.7648 0.894688 10.397 0.50491 10.0434 0.385149C9.70568 0.270811 9.4225 0.270474 9.08456 0.38401C8.73059 0.50293 8.36133 0.892443 7.62279 1.67147C5.52303 3.88637 2.18302 7 0 7L19 7Z"></path>
-        </clipPath>
-        <clipPath id="message-tail-clip">
-          <use href="#message-tail"></use>
-        </clipPath>
-        <!-- <linearGradient id="topic-icon-gradient" x1="0" x2="0" y1="0" y2="1">
-          <stop class="topic-icon-gradient-stop-1" offset="0%" />
-          <stop class="topic-icon-gradient-stop-2" offset="100%" />
-        </linearGradient> -->
-        <path id="message-tail" d="M1.00002881,1.03679295e-14 L7,0 L7,17 C6.8069969,14.1607017 6.12380234,11.2332513 4.95041634,8.21764872 C4.04604748,5.89342034 2.50413132,3.73337411 0.324667862,1.73751004 L0.324652538,1.73752677 C-0.0826597201,1.36452676 -0.110475289,0.731958677 0.262524727,0.324646419 C0.451952959,0.117792698 0.719544377,1.0985861e-14 1.00002881,1.04360964e-14 Z"></path>
-        <path id="logo" fill-rule="evenodd" d="M80,0 C124.18278,0 160,35.81722 160,80 C160,124.18278 124.18278,160 80,160 C35.81722,160 0,124.18278 0,80 C0,35.81722 35.81722,0 80,0 Z M114.262551,46.4516129 L114.123923,46.4516129 C111.089589,46.5056249 106.482806,48.0771432 85.1289541,56.93769 L81.4133571,58.4849956 C72.8664779,62.0684477 57.2607933,68.7965125 34.5963033,78.66919 C30.6591745,80.2345564 28.5967328,81.765936 28.4089783,83.2633288 C28.0626453,86.0254269 31.8703852,86.959903 36.7890378,88.5302703 L38.2642674,89.0045258 C42.3926354,90.314406 47.5534685,91.7248852 50.3250916,91.7847532 C52.9151948,91.8407003 55.7944784,90.8162976 58.9629426,88.7115451 L70.5121776,80.9327422 C85.6657026,70.7535853 93.6285785,65.5352892 94.4008055,65.277854 L94.6777873,65.216416 C95.1594319,65.1213105 95.7366278,65.0717596 96.1481181,65.4374337 C96.6344248,65.8695939 96.5866185,66.6880224 96.5351057,66.9075859 C96.127514,68.6448691 75.2839361,87.6143392 73.6629144,89.2417998 L73.312196,89.6016896 C68.7645143,94.2254793 63.9030972,97.1721503 71.5637945,102.355193 L73.3593638,103.544598 C79.0660342,107.334968 82.9483395,110.083813 88.8107882,113.958377 L90.3875424,114.996094 C95.0654739,118.061953 98.7330313,121.697601 103.562866,121.253237 C105.740839,121.052855 107.989107,119.042224 109.175465,113.09692 L109.246762,112.727987 C112.002037,98.0012935 117.417883,66.09303 118.669527,52.9443975 C118.779187,51.7924073 118.641237,50.318088 118.530455,49.6708963 L118.474159,49.3781963 C118.341081,48.7651315 118.067967,48.0040758 117.346762,47.4189793 C116.412565,46.6610871 115.002114,46.4638844 114.262551,46.4516129 Z"></path>
-        <path id="poll-line" d="M4.47,5.33v13.6c0,4.97,4.03,9,9,9h458.16"></path>
-        <path id="check" fill="none" d="M 4.7071 12.2929 l 5 5 c 0.3905 0.3905 1.0237 0.3905 1.4142 0 l 11 -11"></path>
-        <path id="verified-icon-background" fill-rule="evenodd" clip-rule="evenodd" d="m14.378741 1.509638 1.818245 1.818557c.365651.365716.861601.571194 1.378741.571259l2.574273.000312c1.01361.000117 1.846494.773578 1.940861 1.762436l.008905.187798-.000312 2.5727c-.000065.517322.205439 1.013454.571259 1.379222l1.819649 1.819337c.714441.713427.759174 1.843179.134563 2.609139l-.134797.148109-1.819181 1.8182502c-.365963.3657823-.571558.8620196-.571493 1.3794456l.000312 2.5737972c.000559 1.0136048-.772668 1.846676-1.7615 1.9412861l-.188266.0084786-2.573792-.0003107c-.517426-.0000624-1.013675.2055248-1.379456.5714956l-1.818245 1.8191823c-.71331.7145515-1.843049.7594886-2.609113.1349998l-.148135-.1347645-1.8193435-1.8196542c-.3657628-.3658252-.8618987-.5713214-1.3792103-.571259l-2.5727052.0003107c-1.0136048.0001222-1.846676-.7731321-1.9412861-1.761968l-.0089492-.1877967-.0003107-2.5742678c-.0000624-.5171478-.2055495-1.0130926-.571259-1.3787397l-1.8185622-1.8182515c-.7139886-.713869-.758706-1.843647-.1340846-2.609607l.1338493-.148109 1.8190328-1.81935c.3655665-.365625.5709613-.861471.5710237-1.378494l.0003107-2.573181c.0006006-1.076777.8734635-1.949636 1.9502353-1.950234l2.5731758-.000312c.5170321-.000065 1.0128768-.205452 1.3785044-.571025l1.8193448-1.819038c.761592-.761449 1.996254-.761345 2.757716.000247zm3.195309 8.047806c-.426556-.34125-1.032655-.306293-1.417455.060333l-.099151.108173-4.448444 5.55815-1.7460313-1.74707-.1104961-.096564c-.4229264-.32188-1.0291801-.289692-1.4154413.096564-.3862612.386269-.4184492.992511-.0965653 1.41544l.0965653.1105 2.5999987 2.5999987.109876.0961467c.419874.320359 1.015131.2873897 1.397071-.0773773l.098579-.107692 5.2-6.4999961.083772-.120484c.273208-.455884.174278-1.054885-.252278-1.396122z"></path>
-        <path id="verified-icon-check" d="M8 8H18V18H8V8Z"></path>
-        <path id="topic-icon" d="M21.3733 4.27035C19.2176 2.25323 16.2016 1 12.8636 1C6.31153 1 1 5.82866 1 11.7851C1 15.1823 2.58685 17.9669 5.28707 19.9438C5.63238 20.1966 5.95042 21.6013 5.18073 22.7812C4.86598 23.2637 4.51948 23.639 4.25272 23.928C3.86715 24.3457 3.6482 24.5828 3.93266 24.7022C4.22935 24.8266 5.98245 24.8882 7.24776 24.1786C8.23812 23.6232 8.83793 23.0691 9.24187 22.696C9.57588 22.3875 9.77595 22.2027 9.95217 22.2431C10.584 22.388 11.236 22.4868 11.9035 22.5354C11.9126 22.5361 11.9218 22.5368 11.9309 22.5374C12.2386 22.5592 12.5497 22.5702 12.8636 22.5702C19.4157 22.5702 24.7273 17.7416 24.7273 11.7851C24.7273 8.86318 23.4491 6.21263 21.3733 4.27035Z"></path>
-        <!-- <path id="verified-icon-background" d="M12.3 2.9c.1.1.2.1.3.2.7.6 1.3 1.1 2 1.7.3.2.6.4.9.4.9.1 1.7.2 2.6.2.5 0 .6.1.7.7.1.9.1 1.8.2 2.6 0 .4.2.7.4 1 .6.7 1.1 1.3 1.7 2 .3.4.3.5 0 .8-.5.6-1.1 1.3-1.6 1.9-.3.3-.5.7-.5 1.2-.1.8-.2 1.7-.2 2.5 0 .4-.2.5-.6.6-.8 0-1.6.1-2.5.2-.5 0-1 .2-1.4.5-.6.5-1.3 1.1-1.9 1.6-.3.3-.5.3-.8 0-.7-.6-1.4-1.2-2-1.8-.3-.2-.6-.4-.9-.4-.9-.1-1.8-.2-2.7-.2-.4 0-.5-.2-.6-.5 0-.9-.1-1.7-.2-2.6 0-.4-.2-.8-.4-1.1-.6-.6-1.1-1.3-1.6-2-.4-.4-.3-.5 0-1 .6-.6 1.1-1.3 1.7-1.9.3-.3.4-.6.4-1 0-.8.1-1.6.2-2.5 0-.5.1-.6.6-.6.9-.1 1.7-.1 2.6-.2.4 0 .7-.2 1-.4.7-.6 1.4-1.2 2.1-1.7.1-.2.3-.3.5-.2z" /> -->
-        <!-- <path id="verified-icon-check" d="M16.4 10.1l-.2.2-5.4 5.4c-.1.1-.2.2-.4 0l-2.6-2.6c-.2-.2-.1-.3 0-.4.2-.2.5-.6.7-.6.3 0 .5.4.7.6l1.1 1.1c.2.2.3.2.5 0l4.3-4.3c.2-.2.4-.3.6 0 .1.2.3.3.4.5.2 0 .3.1.3.1z" /> -->
-        <symbol id="message-tail-filled" viewBox="0 0 11 20">
-          <g transform="translate(9 -14)" fill="inherit" fill-rule="evenodd">
-            <path d="M-6 16h6v17c-.193-2.84-.876-5.767-2.05-8.782-.904-2.325-2.446-4.485-4.625-6.48A1 1 0 01-6 16z" transform="matrix(1 0 0 -1 0 49)" id="corner-fill" fill="inherit"></path>
-          </g>
-        </symbol>
-        <symbol id="star-sparkle" viewBox="0 0 7 7">
-          <path d="M3.49852 6.5C3.64328 6.5 3.75554 6.39655 3.77917 6.24581C4.04505 4.27438 4.31979 3.99655 6.23412 3.78374C6.38479 3.76601 6.5 3.64483 6.5 3.5C6.5 3.35222 6.38774 3.23399 6.23708 3.21626C4.3257 2.98867 4.06278 2.72266 3.77917 0.754187C3.75554 0.603448 3.64033 0.5 3.49852 0.5C3.35672 0.5 3.24151 0.603448 3.21787 0.754187C2.95199 2.72562 2.67725 3.00345 0.765879 3.21626C0.61226 3.23399 0.5 3.35222 0.5 3.5C0.5 3.64483 0.609306 3.76305 0.762925 3.78374C2.6743 4.04089 2.92541 4.27734 3.21787 6.24581C3.24446 6.39655 3.35968 6.5 3.49852 6.5Z" fill="currentColor"></path>
-        </symbol>
-        <linearGradient id="paint0_linear_6651_5783" x1="12.1999" y1="-1.71024" x2="12.1999" y2="25.2914" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#FFF0C2"></stop>
-          <stop offset="1" stop-color="#FFEBBA"></stop>
-        </linearGradient>
-        <linearGradient id="paint1_linear_6651_5783" x1="12.1992" y1="-1.70952" x2="20.922" y2="24.9546" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#FFD147"></stop>
-          <stop offset="1" stop-color="#FFB526"></stop>
-        </linearGradient>
-        <linearGradient id="paint2_linear_6651_5783" x1="12.1856" y1="1.51874" x2="16.8655" y2="22.0231" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#E58F0D"></stop>
-          <stop offset="1" stop-color="#EB7814"></stop>
-        </linearGradient>
-        <!-- <linearGradient id="g" x1="-300%" x2="-200%" y1="0" y2="0">
-          <stop offset="-10%" stop-opacity=".1"/>
-          <stop offset="30%" stop-opacity=".07"/>
-          <stop offset="70%" stop-opacity=".07"/>
-          <stop offset="110%" stop-opacity=".1"/>
-          <animate attributeName="x1" from="-300%" to="1200%" dur="3s" repeatCount="indefinite"/>
-          <animate attributeName="x2" from="-200%" to="1300%" dur="3s" repeatCount="indefinite"/>
-        </linearGradient> -->
-        <!-- <linearGradient id="stories-gradient" x1="91.56%" y1="-0.56%" x2="13.42%" y2="102.37%">
-          <stop offset="0%" stop-color="#34C76F"></stop>
-          <stop offset="100%" stop-color="#3DA1FD"></stop>
-        </linearGradient> -->
-      </defs>
-    </svg>
-    
-    <div class="sidebar-left-overlay"></div>
-    <div class="whole page-chats" style="" id="page-chats">
-      <div id="main-columns" class="tabs-container" data-animation="navigation" style="">
-        <div class="folders-sidebar sidebar-left-common" id="folders-sidebar"></div>
-        <div class="sidebar-left-placeholder"></div>
-        <div class="tabs-tab chatlist-container sidebar sidebar-left main-column sidebar-left-common can-menu-have-z-index" id="column-left">
-          <div class="sidebar-slider tabs-container" data-animation="navigation">
-            <div class="tabs-tab sidebar-slider-item item-main active">
-              <div class="sidebar-header main-search-sidebar-header can-have-forum is-input-the-last-child"><div class="sidebar-header-search-trigger"><button class="btn-icon rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div>
-                <div class="sidebar-header__btn-container">
-                  <div class="animated-menu-icon"></div>
-                  <button class="btn-icon rp btn-menu-toggle sidebar-tools-button is-visible"><div class="c-ripple"></div><span class="badge badge-20 badge-primary is-badge-empty sidebar-tools-button-notifications"></span></button><div class="btn-icon sidebar-back-button"></div>
-                </div>
-              <div class="input-search old-style">
-      <input type="text" autocomplete="off" class="input-field-input is-empty input-search-input with-focus-effect" dir="auto" placeholder=" ">
-      <div class="input-field-border"></div><span class="tgico input-search-part input-search-icon will-animate"></span><button class="btn-icon input-search-clear input-search-part input-search-button" cancel-mouse-down=""><span class="tgico button-icon"></span></button><span class="i18n input-search-placeholder will-animate">Search</span></div></div><div class="stories-list"><div class="_ListContainer_pejiw_115 disable-hover" style="transform: translateY(-69px); --progress: 1;"><div class="scrollable scrollable-x"><div class="_List_pejiw_41 _space-evenly_pejiw_45"><div class="_ListItem_pejiw_56 _isMasked_pejiw_86" style="z-index: 103; transform: translateX(calc(var(--stories-additional-offset, 0px) * 1 + 240px)) scale(0.555625);"><div class="avatar avatar-like avatar-54 avatar-gradient has-stories" data-peer-id="-1161464837" data-color="violet" style="padding: 3px;"><div><canvas width="56" height="56" class="avatar-stories-svg" style="--offset: -1px;"></canvas><div class="avatar-stories-simple is-unread"></div><div class="avatar-background"></div><div class="avatar avatar-like avatar-48 avatar-gradient" data-color="violet"><img class="avatar-photo" src="blob:https://web.telegram.org/fbf46219-599e-4778-912a-fa28352497cc"></div></div></div><div class="_ListItemName_pejiw_71"><span class="peer-title" dir="auto" data-peer-id="-1161464837" data-thread-id="0" data-dialog="0" data-only-first-name="1" data-username="0" data-limit-symbols="0" data-with-icons="0">Владилен:</span></div></div><div class="_ListItem_pejiw_56" style="z-index: 102; transform: translateX(calc(var(--stories-additional-offset, 0px) * 1 + 90px)) scale(0.555625);"><div class="avatar avatar-like avatar-54 avatar-gradient has-stories" data-peer-id="-1365745638" data-color="blue" style="padding: 3px;"><div><canvas width="56" height="56" class="avatar-stories-svg" style="--offset: -1px;"></canvas><div class="avatar-stories-simple is-unread"></div><div class="avatar-background"></div><div class="avatar avatar-like avatar-48 avatar-gradient" data-color="blue"><img class="avatar-photo" src="blob:https://web.telegram.org/aed7645a-f143-4428-b5e8-4f6d19d8b7db"></div></div></div><div class="_ListItemName_pejiw_71"><span class="peer-title" dir="auto" data-peer-id="-1365745638" data-thread-id="0" data-dialog="0" data-only-first-name="1" data-username="0" data-limit-symbols="0" data-with-icons="0">ecom.tech</span></div></div></div></div></div></div>
-              <div class="sidebar-content transition zoom-fade can-have-forum">
-                <div class="transition-item active has-filters" id="chatlist-container" style="--stories-scrolled: 92px;">
-                  
-                  
-                <div class="connection-status-bottom"><div class="_container_fkln9_1"><div class="_suggestionContainer_fkln9_15"><div class="rp row row-clickable hover-effect _suggestion_fkln9_5 _secondary_fkln9_24"><div class="c-ripple"></div><button class="btn-icon close _close_fkln9_42 rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><div dir="auto" class="row-title"><span class="text-bold _suggestionTitle_fkln9_21"><span class="i18n">Never miss a message! <img src="assets/img/emoji/1f514.png" class="emoji emoji-image" alt="🔔"></span></span></div><div dir="auto" class="row-subtitle"><span class="_suggestionSubtitle_fkln9_11"><span class="i18n">Enable notifications to stay updated.</span></span></div></div></div></div><div class="folders-tabs-scrollable menu-horizontal-scrollable">
-                    
-                  <div class="scrollable scrollable-x"><nav class="menu-horizontal-div" id="folders-tabs"><div class="menu-horizontal-div-item rp active" data-filter-id="0"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="text-super"><span class="i18n">All Chats</span></span><div class="badge badge-20 badge-primary">5</div><i></i></span></div><div class="menu-horizontal-div-item rp" data-filter-id="2"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="text-super" dir="auto">Работа</span><div class="badge badge-20 badge-primary badge-gray">3</div><i></i></span></div></nav></div></div><div class="tabs-container" id="folders-container" data-animation="tabs"><div class="scrollable scrollable-y tabs-tab chatlist-parts folders-scrollable scrolled-start scrollable-y-bordered active" data-filter-id="0" style=""><div class="scrollable-thumb-container"><div class="scrollable-thumb" style="height: 89.7016px; transform: translateY(0px);"></div></div><div class="chatlist-top"><ul class="chatlist virtual-chatlist" data-autonomous="0" style="height: 9944px;"><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1700653489" data-peer-id="-1700653489" style="top: 0px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="5998726034" data-only-first-name="1">не мшнобч</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Похуй пушим</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">599</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1700653489" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Поступашки - Вакансии, Мемы, Задачи</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:39</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1700653489" data-color="green"><img class="avatar-photo" src="blob:https://web.telegram.org/235219dd-d2dc-4a2f-88a1-604a992aa99a"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-2033817896" data-peer-id="-2033817896" style="top: 72px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="1038005879" data-only-first-name="1">Андрей С.</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto"><span><img src="assets/img/emoji/1f3b0.png" class="emoji emoji-image" alt="🎰"></span></span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">4</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-2033817896" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Основа S21</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:36</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-2033817896" data-color="blue"><img class="avatar-photo" src="blob:https://web.telegram.org/69fc649c-f21e-42eb-9f4f-cb6b67980215"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big active _Item_5idej_1" href="#8466582536" data-peer-id="8466582536" style="top: 144px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="8466582536" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="white" data-me-as-notes="0" data-as-all-chats="0">Happy Birthday bot</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:32</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="8466582536" data-color="pink">Hb</div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-2554535308" data-peer-id="-2554535308" style="top: 216px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="1374008428" data-only-first-name="1">Антон</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Я буду в командировке в пути. Вернусь в воскресенье.</span></div><div class="dialog-subtitle-badge badge badge-22 mention mention-badge dialog-subtitle-badge-mention is-visible">@</div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">14</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-2554535308" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">AI IDE BAS_team</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:26</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-2554535308" data-color="green"><img class="avatar-photo" src="blob:https://web.telegram.org/db780d36-ffbc-4638-8f28-6c91cc0bd59b"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1163904855" data-peer-id="-1163904855" style="top: 288px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="858557225" data-only-first-name="1">Petr</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">наберем всем скопом по 1 usdt <img src="assets/img/emoji/1f602.png" class="emoji emoji-image" alt="😂"></span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">7</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1163904855" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">sns_internships</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:04</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1163904855" data-color="orange"><img class="avatar-photo" src="blob:https://web.telegram.org/99fa7e1a-2df7-43cb-b72d-c5f221991cc9"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1720833502" data-peer-id="-1720833502" style="top: 360px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><div class="dialog-subtitle-media media-container no-background"><img class="media-photo" src="blob:https://web.telegram.org/7053f513-8492-49cf-93d9-84edc05ad18e"></div></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">GLM-4.7 – новая опенсорсная сота для кодинга 
+.date-section {
+    margin-bottom: 20px
+}
 
-Похоже, новая китайская звезда  – это стартап Z.ai. О...</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">9</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title with-icons" dir="auto" data-peer-id="-1720833502" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0"><span class="peer-title-inner" dir="auto">Data Secrets</span><span class="verified-icon"><svg viewBox="0 0 26 26" width="26" height="26" class="verified-icon-svg"><use href="#verified-icon-check" class="verified-icon-check"></use><use href="#verified-icon-background" class="verified-icon-background"></use></svg></span></span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">20:00</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1720833502" data-color="green"><img class="avatar-photo" src="blob:https://web.telegram.org/3af9d194-3029-4549-aaff-19e297675201"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1897390401" data-peer-id="-1897390401" style="top: 432px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="508073234" data-only-first-name="1">Саша</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Здравствуйте, подскажите, пожалуйста, какие устройства способны выполнять сложные задачи, например в...</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">8</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1897390401" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">better data community</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">19:59</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-1897390401" data-color="cyan"><img class="avatar-photo" src="blob:https://web.telegram.org/7f7197d7-eb96-4cf9-ae9e-a1b79480ef2d"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1866807276" data-peer-id="-1866807276" style="top: 504px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="7492917700" data-only-first-name="1">SOCl₂</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto"><img src="assets/img/emoji/1f4fa.png" class="emoji emoji-image" alt="📺"></span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">92</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1866807276" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Боталка(Студенты) — Поступашки</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">19:52</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1866807276" data-color="blue"><img class="avatar-photo" src="blob:https://web.telegram.org/3d51db06-2e0a-4d03-9fb5-8897d5825b71"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#-3467665351" data-peer-id="-3467665351" style="top: 576px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="825953834" data-only-first-name="1">Ромашка</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Есть у кого ссылка для загрузки решений?</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">1</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-3467665351" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Data Nomads</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">19:51</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-3467665351" data-color="green"><img class="avatar-photo" src="blob:https://web.telegram.org/bf20eca1-c235-4878-8e20-9839f6e3fcf1"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1170498799" data-peer-id="-1170498799" style="top: 648px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><div class="dialog-subtitle-media media-container no-background"><img class="media-photo" src="blob:https://web.telegram.org/3551cd9f-4f7d-4caf-8eef-da8903a5c26c"></div></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto"><span><span class="i18n">Album</span></span></span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">14</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1170498799" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Т-Образование</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">19:44</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1170498799" data-color="orange"><img class="avatar-photo" src="blob:https://web.telegram.org/e04273e2-69cf-4a45-a006-c44da1de1e99"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-3166759903" data-peer-id="-3166759903" style="top: 720px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="1127653287" data-only-first-name="1">Oleg Zhr</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">в начале 90 в некоторых НИИ еще было очень продвинутое оборудование а тк зарплат уже практически не ...</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">2</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-3166759903" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Sber500 x GigaChat Bootcamp (2 волна)</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">18:44</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-3166759903" data-color="pink"><img class="avatar-photo" src="blob:https://web.telegram.org/990ba921-428c-4906-a591-b6ab1cb8535c"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#-3411839694" data-peer-id="-3411839694" style="top: 792px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="511385189" data-only-first-name="1">Айсен</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Эхх.. Если бы..</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-3411839694" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">AMV<img src="assets/img/emoji/1f1e8-1f1f3.png" class="emoji emoji-image" alt="🇨🇳"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">17:46</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-3411839694" data-color="cyan"><img class="avatar-photo" src="blob:https://web.telegram.org/d62ec986-7021-426a-80ad-6decac670dbd"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#-1161464837" data-peer-id="-1161464837" style="top: 864px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><div class="dialog-subtitle-media media-container no-background"><img class="media-photo" src="blob:https://web.telegram.org/b7e5e120-6fdf-4b36-8cc9-0283f3326852"></div></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Год с ChatGPT по этапам
+.date-section h4 {
+    margin-bottom: 10px;
+    font-size: 16px
+}
 
-Больше этот год был переломными в отношении с нейронками. Их переосознание ...</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1161464837" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Владилен: IT в эпоху AI</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">16:56</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger has-stories" data-peer-id="-1161464837" data-color="violet" style="padding: 3px;"><div><canvas width="56" height="56" class="avatar-stories-svg" style="--offset: -1px;"></canvas><div class="avatar avatar-like avatar-48 avatar-gradient" data-color="violet"><img class="avatar-photo" src="blob:https://web.telegram.org/fbf46219-599e-4778-912a-fa28352497cc"></div></div></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#-4903565206" data-peer-id="-4903565206" style="top: 936px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="144122112" data-only-first-name="1">Ayarhaan Эдик</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Хорошие же парни</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-4903565206" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">«Хорошие же парни» (с) Ваня</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">15:49</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-4903565206" data-color="orange"><img class="avatar-photo" src="blob:https://web.telegram.org/f1859e2f-3b25-4a1c-851d-73aae86c4f37"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#5718179413" data-peer-id="5718179413" style="top: 1008px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">аа</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="5718179413" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">zenamons</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">15:41</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="5718179413" data-color="violet"><img class="avatar-photo" src="blob:https://web.telegram.org/603df446-df8e-43d7-9e16-8b61e038ec97"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#-5009844298" data-peer-id="-5009844298" style="top: 1080px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="464816145" data-only-first-name="1">Роман</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">Хорошо</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-5009844298" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Чат бот Сбер</span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">15:41</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-5009844298" data-color="cyan">ЧС</div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1060745621" data-peer-id="-1060745621" style="top: 1152px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="295002536" data-only-first-name="1">foo</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">sidequest на пк и на квест устанавливаешь, с торрентов качаешь игры и устанавливаешь апк-шки, если у...</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">3</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1060745621" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Future Yakutia <img src="assets/img/emoji/1f384.png" class="emoji emoji-image" alt="🎄"></span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">14:40</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger" data-peer-id="-1060745621" data-color="blue"><img class="avatar-photo" src="blob:https://web.telegram.org/2aa4d397-8bd9-4f47-a216-6d86316ab466"></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-1365745638" data-peer-id="-1365745638" style="top: 1224px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><div class="dialog-subtitle-media media-container no-background"><img class="media-photo" src="blob:https://web.telegram.org/e6bc18f3-35e9-4c6f-a519-c9951d7ec61d"></div></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">#advent_ecom_tech
+.birthday-item,.holiday-item,.responsible-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 4px
+}
 
-В четвертый день нашего адвент календаря сходили к нашему ML департаменту и спрос...</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread is-visible unread">15</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-1365745638" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">ecom.tech</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">Mon</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient dialog-avatar row-media row-media-bigger has-stories" data-peer-id="-1365745638" data-color="blue" style="padding: 3px;"><div><canvas width="56" height="56" class="avatar-stories-svg" style="--offset: -1px;"></canvas><div class="avatar avatar-like avatar-48 avatar-gradient" data-color="blue"><img class="avatar-photo" src="blob:https://web.telegram.org/aed7645a-f143-4428-b5e8-4f6d19d8b7db"></div></div></div></a><a class="row no-wrap row-with-padding row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big is-muted _Item_5idej_1" href="#-3238409705" data-peer-id="-3238409705" style="top: 1296px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow"><span class="primary-text"><span class="peer-title" dir="auto" data-peer-id="620069122" data-only-first-name="1">Alexander</span>: </span></span><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">можно присоединиться — курс официально закончится только в середине января</span></div><div class="dialog-subtitle-badge badge badge-22 dialog-subtitle-badge-unread unread is-visible">2</div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title" dir="auto" data-peer-id="-3238409705" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="0">Т-Академия | AI в разработке ПО</span><span class="tgico dialog-muted-icon"></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">Mon</span></span></div></div><div class="avatar avatar-like avatar-54 avatar-gradient is-forum dialog-avatar row-media row-media-bigger" data-peer-id="-3238409705" data-color="pink"><img class="avatar-photo" src="blob:https://web.telegram.org/2d0fbd8c-3bfd-47dc-9763-f76e879d6bac"></div></a></ul></div><div class="chatlist-bottom"></div></div><div class="scrollable scrollable-y tabs-tab chatlist-parts folders-scrollable scrolled-start scrolled-end scrollable-y-bordered" data-filter-id="2"><div class="scrollable-thumb-container"><div class="scrollable-thumb" style="height: 0px;"></div></div><div class="chatlist-top"><ul class="chatlist virtual-chatlist" data-autonomous="0" style="height: 0px; overflow: hidden;"></ul></div><div class="chatlist-bottom"></div></div></div></div></div>
-                <div class="transition-item sidebar-search" id="search-container"></div>
-              <button class="btn-new-menu btn-circle rp btn-corner z-depth-1 btn-menu-toggle animated-button-icon" tabindex="-1" id="new-menu"><span class="tgico animated-button-icon-icon animated-button-icon-icon-first"></span><span class="tgico animated-button-icon-icon animated-button-icon-icon-last"></span><div class="c-ripple"></div></button><div class="btn-circle rp btn-corner z-depth-1 btn-update is-hidden" tabindex="-1"><div class="c-ripple"></div><span class="i18n">UPDATE</span></div></div>
-            <div class="topics-slider"></div></div>
-          </div>
-        <div class="sidebar-right-border"></div><div class="sidebar-resize-handle"></div></div>
-        <div class="tabs-tab main-column" id="column-center"><div class="chats-container tabs-container" data-animation="navigation"><div class="chat tabs-tab active can-click-date" style="--primary-color: #3390ec; --primary-color-rgb: 51,144,236; --light-primary-color: rgba(51, 144, 236, 0.08); --light-filled-primary-color: #eef6fd; --dark-primary-color: hsl(209.83783783783787, 82.95964125560539%, 52.27450980392157%); --saved-color: #3390ec; --light-filled-saved-color: #7cb7f2; --message-out-background-color: #e3fee0; --message-out-background-color-rgb: 227,254,224; --light-message-out-background-color: rgba(227, 254, 224, 0.12); --light-filled-message-out-background-color: #fbfefb; --dark-message-out-background-color: hsl(114.00000000000001, 93.75000000000003%, 81.72549019607843%); --message-out-primary-color: #5ca853; --message-out-primary-color-rgb: 92,168,83; --light-filled-message-out-primary-color: #d8f7d4; --surface-color: #ffffff; --surface-color-rgb: 255,255,255; --danger-color: #df3f40; --danger-color-rgb: 223,63,64; --light-danger-color: rgba(223, 63, 64, 0.08); --dark-danger-color: hsl(359.625, 71.42857142857143%, 48.07843137254902%); --primary-text-color: #000000; --primary-text-color-rgb: 0,0,0; --secondary-text-color: #707579; --secondary-text-color-rgb: 112,117,121; --light-secondary-text-color: rgba(112, 117, 121, 0.08); --light-filled-secondary-text-color: #f3f3f4; --message-background-color: #ffffff; --light-message-background-color: rgba(255, 255, 255, 0.08); --light-filled-message-background-color: #ffffff; --dark-message-background-color: hsl(0, 0%, 92%); --green-color: #70b768; --message-highlighting-color: hsla(103.40425531914893, 39.17142857142857%, 42.69607843137255%, .4); --message-highlighting-color-rgb: 90,152,66; --message-highlighting-alpha: 0.4;" data-type="chat"><div class="chat-background"><div class="chat-background-item is-pattern is-visible"><canvas width="50" height="50" data-colors="#dbddbb,#6ba587,#d5d88d,#88b884" class="chat-background-item-canvas chat-background-item-color-canvas chat-background-item-scalable"></canvas><canvas data-original-height="1270" width="629" height="1270" class="chat-background-item-canvas chat-background-item-pattern-canvas" style="--opacity-max: 0.5;"></canvas></div></div><div class="sidebar-header topbar has-avatar" data-floating="0" style="--utils-width: 96px;"><div class="chat-info-container"><button class="btn-icon sidebar-close-button"><span class="tgico button-icon"></span><span class="badge badge-20 badge-primary back-unread-badge">5</span></button><div class="chat-info"><div class="person"><div class="avatar avatar-like avatar-42 avatar-gradient person-avatar" data-peer-id="8466582536" data-color="pink">Hb</div><div class="content"><div class="top"><div class="user-title"><span class="peer-title" dir="auto" data-peer-id="8466582536" data-dialog="1" data-with-icons="1" data-thread-id="0" data-me-as-notes="0">Happy Birthday bot</span></div></div><div class="bottom"><div class="info"><span class="i18n">bot</span></div></div></div></div></div><div class="chat-utils"><div class="pinned-message pinned-container hide"><button class="btn-icon pinned-container-close pinned-message-close"><span class="tgico button-icon"></span></button><div class="pinned-container-wrapper pinned-message-wrapper rp"><div class="c-ripple"></div><div class="pinned-message-border"><div class="pinned-message-border-wrapper-1" style=""></div></div><div class="pinned-message-content pinned-container-content"><div class="animated-super pinned-message-media-container"></div><div class="pinned-message-title pinned-container-title" dir="auto"><span class="i18n">Pinned Message</span> <div class="animated-counter"></div></div><div class="pinned-message-subtitle pinned-container-subtitle" dir="auto"><div class="animated-super"></div></div></div><div class="pinned-container-wrapper-utils pinned-message-wrapper-utils"><button class="btn-icon pinned-container-close pinned-message-pinlist"><span class="tgico button-icon"></span></button><button class="btn-icon pinned-container-close pinned-message-close"><span class="tgico button-icon"></span></button></div></div></div><button class="btn-primary btn-color-primary chat-join hide rp"><div class="c-ripple"></div></button><button class="btn-icon force-show-on-mobile rp hide"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon chat-pinlist rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp hide"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp hide"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp btn-menu-toggle hide"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp hide" style="display: none;"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp btn-menu-toggle"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div></div><div class="pinned-requests pinned-container hide"><div class="pinned-container-wrapper pinned-requests-wrapper rp"><div class="c-ripple"></div><div class="pinned-container-wrapper-utils pinned-requests-wrapper-utils"><button class="btn-icon pinned-container-close pinned-requests-close"><span class="tgico button-icon"></span></button></div></div></div><div class="pinned-actions pinned-container hide"><div class="pinned-container-wrapper pinned-actions-wrapper rp"><div class="pinned-container-wrapper-utils pinned-actions-wrapper-utils"><button class="btn-icon pinned-container-close pinned-actions-close"><span class="tgico button-icon"></span></button></div></div></div><div class="pinned-live pinned-container hide"></div><div class="pinned-translation pinned-container hide"><div class="pinned-translation-button"><span class="tgico pinned-translation-button-icon"></span><span class="i18n">Translate to <span class="i18n">English</span></span></div><button class="btn-icon rp btn-menu-toggle pinned-translation-menu primary"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div><div class="pinned-remove-fee pinned-container hide"></div><div class="pinned-sponsored pinned-container hide"></div></div><div class="bubbles scrolled-down has-groups has-sticky-dates"><div class="bubbles-remover-container"><div class="bubbles-remover bubbles-inner"></div></div><div class="scrollable scrollable-y"><div class="scrollable-thumb-container"><div class="scrollable-thumb" style="height: 680.163px; transform: translateY(455.837px);"></div></div><div class="bubbles-inner has-rights"><section class="bubbles-date-group"><div class="bubble service is-date is-sticky"><div class="bubble-content"><div class="service-msg"><span class="i18n">Today</span></div></div></div><div class="bubble service is-date is-fake"><div class="bubble-content"><div class="service-msg"><span class="i18n">Today</span></div></div></div><div class="sticky_sentinel sticky_sentinel--top"></div><div class="bubbles-group bubbles-group-first"><div data-mid="11503" data-peer-id="8466582536" data-timestamp="1766488001" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:06</span><div class="time-inner" title="23 December 2025, 20:06:41"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:06</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11504" data-peer-id="8466582536" data-timestamp="1766488001" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:06</span><div class="time-inner" title="23 December 2025, 20:06:41"><span class="i18n" dir="auto">20:06</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11505" data-peer-id="8466582536" data-timestamp="1766488044" class="bubble hide-name is-out can-have-tail is-read is-group-first"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=panel" onclick="execBotCommand(this)">/panel</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:07</span><div class="time-inner" title="23 December 2025, 20:07:24"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:07</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div><div data-mid="11506" data-peer-id="8466582536" data-timestamp="1766488047" class="bubble hide-name is-out can-have-tail is-read is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:07</span><div class="time-inner" title="23 December 2025, 20:07:27"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:07</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11507" data-peer-id="8466582536" data-timestamp="1766488047" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:07</span><div class="time-inner" title="23 December 2025, 20:07:27"><span class="i18n" dir="auto">20:07</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11508" data-peer-id="8466582536" data-timestamp="1766488169" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:09</span><div class="time-inner" title="23 December 2025, 20:09:29"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:09</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11509" data-peer-id="8466582536" data-timestamp="1766488169" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:09</span><div class="time-inner" title="23 December 2025, 20:09:29"><span class="i18n" dir="auto">20:09</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11510" data-peer-id="8466582536" data-timestamp="1766488244" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:10</span><div class="time-inner" title="23 December 2025, 20:10:44"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:10</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11511" data-peer-id="8466582536" data-timestamp="1766488244" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:10</span><div class="time-inner" title="23 December 2025, 20:10:44"><span class="i18n" dir="auto">20:10</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11512" data-peer-id="8466582536" data-timestamp="1766488308" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:11</span><div class="time-inner" title="23 December 2025, 20:11:48"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:11</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11513" data-peer-id="8466582536" data-timestamp="1766488308" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:11</span><div class="time-inner" title="23 December 2025, 20:11:48"><span class="i18n" dir="auto">20:11</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11514" data-peer-id="8466582536" data-timestamp="1766489248" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:27</span><div class="time-inner" title="23 December 2025, 20:27:28"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:27</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11515" data-peer-id="8466582536" data-timestamp="1766489255" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:27</span><div class="time-inner" title="23 December 2025, 20:27:35"><span class="i18n" dir="auto">20:27</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11516" data-peer-id="8466582536" data-timestamp="1766489257" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:27</span><div class="time-inner" title="23 December 2025, 20:27:37"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:27</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11517" data-peer-id="8466582536" data-timestamp="1766489257" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:27</span><div class="time-inner" title="23 December 2025, 20:27:37"><span class="i18n" dir="auto">20:27</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11518" data-peer-id="8466582536" data-timestamp="1766489301" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:28</span><div class="time-inner" title="23 December 2025, 20:28:21"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:28</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11519" data-peer-id="8466582536" data-timestamp="1766489301" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:28</span><div class="time-inner" title="23 December 2025, 20:28:21"><span class="i18n" dir="auto">20:28</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11520" data-peer-id="8466582536" data-timestamp="1766489303" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:28</span><div class="time-inner" title="23 December 2025, 20:28:23"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:28</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group"><div data-mid="11521" data-peer-id="8466582536" data-timestamp="1766489303" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:28</span><div class="time-inner" title="23 December 2025, 20:28:23"><span class="i18n" dir="auto">20:28</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div><div class="bubbles-group"><div data-mid="11522" data-peer-id="8466582536" data-timestamp="1766489571" class="bubble hide-name is-out can-have-tail is-read is-group-first is-group-last"><div class="bubble-content-wrapper" style=""><div class="bubble-content"><div class="message spoilers-container" dir="auto"><a href="tg://bot_command?command=start" onclick="execBotCommand(this)">/start</a><span class="time"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:32</span><div class="time-inner" title="23 December 2025, 20:32:51"><span class="tgico time-sending-status"></span><span class="i18n" dir="auto">20:32</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div></div></div></div><div class="bubbles-group bubbles-group-last"><div data-mid="11523" data-peer-id="8466582536" data-timestamp="1766489571" class="bubble with-reply-markup hide-name is-in can-have-tail is-group-first is-group-last" style="--peer-color-rgb: var(--peer-6-color-rgb); --peer-border-background: var(--peer-6-border-background);"><div class="bubble-content-wrapper"><div class="bubble-content"><div class="message spoilers-container" dir="auto"><span class="translatable-message">Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.</span><span class="time"><span class="i18n" dir="auto">20:32</span><div class="time-inner" title="23 December 2025, 20:32:51"><span class="i18n" dir="auto">20:32</span></div></span><span class="clearfix"></span></div><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg></div><div class="reply-markup"><div class="reply-markup-row"><button class="is-web-view is-first is-last reply-markup-button rp"><div class="c-ripple"></div><span class="tgico reply-markup-button-icon"></span><span class="reply-markup-button-text"><img src="assets/img/emoji/1f310.png" class="emoji emoji-image" alt="🌐"> Открыть календарь</span></button></div></div></div></div></div></section></div></div><div class="bubbles-floating-separators-container"></div></div><div class="chat-input chat-input-main"><div class="chat-input-container chat-input-main-container"><div class="rows-wrapper-wrapper"><div class="rows-wrapper chat-input-wrapper chat-input-main-wrapper chat-rows-wrapper"><svg viewBox="0 0 11 20" width="11" height="20" class="bubble-tail"><use href="#message-tail-filled"></use></svg><div class="autocomplete-helper z-depth-1 autocomplete-peer-helper bot-commands"></div><div class="reply-wrapper rows-wrapper-row"><button class="btn-icon rp" tabindex="-1"><div class="c-ripple"></div></button><button class="btn-icon reply-cancel" tabindex="-1"><span class="tgico button-icon"></span></button><div class="btn-menu"><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Show Message</span></div><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Reply in Another Chat</span></div><div class="btn-menu-item rp-overflow danger"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Do Not Reply</span></div><div class="btn-menu-item rp-overflow danger"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Do Not Quote</span></div></div><div class="btn-menu"><form><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Chat.Alert.Forward.Action.Show1</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="author" value="1"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Chat.Alert.Forward.Action.Hide1</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="author" value="0"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><hr></form><form><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Chat.Alert.Forward.Action.ShowCaption</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="caption" value="1"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Chat.Alert.Forward.Action.HideCaption</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="caption" value="0"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><hr></form><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Forward to Another Chat</span></div><div class="btn-menu-item rp-overflow danger"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Do Not Forward</span></div></div><div class="btn-menu"><form><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Show Above the Message</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="position" value="1"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Show Below the Message</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="position" value="0"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><hr></form><form><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Show Larger Media</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="size" value="1"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><div class="btn-menu-item rp-overflow has-checkbox"><span class="i18n btn-menu-item-text">Show Smaller Media</span><label class="checkbox-field checkbox-without-caption"><input class="checkbox-field-input" type="radio" name="size" value="0"><div class="checkbox-box"><div class="checkbox-box-border"></div><div class="checkbox-box-background"></div><svg class="checkbox-box-check" viewBox="0 0 24 24"><use href="#check" x="-1"></use></svg></div></label></div><hr></form><div class="btn-menu-item rp-overflow danger"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Remove Link Preview</span></div></div></div><div class="autocomplete-helper z-depth-1 stickers-helper"></div><div class="autocomplete-helper z-depth-1 emoji-helper"></div><div class="autocomplete-helper z-depth-1 autocomplete-peer-helper commands-helper"></div><div class="autocomplete-helper z-depth-1 autocomplete-peer-helper mentions-helper"></div><div class="autocomplete-helper z-depth-1 inline-helper"></div><div class="new-message-wrapper rows-wrapper-row has-offset" data-offset="commands" style="--commands-size: 114px;"><div class="new-message-bot-commands is-view"><span class="tgico new-message-bot-commands-view-icon"></span><div class="new-message-bot-commands-icon-scale"><div class="animated-menu-icon animated-menu-close-icon hide"></div></div><div class="new-message-bot-commands-view">Открыть</div></div><button class="btn-icon toggle-emoticons" tabindex="-1"><span class="tgico button-icon"></span></button><div class="input-message-container"><div class="input-message-input is-empty scrollable scrollable-y no-scrollbar" contenteditable="true" dir="auto" tabindex="-1" data-peer-id="8466582536" style="transition-duration: 0ms; height: 37px;"></div><span class="input-field-placeholder i18n is-empty">Message</span><div contenteditable="true" tabindex="-1" class="input-message-input is-empty scrollable scrollable-y no-scrollbar input-field-input-fake"></div></div><button class="btn-icon btn-scheduled float hide show" tabindex="-1"><span class="tgico button-icon"></span></button><button class="btn-icon toggle-reply-markup float hide show" tabindex="-1"><span class="tgico button-icon"></span></button><button class="btn-icon hide rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><div class="btn-icon btn-menu-toggle attach-file"><span class="tgico"></span></div><div class="record-time"></div><input type="file" multiple="" style="display: none;"></div></div></div><div class="fake-wrapper fake-rows-wrapper"></div><div class="fake-wrapper fake-selection-wrapper"></div><button class="btn-circle btn-corner z-depth-1 bubbles-corner-button chat-secondary-button bubbles-go-down rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span><span class="badge badge-24 badge-primary is-badge-empty"></span></button><div class="chat-input-control chat-input-wrapper"><button class="btn-primary btn-transparent text-bold chat-input-control-button rp"><div class="c-ripple"></div><span class="i18n">START</span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><div class="c-ripple"></div><span class="i18n">Unblock</span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><span class="i18n">JOIN</span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><div class="c-ripple"></div><span class="i18n">Only Premium users can message <span class="peer-title" dir="auto" data-peer-id="8466582536" data-only-first-name="1">Happy Birthday bot</span>.<br><a>Learn more...</a></span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><div class="c-ripple"></div><span class="chat-input-frozen-text"><span class="i18n danger">Your Account is Frozen</span><span class="i18n secondary chat-input-frozen-text-subtitle">Click to view details</span></span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><span class="i18n">Unpin All Messages</span></button><button class="btn-primary btn-transparent text-bold chat-input-control-button rp hide"><div class="c-ripple"></div><span class="i18n">Open Chat</span></button></div><button class="btn-circle btn-corner z-depth-1 bubbles-corner-button chat-secondary-button bubbles-go-mention bubbles-go-reaction rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span><span class="badge badge-24 badge-primary is-badge-empty"></span></button><button class="btn-circle btn-corner z-depth-1 bubbles-corner-button chat-secondary-button bubbles-go-mention bubbles-go-reaction rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span><span class="badge badge-24 badge-primary is-badge-empty"></span></button><button class="btn-icon btn-circle btn-record-cancel chat-input-secondary-button chat-secondary-button rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><div class="btn-send-container"><span class="btn-send-stars-badge stars-badge-base"><span class="tgico stars-badge-base__icon"></span><span>NaN</span></span><div class="record-ripple"></div><button class="btn-icon rp btn-circle btn-send animated-button-icon record" tabindex="-1"><div class="c-ripple"></div><span class="tgico animated-button-icon-icon btn-send-icon-send"></span><span class="tgico animated-button-icon-icon btn-send-icon-schedule"></span><span class="tgico animated-button-icon-icon btn-send-icon-edit"></span><span class="tgico animated-button-icon-icon btn-send-icon-record"></span><span class="tgico animated-button-icon-icon btn-send-icon-forward"></span></button><div class="btn-send-effect-container"></div><div class="btn-menu menu-send top-left"><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Send Without Sound</span></div><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Schedule Message</span></div><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Set a Reminder</span></div><div class="btn-menu-item rp-overflow"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Send When Online</span></div><div class="btn-menu-item rp-overflow danger"><span class="tgico btn-menu-item-icon"></span><span class="i18n btn-menu-item-text">Remove Effect</span></div></div></div></div></div></div></div><div class="pinned-audio pinned-container is-floating"><div class="pinned-container-wrapper pinned-audio-wrapper rp"><div class="c-ripple"></div><button class="btn-icon active"><span class="tgico button-icon"></span></button><button class="btn-icon active pinned-audio-ico"></button><button class="btn-icon active"><span class="tgico button-icon"></span></button><div class="pinned-audio-content pinned-container-content"><div class="pinned-audio-title pinned-container-title" dir="auto"></div><div class="pinned-audio-subtitle pinned-container-subtitle" dir="auto"></div></div><div class="pinned-audio-progress-wrapper"><div class="progress-line use-transform pinned-audio-progress"><div class="progress-line__filled"></div><input class="progress-line__seek" type="range" step="0.016666666666666666" min="0" max="1"></div></div><div class="pinned-container-wrapper-utils pinned-audio-wrapper-utils"><div class="btn-icon player-volume pinned-audio-volume active"><div class="pinned-audio-volume-tunnel"></div><span class="tgico button-icon player-volume__icon"></span><div class="progress-line-container"><div class="progress-line"><div class="progress-line__filled" style="width: 100%;"></div><input class="progress-line__seek" type="range" step="0.01" min="0" max="1"></div></div></div><button class="btn-icon btn-menu-toggle"><span class="tgico"></span><div class="btn-menu bottom-left playback-rate-menu"><div class="btn-menu-item rp-overflow"><span dir="" class="btn-menu-item-text">0.5x</span></div><div class="btn-menu-item rp-overflow"><span dir="" class="btn-menu-item-text">1x</span></div><div class="btn-menu-item rp-overflow"><span dir="" class="btn-menu-item-text">1.5x</span></div><div class="btn-menu-item rp-overflow"><span dir="" class="btn-menu-item-text">2x</span></div></div></button><button class="btn-icon"><span class="tgico button-icon"></span></button><button class="btn-icon pinned-container-close pinned-audio-close"><span class="tgico button-icon"></span></button></div></div></div></div>
-        <div class="tabs-tab sidebar sidebar-right main-column" id="column-right">
-          <div class="sidebar-content sidebar-slider tabs-container" data-animation="navigation"><div class="tabs-tab sidebar-slider-item scrolled-start scrolled-end scrollable-y-bordered shared-media-container profile-container is-collapsed"><div class="sidebar-header"><button class="btn-icon sidebar-close-button"><div class="animated-close-icon"></div></button><div class="transition slide-fade" data-animation="slide-fade"><div class="transition-item active"><div class="sidebar-header__title"><span class="i18n">Bot Info</span></div><button class="btn-icon rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div><div class="transition-item"><div class="sidebar-header__rows"><div class="sidebar-header__title"><span class="peer-title" dir="auto" data-peer-id="8466582536" data-thread-id="0" data-me-as-notes="0" data-dialog="1">Happy Birthday bot</span></div><div class="sidebar-header__subtitle"><div class="transition slide-fade" data-animation="slide-fade"><div class="transition-item active"><span class="i18n">1 chat</span></div><div class="transition-item"><span class="i18n">Loading...</span></div><div class="transition-item"><span class="i18n">Loading...</span></div><div class="transition-item"><span class="i18n">0 media files</span></div><div class="transition-item"><span class="i18n">0 gifts</span></div><div class="transition-item"><span class="i18n">Loading...</span></div><div class="transition-item"><span class="i18n">0 files</span></div><div class="transition-item"><span class="i18n">0 links</span></div><div class="transition-item"><span class="i18n">0 music files</span></div><div class="transition-item"><span class="i18n">0 voice messages</span></div><div class="transition-item"><span class="i18n">Loading...</span></div><div class="transition-item"><span class="i18n">Loading...</span></div></div></div></div></div></div><button class="btn-icon rp btn-menu-toggle hide"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div><div class="sidebar-content"><div class="scrollable scrollable-y no-parallax" style=""><div class="scrollable-thumb-container"><div class="scrollable-thumb" style="height: 0px;"></div></div><div class="profile-content search-empty"><div class="profile-avatars-container is-single"><div class="avatar avatar-like avatar-120 avatar-gradient profile-avatars-avatar-fake" data-peer-id="8466582536" data-color="pink">Hb</div><div class="profile-avatars-avatars"><div class="profile-avatars-avatar media-container active"><div class="avatar avatar-like avatar-full avatar-gradient profile-avatars-avatar-first" data-peer-id="8466582536" data-color="pink">Hb</div></div></div><div class="profile-avatars-gradient"></div><div class="profile-avatars-gradient profile-avatars-gradient-top"></div><div class="profile-avatars-tabs"><div class="profile-avatars-tab active"></div></div><div class="profile-avatars-arrow"><span class="tgico profile-avatars-arrow-icon"></span></div><div class="profile-avatars-arrow profile-avatars-arrow-next"><span class="tgico profile-avatars-arrow-icon"></span></div><div class="profile-avatars-info"><div class="profile-name"><span class="peer-title" dir="auto" data-peer-id="8466582536" data-dialog="1" data-with-icons="1" data-thread-id="0" data-me-as-notes="0" data-clickable-emoji-status="1">Happy Birthday bot</span></div><div class="profile-subtitle"><div class="profile-subtitle-text"><span><span class="i18n">bot</span></span></div></div></div><div class="profile-pinned-gifts"></div></div><div class="sidebar-left-section-container"><div class="sidebar-left-section no-delimiter"><div class="sidebar-left-section-content"><div class="rp row row-with-icon row-with-padding row-clickable hover-effect"><div class="c-ripple"></div><div dir="auto" class="row-title">Happy_birthday_telegram_bot</div><div dir="auto" class="row-subtitle"><span class="i18n">Username</span></div><span class="tgico row-icon"></span></div><label class="rp row no-subtitle row-with-icon row-with-padding row-clickable hover-effect"><div class="c-ripple"></div><div class="row-row row-title-row"><div dir="auto" class="row-title"><span class="i18n">Notifications</span></div><div dir="auto" class="row-title row-title-right"><label class="checkbox-field checkbox-without-caption checkbox-field-toggle"><input class="checkbox-field-input" type="checkbox"><div class="checkbox-toggle"><div class="checkbox-toggle-circle"></div></div></label></div></div><span class="tgico row-icon"></span></label></div></div></div><div class="search-super hide"><div class="search-super-tabs-scrollable menu-horizontal-scrollable sticky"><div class="scrollable scrollable-x search-super-nav-scrollable"><nav class="search-super-tabs menu-horizontal-div"><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Chats</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Stories</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Members</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Media</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Gifts</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Saved</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Files</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Links</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Music</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Voice</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Groups</span><i></i></span></div><div class="menu-horizontal-div-item rp hide"><div class="c-ripple"></div><span class="menu-horizontal-div-item-span"><span class="i18n">Similar Channels</span><i></i></span></div></nav></div></div><div class="search-super-tabs-container tabs-container" data-animation="tabs"><div class="search-super-tab-container search-super-container-savedDialogs tabs-tab"><div class="search-super-content-container search-super-content-savedDialogs"><ul class="chatlist virtual-chatlist" data-autonomous="0" style="height: 80px;"><a class="row no-wrap row-clickable hover-effect rp chatlist-chat chatlist-chat-bigger row-big _Item_5idej_1" href="#8091328122" data-peer-id="8091328122" data-is-all-chats="true" style="top: 0px;"><div class="c-ripple"></div><div class="row-row row-subtitle-row dialog-subtitle has-multiple-badges"><div class="row-subtitle no-wrap dialog-subtitle-flex" dir="auto"><span class="dialog-subtitle-span dialog-subtitle-span-overflow dialog-subtitle-span-last" dir="auto">1. Нам в календарь надо добавить дни рождения персональные и плюс проф праздники 
-2. ⁠в календаре из...</span></div></div><div class="row-row row-title-row dialog-title"><div class="row-title no-wrap user-title" dir="auto"><span class="peer-title with-icons" dir="auto" data-peer-id="8091328122" data-from-name="0" data-dialog="1" data-only-first-name="0" data-with-icons="1" data-thread-id="0" data-icons-color="primary-color" data-me-as-notes="0" data-as-all-chats="topics"><span class="emoji-topic-icon"><img src="assets/img/emoji/1f4ac.png" class="emoji emoji-image" alt="💬"></span><span class="peer-title-inner" dir="auto"><span class="i18n">All Messages</span></span></span></div><div class="row-title row-title-right row-title-right-secondary dialog-title-details"><span class="message-status sending-status hide"></span><span class="message-time"><span class="i18n" dir="auto">Dec 8</span></span></div></div></a></ul></div></div><div class="search-super-tab-container search-super-container-stories tabs-tab"><div class="search-super-content-container search-super-content-stories"></div></div><div class="search-super-tab-container search-super-container-members tabs-tab"><div class="search-super-content-container search-super-content-members"></div></div><div class="search-super-tab-container search-super-container-media tabs-tab"><div class="search-super-content-container search-super-content-media"></div><div class="preloader">
-  <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-  <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle>
-  </svg></div></div><div class="search-super-tab-container search-super-container-gifts tabs-tab"><div class="search-super-content-container search-super-content-gifts"></div></div><div class="search-super-tab-container search-super-container-saved tabs-tab"><div class="search-super-content-container search-super-content-saved"></div></div><div class="search-super-tab-container search-super-container-files tabs-tab"><div class="search-super-content-container search-super-content-files"></div><div class="preloader">
-  <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-  <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle>
-  </svg></div></div><div class="search-super-tab-container search-super-container-links tabs-tab"><div class="search-super-content-container search-super-content-links"></div><div class="preloader">
-  <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-  <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle>
-  </svg></div></div><div class="search-super-tab-container search-super-container-music tabs-tab"><div class="search-super-content-container search-super-content-music"></div><div class="preloader">
-  <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-  <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle>
-  </svg></div></div><div class="search-super-tab-container search-super-container-voice tabs-tab"><div class="search-super-content-container search-super-content-voice"></div><div class="preloader">
-  <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-  <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle>
-  </svg></div></div><div class="search-super-tab-container search-super-container-groups tabs-tab"><div class="search-super-content-container search-super-content-groups"></div></div><div class="search-super-tab-container search-super-container-similar tabs-tab"><div class="search-super-content-container search-super-content-similar"></div></div></div></div></div></div><button class="btn-circle btn-corner z-depth-1 rp" tabindex="-1"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div></div></div>
-        </div>
-      </div>
-    </div>
-    <div id="stories-viewer"></div>
-  
+.birthday-item p,.holiday-item p,.responsible-item p {
+    margin: 5px 0
+}
 
-<div class="night" style="display: none;"></div><div id="audio-asset-player"></div><div style="display: none;"></div><div class="emoji-animation-container"></div><div><div class="_Browser_1crtd_41 movable-element animated-item" style="inset: 291px auto auto 74.5px; width: 480px; height: 688px;"><div class="_BrowserHeader_1crtd_55"><button class="btn-icon _BrowserHeaderButton_1crtd_65" tabindex="-1"><div class="animated-close-icon"></div></button><div class="scrollable scrollable-x _BrowserHeaderTabsScrollable_1crtd_81 scrolled-start scrolled-end"><div class="_BrowserHeaderTabs_1crtd_72"><div class="_BrowserHeaderSelector_1crtd_174" style="transform: translateX(7px); width: 201.664px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="_BrowserHeaderSelectorTail_1crtd_188 _left_1crtd_192"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 16V0C16 8.83656 8.83656 16 0 16H16Z" fill="var(--surface-color)"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="_BrowserHeaderSelectorTail_1crtd_188 _right_1crtd_195"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 16V0C16 8.83656 8.83656 16 0 16H16Z" fill="var(--surface-color)"></path></svg></div><div class="_BrowserHeaderTab_1crtd_72 _active_1crtd_157 _first_1crtd_96 animated-item" style="--text-width: 161.6640625px; z-index: 4;"><button class="btn-icon _BrowserHeaderButton_1crtd_65 _BrowserHeaderTabIcon_1crtd_111" tabindex="-1"><span class="_BrowserHeaderTabIconInner_1crtd_117"><div class="avatar avatar-like avatar-24 avatar-gradient " data-peer-id="8466582536" data-color="pink">Hb</div></span><span class="tgico _BrowserHeaderTabHover_1crtd_163 _BrowserHeaderTabMore_1crtd_126"></span></button><div class="_BrowserHeaderTabTitle_1crtd_102">Happy Birthday bot</div><div class="_BrowserHeaderTabHover_1crtd_163 _BrowserHeaderTabMask_1crtd_149"></div><button class="btn-icon _BrowserHeaderTabHover_1crtd_163 _BrowserHeaderTabClose_1crtd_141" tabindex="-1"><span class="tgico"></span></button></div><button class="btn-icon _BrowserHeaderButton_1crtd_65 _BrowserHeaderTabIcon_1crtd_111 _BrowserHeaderNewButton_1crtd_214" tabindex="-1"><span class="_BrowserHeaderTabIconInner_1crtd_117"><span class="tgico"></span></span></button></div></div><div class="_BrowserHeaderCollapsedTitle_1crtd_199" style="--translateX: -28px;"><span class="i18n">Happy Birthday bot</span></div><button class="btn-icon _BrowserHeaderButton_1crtd_65" tabindex="-1"><span class="tgico"></span></button></div><div class="_BrowserBody_1crtd_220" style="width: 480px; --browser-width: 480px; height: 640px;"><div class="_BrowserPage_1crtd_228"><div class="web-app-body" style="background-color: rgb(255, 255, 255);"><iframe src="https://miniapp.micro-tab.ru:4443/?v=2025.12.23.11#tgWebAppData=query_id%3DAAF63kdiAwAAAHreR2J7Bb3L%26user%3D%257B%2522id%2522%253A8091328122%252C%2522first_name%2522%253A%2522Daren%2522%252C%2522last_name%2522%253A%2522Krystin%2522%252C%2522username%2522%253A%2522triumf_ykt%2522%252C%2522language_code%2522%253A%2522ru%2522%252C%2522allows_write_to_pm%2522%253Atrue%252C%2522photo_url%2522%253A%2522https%253A%255C%252F%255C%252Ft.me%255C%252Fi%255C%252Fuserpic%255C%252F320%255C%252F6NzUCWt2e6QM_IbAPmwh6qtUbc1x9kyoQjPM7clptS4WqxmdtvDQRlSA1AxvYSA4.svg%2522%257D%26auth_date%3D1766489861%26signature%3DdktawMgK3qK2578OFaWJAYyc6W2Qi7n5j8Fw-V7znG2kdJFhm277DCZC7nKwPbqJgDm_xbObhnlSvi1EbwQTBA%26hash%3D9737ad9ed8f47a9e3f125f0f499e7b8326b544c5c015451fc95f0241b6d19411&amp;tgWebAppVersion=9.1&amp;tgWebAppPlatform=web&amp;tgWebAppThemeParams=%7B%22bg_color%22%3A%22%23ffffff%22%2C%22button_color%22%3A%22%233390ec%22%2C%22button_text_color%22%3A%22%23ffffff%22%2C%22hint_color%22%3A%22%23707579%22%2C%22link_color%22%3A%22%2300488f%22%2C%22secondary_bg_color%22%3A%22%23f4f4f5%22%2C%22text_color%22%3A%22%23000000%22%2C%22header_bg_color%22%3A%22%23ffffff%22%2C%22accent_text_color%22%3A%22%233390ec%22%2C%22section_bg_color%22%3A%22%23ffffff%22%2C%22section_header_text_color%22%3A%22%233390ec%22%2C%22subtitle_text_color%22%3A%22%23707579%22%2C%22destructive_text_color%22%3A%22%23df3f40%22%7D" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-storage-access-by-user-activation" allow="camera; microphone; geolocation; accelerometer; gyroscope; magnetometer; device-orientation;" class="payment-verification" allowfullscreen="" style="opacity: 1;"></iframe><div class="web-app-footer" style="background: rgb(244, 244, 245);"><button class="btn-primary btn-color-primary web-app-button web-app-button-secondary rp" disabled="" style="--text-color: undefined;"><div class="c-ripple"></div><span></span></button><button class="btn-primary web-app-button btn-color-primary rp" disabled="" style="--text-color: undefined;"><div class="c-ripple"></div><span></span></button></div><div class="web-app-fullscreen-buttons"><button class="btn-icon rp btn-menu-toggle"><div class="c-ripple"></div><span class="tgico button-icon"></span></button><button class="btn-icon rp"><div class="c-ripple"></div><span class="tgico button-icon"></span></button></div></div></div></div><div data-side="n" class="movable-element-resize-handler movable-element-resize-handler-side-n"></div><div data-side="e" class="movable-element-resize-handler movable-element-resize-handler-side-e"></div><div data-side="s" class="movable-element-resize-handler movable-element-resize-handler-side-s"></div><div data-side="w" class="movable-element-resize-handler movable-element-resize-handler-side-w"></div><div data-side="ne" class="movable-element-resize-handler movable-element-resize-handler-side-ne"></div><div data-side="se" class="movable-element-resize-handler movable-element-resize-handler-side-se"></div><div data-side="sw" class="movable-element-resize-handler movable-element-resize-handler-side-sw"></div><div data-side="nw" class="movable-element-resize-handler movable-element-resize-handler-side-nw"></div></div></div></body></html>
+.comment {
+    font-style: italic;
+    color: #666
+}
 
-accessKey
-: 
-""
-attributeStyleMap
-: 
-StylePropertyMap {size: 82}
-attributes
-: 
-NamedNodeMap {0: lang, 1: class, 2: dir, 3: style, lang: lang, class: class, dir: dir, style: style, length: 4}
-autocapitalize
-: 
-""
-autofocus
-: 
-false
-baseURI
-: 
-"https://web.telegram.org/k/#@Happy_birthday_telegram_bot"
-childElementCount
-: 
-2
-childNodes
-: 
-NodeList(3) [head, text, body.animation-level-2.has-horizontal-folders.has-pending-suggestion.has-chat]
-children
-: 
-HTMLCollection(2) [head, body.animation-level-2.has-horizontal-folders.has-pending-suggestion.has-chat]
-classList
-: 
-DOMTokenList(2) ['custom-scroll', 'no-touch', value: 'custom-scroll no-touch']
-className
-: 
-"custom-scroll no-touch"
-clientHeight
-: 
-1270
-clientLeft
-: 
-0
-clientTop
-: 
-0
-clientWidth
-: 
-629
-contentEditable
-: 
-"inherit"
-currentCSSZoom
-: 
-1
-dataset
-: 
-DOMStringMap {}
-dir
-: 
-"ltr"
-draggable
-: 
-false
-elementTiming
-: 
-""
-enterKeyHint
-: 
-""
-firstChild
-: 
-head
-firstElementChild
-: 
-head
-hidden
-: 
-false
-id
-: 
-""
-inert
-: 
-false
-innerHTML
-: 
-"<head>\n    <meta charset=\"utf-8\">\n    <title>
-innerText
-: 
-"\nSearch\nВладилен:\necom.tech\n\nNever miss a message! \nEnable notifications to stay updated.\nAll Chats\n5\nРабота\n3\nне мшнобч: \nПохуй пушим\n599\nПоступашки - Вакансии, Мемы, Задачи\n\n20:39\nАндрей С.: \n4\nОснова S21\n\n20:36\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\nHappy Birthday bot\n20:32\nHB\nАнтон: \nЯ буду в командировке в пути. Вернусь в воскресенье.\n@\n14\nAI IDE BAS_team\n\n20:26\nPetr: \nнаберем всем скопом по 1 usdt \n7\nsns_internships\n\n20:04\nGLM-4.7 – новая опенсорсная сота для кодинга Похоже, новая китайская звезда – это стартап Z.ai. О...\n9\nData Secrets\n\n20:00\nСаша: \nЗдравствуйте, подскажите, пожалуйста, какие устройства способны выполнять сложные задачи, например в...\n8\nbetter data community\n\n19:59\nSOCl₂: \n92\nБоталка(Студенты) — Поступашки\n\n19:52\nРомашка: \nЕсть у кого ссылка для загрузки решений?\n1\nData Nomads\n19:51\nAlbum\n14\nТ-Образование\n\n19:44\nOleg Zhr: \nв начале 90 в некоторых НИИ еще было очень продвинутое оборудование а тк зарплат уже практически не ...\n2\nSber500 x GigaChat Bootcamp (2 волна)\n\n18:44\nАйсен: \nЭхх.. Если бы..\nAMV\n17:46\nГод с ChatGPT по этапам Больше этот год был переломными в отношении с нейронками. Их переосознание ...\nВладилен: IT в эпоху AI\n16:56\nAyarhaan Эдик: \nХорошие же парни\n«Хорошие же парни» (с) Ваня\n15:49\nаа\nzenamons\n15:41\nРоман: \nХорошо\nЧат бот Сбер\n15:41\nЧС\nfoo: \nsidequest на пк и на квест устанавливаешь, с торрентов качаешь игры и устанавливаешь апк-шки, если у...\n3\nFuture Yakutia \n\n14:40\n#advent_ecom_tech В четвертый день нашего адвент календаря сходили к нашему ML департаменту и спрос...\n15\necom.tech\n\nMon\nAlexander: \nможно присоединиться — курс официально закончится только в середине января\n2\nТ-Академия | AI в разработке ПО\n\nMon\n\n\nUPDATE\n\nHB\nHappy Birthday bot\nbot\n\n\nToday\n/start\n\n20:06\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:06\n\n Открыть календарь\n/panel\n\n20:07\n/start\n\n20:07\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:07\n\n Открыть календарь\n/start\n\n20:09\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:09\n\n Открыть календарь\n/start\n\n20:10\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:10\n\n Открыть календарь\n/start\n\n20:11\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:11\n\n Открыть календарь\n/start\n\n20:27\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:27\n\n Открыть календарь\n/start\n\n20:27\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:27\n\n Открыть календарь\n/start\n\n20:28\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:28\n\n Открыть календарь\n/start\n\n20:28\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:28\n\n Открыть календарь\n/start\n\n20:32\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:32\n\n Открыть календарь\n\n\nОткрыть\n\nMessage\n\n\nNaN\n\n\n\n\n\nHB\n\nHappy Birthday bot\n\n\nHappy Birthday bot\n"
-inputMode
-: 
-""
-isConnected
-: 
-true
-isContentEditable
-: 
-false
-lang
-: 
-"en"
-lastChild
-: 
-body.animation-level-2.has-horizontal-folders.has-pending-suggestion.has-chat
-lastElementChild
-: 
-body.animation-level-2.has-horizontal-folders.has-pending-suggestion.has-chat
-localName
-: 
-"html"
-namespaceURI
-: 
-"http://www.w3.org/1999/xhtml"
-nodeName
-: 
-"HTML"
-nodeType
-: 
-1
-nonce
-: 
-""
-offsetHeight
-: 
-1270
-offsetLeft
-: 
-0
-offsetTop
-: 
-0
-offsetWidth
-: 
-629
-outerHTML
-: 
-"<html lang=\"en\" class=\"custom-scroll no-touch\
-outerText
-: 
-"\nSearch\nВладилен:\necom.tech\n\nNever miss a message! \nEnable notifications to stay updated.\nAll Chats\n5\nРабота\n3\nне мшнобч: \nПохуй пушим\n599\nПоступашки - Вакансии, Мемы, Задачи\n\n20:39\nАндрей С.: \n4\nОснова S21\n\n20:36\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\nHappy Birthday bot\n20:32\nHB\nАнтон: \nЯ буду в командировке в пути. Вернусь в воскресенье.\n@\n14\nAI IDE BAS_team\n\n20:26\nPetr: \nнаберем всем скопом по 1 usdt \n7\nsns_internships\n\n20:04\nGLM-4.7 – новая опенсорсная сота для кодинга Похоже, новая китайская звезда – это стартап Z.ai. О...\n9\nData Secrets\n\n20:00\nСаша: \nЗдравствуйте, подскажите, пожалуйста, какие устройства способны выполнять сложные задачи, например в...\n8\nbetter data community\n\n19:59\nSOCl₂: \n92\nБоталка(Студенты) — Поступашки\n\n19:52\nРомашка: \nЕсть у кого ссылка для загрузки решений?\n1\nData Nomads\n19:51\nAlbum\n14\nТ-Образование\n\n19:44\nOleg Zhr: \nв начале 90 в некоторых НИИ еще было очень продвинутое оборудование а тк зарплат уже практически не ...\n2\nSber500 x GigaChat Bootcamp (2 волна)\n\n18:44\nАйсен: \nЭхх.. Если бы..\nAMV\n17:46\nГод с ChatGPT по этапам Больше этот год был переломными в отношении с нейронками. Их переосознание ...\nВладилен: IT в эпоху AI\n16:56\nAyarhaan Эдик: \nХорошие же парни\n«Хорошие же парни» (с) Ваня\n15:49\nаа\nzenamons\n15:41\nРоман: \nХорошо\nЧат бот Сбер\n15:41\nЧС\nfoo: \nsidequest на пк и на квест устанавливаешь, с торрентов качаешь игры и устанавливаешь апк-шки, если у...\n3\nFuture Yakutia \n\n14:40\n#advent_ecom_tech В четвертый день нашего адвент календаря сходили к нашему ML департаменту и спрос...\n15\necom.tech\n\nMon\nAlexander: \nможно присоединиться — курс официально закончится только в середине января\n2\nТ-Академия | AI в разработке ПО\n\nMon\n\n\nUPDATE\n\nHB\nHappy Birthday bot\nbot\n\n\nToday\n/start\n\n20:06\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:06\n\n Открыть календарь\n/panel\n\n20:07\n/start\n\n20:07\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:07\n\n Открыть календарь\n/start\n\n20:09\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:09\n\n Открыть календарь\n/start\n\n20:10\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:10\n\n Открыть календарь\n/start\n\n20:11\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:11\n\n Открыть календарь\n/start\n\n20:27\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:27\n\n Открыть календарь\n/start\n\n20:27\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:27\n\n Открыть календарь\n/start\n\n20:28\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:28\n\n Открыть календарь\n/start\n\n20:28\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:28\n\n Открыть календарь\n/start\n\n20:32\nДобро пожаловать! Откройте календарь дней рождения для просмотра и управления.\n20:32\n\n Открыть календарь\n\n\nОткрыть\n\nMessage\n\n\nNaN\n\n\n\n\n\nHB\n\nHappy Birthday bot\n\n\nHappy Birthday bot\n"
-ownerDocument
-: 
-document
-parentNode
-: 
-document
-part
-: 
-DOMTokenList [value: '']
-previousSibling
-: 
-<!DOCTYPE html>
-scrollHeight
-: 
-1270
-scrollLeft
-: 
-0
-scrollTop
-: 
-0
-scrollWidth
-: 
-629
-slot
-: 
-""
-spellcheck
-: 
-true
-style
-: 
-CSSStyleDeclaration {0: '--vh', 1: '--unread-messages-text', 2: '--primary-color', 3: '--primary-color-rgb', 4: '--light-primary-color', 5: '--light-filled-primary-color', 6: '--dark-primary-color', 7: '--saved-color', 8: '--light-filled-saved-color', 9: '--message-out-background-color', 10: '--message-out-background-color-rgb', 11: '--light-message-out-background-color', 12: '--light-filled-message-out-background-color', 13: '--dark-message-out-background-color', 14: '--message-out-primary-color', 15: '--message-out-primary-color-rgb', 16: '--light-filled-message-out-primary-color', 17: '--surface-color', 18: '--surface-color-rgb', 19: '--danger-color', 20: '--danger-color-rgb', 21: '--light-danger-color', 22: '--dark-danger-color', 23: '--primary-text-color', 24: '--primary-text-color-rgb', 25: '--secondary-text-color', 26: '--secondary-text-color-rgb', 27: '--light-secondary-text-color', 28: '--light-filled-secondary-text-color', 29: '--message-background-color', 30: '--light-message-background-color', 31: '--light-filled-message-background-color', 32: '--dark-message-background-color', 33: '--green-color', 34: '--message-highlighting-color', 35: '--message-highlighting-color-rgb', 36: '--message-highlighting-alpha', 37: '--messages-text-size', 38: '--left-column-width', 39: '--peer-0-color-rgb', 40: '--peer-1-color-rgb', 41: '--peer-2-color-rgb', 42: '--peer-3-color-rgb', 43: '--peer-4-color-rgb', 44: '--peer-5-color-rgb', 45: '--peer-6-color-rgb', 46: '--peer-7-color-rgb', 47: '--peer-7-border-background', 48: '--peer-8-color-rgb', 49: '--peer-8-border-background', 50: '--peer-9-color-rgb', 51: '--peer-9-border-background', 52: '--peer-10-color-rgb', 53: '--peer-10-border-background', 54: '--peer-11-color-rgb', 55: '--peer-11-border-background', 56: '--peer-12-color-rgb', 57: '--peer-12-border-background', 58: '--peer-13-color-rgb', 59: '--peer-13-border-background', 60: '--peer-14-color-rgb', 61: '--peer-14-border-background', 62: '--peer-15-color-rgb', 63: '--peer-15-border-background', 64: '--peer-16-color-rgb', 65: '--peer-16-border-background', 66: '--peer-17-color-rgb', 67: '--peer-17-border-background', 68: '--peer-18-color-rgb', 69: '--peer-18-border-background', 70: '--peer-19-color-rgb', 71: '--peer-19-border-background', 72: '--peer-20-color-rgb', 73: '--peer-20-border-background', 74: '--peer-border-background', 75: '--message-out-peer-border-background', 76: '--message-out-peer-1-border-background', 77: '--message-out-peer-2-border-background', 78: '--message-out-peer-3-border-background', 79: '--message-empty-peer-1-border-background', 80: '--message-empty-peer-2-border-background', 81: '--message-empty-peer-3-border-background', accentColor: '', additiveSymbols: '', alignContent: '', alignItems: '', alignSelf: '', …}
-tabIndex
-: 
--1
-tagName
-: 
-"HTML"
-textContent
-: 
-"\n    \n    Telegram Web\n    \n     \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n\n    \n    \n    \n    \n    \n    \n\n    \n    \n    \n    \n    \n    \n\n    \n    \n    \n    \n    \n    \n    \n\n    \n    \n    \n  .night {--primary-color: #8774e1; --primary-color-rgb: 135,116,225; --light-primary-color: rgba(135, 116, 225, 0.08); --light-filled-primary-color: #292730; --dark-primary-color: hsl(250.45871559633028, 64.49704142011832%, 62.86274509803921%); --saved-color: #8774e1; --light-filled-saved-color: #b2a6eb; --message-out-background-color: #8774e1; --message-out-background-color-rgb: 135,116,225; --light-message-out-background-color: rgba(135, 116, 225, 1); --light-filled-message-out-background-color: #8774e1; --dark-message-out-background-color: hsl(250.45871559633028, 64.49704142011832%, -33.13725490196079%); --message-out-primary-color: #ffffff; --message-out-primary-color-rgb: 255,255,255; --light-filled-message-out-primary-color: #907fe3; --surface-color: #212121; --surface-color-rgb: 33,33,33; --danger-color: #ff595a; --danger-color-rgb: 255,89,90; --light-danger-color: rgba(255, 89, 90, 0.08); --dark-danger-color: hsl(359.6385542168675, 100%, 59.450980392156865%); --primary-text-color: #ffffff; --primary-text-color-rgb: 255,255,255; --secondary-text-color: #aaaaaa; --secondary-text-color-rgb: 170,170,170; --light-secondary-text-color: rgba(170, 170, 170, 0.08); --light-filled-secondary-text-color: #2b2b2b; --message-background-color: #212121; --light-message-background-color: rgba(33, 33, 33, 0.08); --light-filled-message-background-color: #212121; --dark-message-background-color: hsl(0, 0%, 4.941176470588237%); --green-color: #5CC85E;}\n  \n    \n    \n      \n        \n          \n        \n        \n          \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n            \n          \n        \n        \n          \n        \n        \n          \n          \n        \n        \n          \n          \n        \n        \n          \n          \n        \n        \n        \n      \n    \n    \n    \n    \n      \n        \n        \n        \n          \n            \n              \n                \n                  \n                  \n                \n              \n      \n      SearchВладилен:ecom.tech\n              \n                \n                  \n                  \n                Never miss a message! Enable notifications to stay updated.\n                    \n                  All Chats5Работа3не мшнобч: Похуй пушим599Поступашки - Вакансии, Мемы, Задачи20:39Андрей С.: 4Основа S2120:36Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.Happy Birthday bot20:32HbАнтон: Я буду в командировке в пути. Вернусь в воскресенье.@14AI IDE BAS_team20:26Petr: наберем всем скопом по 1 usdt 7sns_internships20:04GLM-4.7 – новая опенсорсная сота для кодинга \n\nПохоже, новая китайская звезда  – это стартап Z.ai. О...9Data Secrets20:00Саша: Здравствуйте, подскажите, пожалуйста, какие устройства способны выполнять сложные задачи, например в...8better data community19:59SOCl₂: 92Боталка(Студенты) — Поступашки19:52Ромашка: Есть у кого ссылка для загрузки решений?1Data Nomads19:51Album14Т-Образование19:44Oleg Zhr: в начале 90 в некоторых НИИ еще было очень продвинутое оборудование а тк зарплат уже практически не ...2Sber500 x GigaChat Bootcamp (2 волна)18:44Айсен: Эхх.. Если бы..AMV17:46Год с ChatGPT по этапам\n\nБольше этот год был переломными в отношении с нейронками. Их переосознание ...Владилен: IT в эпоху AI16:56Ayarhaan Эдик: Хорошие же парни«Хорошие же парни» (с) Ваня15:49ааzenamons15:41Роман: ХорошоЧат бот Сбер15:41ЧСfoo: sidequest на пк и на квест устанавливаешь, с торрентов качаешь игры и устанавливаешь апк-шки, если у...3Future Yakutia 14:40#advent_ecom_tech\n\nВ четвертый день нашего адвент календаря сходили к нашему ML департаменту и спрос...15ecom.techMonAlexander: можно присоединиться — курс официально закончится только в середине января2Т-Академия | AI в разработке ПОMon\n                \n              UPDATE\n            \n          \n        \n        5HbHappy Birthday botbotPinned Message Translate to EnglishTodayToday/start20:0620:06Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:0620:06 Открыть календарь/panel20:0720:07/start20:0720:07Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:0720:07 Открыть календарь/start20:0920:09Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:0920:09 Открыть календарь/start20:1020:10Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:1020:10 Открыть календарь/start20:1120:11Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:1120:11 Открыть календарь/start20:2720:27Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:2720:27 Открыть календарь/start20:2720:27Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:2720:27 Открыть календарь/start20:2820:28Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:2820:28 Открыть календарь/start20:2820:28Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:2820:28 Открыть календарь/start20:3220:32Добро пожаловать! Откройте календарь дней рождения для просмотра и управления.20:3220:32 Открыть календарьShow MessageReply in Another ChatDo Not ReplyDo Not QuoteChat.Alert.Forward.Action.Show1Chat.Alert.Forward.Action.Hide1Chat.Alert.Forward.Action.ShowCaptionChat.Alert.Forward.Action.HideCaptionForward to Another ChatDo Not ForwardShow Above the MessageShow Below the MessageShow Larger MediaShow Smaller MediaRemove Link PreviewОткрытьMessageSTARTUnblockJOINOnly Premium users can message Happy Birthday bot.Learn more...Your Account is FrozenClick to view detailsUnpin All MessagesOpen ChatNaNSend Without SoundSchedule MessageSet a ReminderSend When OnlineRemove Effect0.5x1x1.5x2x\n        \n          Bot InfoHappy Birthday bot1 chatLoading...Loading...0 media files0 giftsLoading...0 files0 links0 music files0 voice messagesLoading...Loading...HbHbHappy Birthday botbotHappy_birthday_telegram_botUsernameNotificationsChatsStoriesMembersMediaGiftsSavedFilesLinksMusicVoiceGroupsSimilar Channels1. Нам в календарь надо добавить дни рождения персональные и плюс проф праздники \n2. ⁠в календаре из...All MessagesDec 8\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n        \n      \n    \n    \n  \n\nHbHappy Birthday botHappy Birthday bot"
-title
-: 
-""
-translate
-: 
-true
-version
-: 
-""
-virtualKeyboardPolicy
-: 
-""
-writingSuggestions
-: 
-"true"
+.error-message {
+    padding: 20px;
+    text-align: center;
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    color: #856404
+}
 
-miniapp.micro-tab.ru…22%23df3f40%22%7D:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+.error-message p {
+    margin: 0 0 10px;
+    font-size: 16px
+}
