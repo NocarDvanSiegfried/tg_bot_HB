@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # Глобальный флаг для предотвращения повторного запуска polling
 # КРИТИЧНО: Используется для гарантии единственного запуска polling в рамках одного процесса
 _bot_polling_started = False
-_bot_polling_lock = asyncio.Lock()
+_bot_polling_lock = None  # Инициализируется при первом вызове start_bot() (когда event loop активен)
 _bot_instance = None  # Храним экземпляр бота для корректного завершения
 
 
@@ -51,7 +51,12 @@ async def start_bot():
     - Флаг сбрасывается для возможности перезапуска
     - Функция завершается без повторных попыток
     """
-    global _bot_polling_started, _bot_instance
+    global _bot_polling_started, _bot_instance, _bot_polling_lock
+    
+    # КРИТИЧНО: Создаем lock при первом вызове (когда event loop уже активен)
+    # Lock нельзя создавать на уровне модуля, так как event loop еще не создан
+    if _bot_polling_lock is None:
+        _bot_polling_lock = asyncio.Lock()
     
     # Защита от повторного запуска
     async with _bot_polling_lock:
@@ -83,7 +88,9 @@ async def start_bot():
     is_valid, error_message = validate_telegram_token(bot_token)
     if not is_valid:
         logger.error(f"Ошибка валидации TELEGRAM_BOT_TOKEN: {error_message}")
-        raise ValueError(f"Неверный TELEGRAM_BOT_TOKEN: {error_message}")
+        logger.warning("Бот не будет запущен. Веб-сервер продолжит работать.")
+        # Не поднимаем исключение, чтобы веб-сервер продолжал работать
+        return
     
     # Логирование успешной валидации (без токена)
     logger.info("TELEGRAM_BOT_TOKEN валиден по формату. Длина токена: %d символов", len(bot_token))
@@ -335,6 +342,18 @@ async def main():
         # КРИТИЧНО: Создаем задачу для бота, чтобы он работал параллельно с веб-сервером
         # Polling блокирует выполнение, поэтому запускаем его в фоне
         bot_task = asyncio.create_task(start_bot())
+        
+        # Мониторинг исключений в bot_task в фоне
+        # Это предотвращает "unhandled exception in task" в логах
+        async def monitor_bot_task():
+            """Мониторинг задачи бота для логирования исключений."""
+            try:
+                await bot_task
+            except Exception as e:
+                logger.error(f"❌ Telegram бот завершился с ошибкой: {e}", exc_info=True)
+                # Не поднимаем исключение, чтобы веб-сервер продолжал работать
+        
+        asyncio.create_task(monitor_bot_task())
         
         # Даем боту время инициализироваться
         await asyncio.sleep(1)
