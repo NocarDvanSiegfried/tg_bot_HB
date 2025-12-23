@@ -1,47 +1,21 @@
-import asyncio
-import os
+"""
+Модуль для инициализации Telegram бота.
 
-from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
+КРИТИЧНО: Этот модуль НЕ должен быть entry point.
+Все запуски бота должны происходить через backend/main.py.
 
-from src.infrastructure.database.database_factory import get_database
-from src.presentation.telegram.handlers import (
-    migration_guard_handler,
-    start_handler,
-)
+Этот файл оставлен для совместимости с тестами и может быть удален в будущем.
+Вся логика запуска бота находится в backend/main.py в функции start_bot().
+"""
 
-
-async def main():
-    """Запуск Telegram бота."""
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not bot_token:
-        raise ValueError("TELEGRAM_BOT_TOKEN environment variable is required")
-
-    database_url = os.getenv("DATABASE_URL")
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable is required")
-
-    # Инициализация бота
-    bot = Bot(token=bot_token)
-    storage = MemoryStorage()
-    dp = Dispatcher(storage=storage)
-
-    # Инициализация БД через factory
-    os.environ["DATABASE_URL"] = database_url
-    db = get_database()
-    await db.create_tables()
-
-    # Регистрация роутеров
-    # КРИТИЧНО: Порядок важен - start_handler должен быть первым
-    dp.include_router(start_handler.router)
-    # Временный migration-guard handler для старых callback'ов
-    # Регистрируется ПОСЛЕ всех специализированных handlers
-    # Ловит только те callback'и, которые не обработаны другими handlers
-    dp.include_router(migration_guard_handler.router)
-
-    # Запуск polling
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# Этот модуль больше не содержит логику запуска бота.
+# Вся логика перенесена в backend/main.py для предотвращения конфликтов polling.
+# 
+# Если вам нужно запустить бота:
+# - Используйте: python main.py (из корня backend/)
+# - НЕ используйте: python -m src.presentation.telegram.bot
+#
+# Если вы видите TelegramConflictError:
+# - Убедитесь, что бот запускается только через main.py
+# - Проверьте, что нет других процессов, запускающих polling
+# - Убедитесь, что bot.py не импортируется с side-effects
