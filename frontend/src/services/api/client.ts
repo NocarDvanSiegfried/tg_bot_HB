@@ -99,6 +99,12 @@ export async function fetchWithErrorHandling(
  * @returns полный URL с API_BASE_URL
  */
 export function buildApiUrl(endpoint: string): string {
+  // Валидация: запретить panel/birthdays в production
+  if (endpoint.includes('/api/panel/birthdays')) {
+    logger.error(`[API] FORBIDDEN: Attempted to use legacy panel endpoint: ${endpoint}`)
+    throw new Error('Legacy panel endpoint is not allowed. Use /api/birthdays instead.')
+  }
+  
   return `${API_BASE_URL}${endpoint}`
 }
 

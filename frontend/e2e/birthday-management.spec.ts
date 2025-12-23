@@ -39,7 +39,7 @@ test.describe('Birthday Management', () => {
 
   test('should handle API errors gracefully', async ({ page }) => {
     // Перехватываем сетевые запросы для симуляции ошибок
-    await page.route('**/api/panel/birthdays*', (route) => {
+    await page.route('**/api/birthdays*', (route) => {
       route.fulfill({
         status: 500,
         body: JSON.stringify({ detail: 'Internal server error' }),
