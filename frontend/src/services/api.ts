@@ -1,150 +1,9 @@
 import { Birthday } from '../types/birthday'
 import { Responsible } from '../types/responsible'
-import { API_BASE_URL, API_TIMEOUT_MS } from '../config/api'
 import { logger } from '../utils/logger'
 import { cache, CacheKeys, CacheTTL } from '../utils/cache'
-
-// Получить initData из Telegram WebApp
-function getInitData(): string | null {
-  if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-    return window.Telegram.WebApp.initData || null
-  }
-  return null
-}
-
-// Создать headers с initData
-function getHeaders(additionalHeaders: Record<string, string> = {}): Record<string, string> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...additionalHeaders,
-  }
-  
-  const initData = getInitData()
-  if (initData) {
-    headers['X-Init-Data'] = initData
-  }
-  
-  return headers
-}
-
-// Улучшенная обработка ошибок fetch
-async function fetchWithErrorHandling(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
-  const method = options.method || 'GET'
-  
-  // ЛОГИРОВАНИЕ ПЕРЕД ОТПРАВКОЙ
-  logger.info(`[API] ===== Starting ${method} ${url} =====`)
-  logger.info(`[API] Request options:`, {
-    method,
-    headers: options.headers,
-    body: options.body ? (typeof options.body === 'string' ? options.body.substring(0, 200) + '...' : '[...]') : undefined
-  })
-  
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
-    
-    logger.info(`[API] Sending ${method} request to ${url}...`)
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    })
-    
-    clearTimeout(timeoutId)
-    logger.info(`[API] Response received: ${response.status} ${response.statusText}`)
-    
-    if (!response.ok) {
-      // Детальная обработка ошибок
-      if (response.status === 0) {
-        throw new Error('CORS error: запрос заблокирован браузером')
-      }
-      
-      // Клонируем response перед чтением, чтобы не повредить оригинальный объект
-      const responseClone = response.clone()
-      
-      // Пытаемся получить детали ошибки из ответа
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-      let errorData: any = null
-      try {
-        errorData = await responseClone.json()
-        if (errorData.detail) {
-          // Если detail - строка, используем её
-          if (typeof errorData.detail === 'string') {
-            errorMessage = errorData.detail
-          } else if (Array.isArray(errorData.detail)) {
-            // Если detail - массив (ошибки валидации FastAPI)
-            const validationErrors = errorData.detail.map((e: any) => {
-              const field = e.loc ? e.loc.slice(1).join('.') : 'unknown' // Убираем 'body' из пути
-              const fieldName = field === 'full_name' ? 'ФИО' :
-                               field === 'company' ? 'Компания' :
-                               field === 'position' ? 'Должность' :
-                               field === 'birth_date' ? 'Дата рождения' :
-                               field === 'comment' ? 'Комментарий' : field
-              const message = e.msg || e.message || 'Ошибка валидации'
-              return `${fieldName}: ${message}`
-            }).join('; ')
-            errorMessage = `Ошибка валидации: ${validationErrors}`
-          }
-        } else if (errorData.errors) {
-          // Обработка ошибок валидации Pydantic (формат с errors)
-          const validationErrors = errorData.errors.map((e: any) => {
-            const field = e.loc ? e.loc.slice(1).join('.') : 'unknown' // Убираем 'body' из пути
-            const fieldName = field === 'full_name' ? 'ФИО' :
-                             field === 'company' ? 'Компания' :
-                             field === 'position' ? 'Должность' :
-                             field === 'birth_date' ? 'Дата рождения' :
-                             field === 'comment' ? 'Комментарий' : field
-            const message = e.msg || e.message || 'Ошибка валидации'
-            return `${fieldName}: ${message}`
-          }).join('; ')
-          errorMessage = `Ошибка валидации: ${validationErrors}`
-        }
-        
-        // Улучшенные сообщения для различных статусов
-        if (response.status === 401) {
-          errorMessage = errorMessage || 'Ошибка авторизации. Пожалуйста, обновите страницу.'
-        } else if (response.status === 403) {
-          errorMessage = errorMessage || 'Доступ запрещен. У вас нет прав для выполнения этого действия.'
-        } else if (response.status === 404) {
-          errorMessage = errorMessage || 'Ресурс не найден. Возможно, он был удален.'
-        } else if (response.status === 422) {
-          errorMessage = errorMessage || 'Ошибка валидации данных. Проверьте введенные данные.'
-        } else if (response.status >= 500) {
-          errorMessage = 'Ошибка сервера. Пожалуйста, попробуйте позже.'
-        }
-        logger.error(`[API] Error response for ${method} ${url}:`, errorData)
-      } catch {
-        // Игнорируем ошибку парсинга JSON
-        logger.error(`[API] Error response for ${method} ${url}: ${response.status} ${response.statusText}`)
-      }
-      throw new Error(errorMessage)
-    }
-    
-    return response
-  } catch (error) {
-    logger.error(`[API] ===== Fetch ERROR for ${method} ${url} =====`)
-    logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
-    logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
-    logger.error(`[API] Error stack: ${error instanceof Error ? error.stack : 'N/A'}`)
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout: сервер не отвечает')
-      }
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        logger.error(`[API] Network error - возможно CORS или сеть: ${error.message}`)
-        throw new Error('Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API.')
-      }
-      // Обработка ошибок CORS
-      if (error.message.includes('CORS') || error.message.includes('Cross-Origin')) {
-        throw new Error('Ошибка CORS: проверьте настройки сервера')
-      }
-      throw error
-    }
-    throw new Error('Unknown error occurred')
-  }
-}
+import { API_ENDPOINTS } from './api/endpoints'
+import { buildApiUrl, fetchWithErrorHandling, getHeaders } from './api/client'
 
 export interface CalendarData {
   date: string
@@ -182,7 +41,7 @@ export interface MonthBirthdays {
 
 export const api = {
   async getCalendar(date: string): Promise<CalendarData> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/${date}`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.CALENDAR(date)), {
       headers: getHeaders(),
     })
     return response.json()
@@ -199,7 +58,7 @@ export const api = {
     }
     
     // Загружаем данные
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/calendar/month/${year}/${month}`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.CALENDAR_MONTH(year, month)), {
       headers: getHeaders(),
     })
     const data = await response.json()
@@ -221,7 +80,7 @@ export const api = {
     }
     
     // Загружаем данные
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/birthdays`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.BIRTHDAYS.LIST), {
       headers: getHeaders(),
     })
     const data = await response.json()
@@ -233,31 +92,12 @@ export const api = {
   },
 
   async createBirthday(data: Omit<Birthday, 'id'>): Promise<Birthday> {
-    const url = `${API_BASE_URL}/api/panel/birthdays`
-    logger.info(`[API] ===== createBirthday START =====`)
-    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
-    logger.info(`[API] Full URL: ${url}`)
-    logger.info(`[API] Request data:`, data)
-    
-    const headers = getHeaders()
-    const initData = getInitData()
-    logger.info(`[API] initData available: ${!!initData}`)
-    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
-    logger.info(`[API] Headers:`, { 
-      'Content-Type': headers['Content-Type'],
-      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
-    })
-    
-    logger.info(`[API] Sending POST request to ${url}...`)
-    const response = await fetchWithErrorHandling(url, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.BIRTHDAYS.LIST), {
       method: 'POST',
-      headers: headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     })
-    logger.info(`[API] createBirthday response received, status: ${response.status}`)
     const result = await response.json()
-    logger.info(`[API] createBirthday result:`, result)
-    logger.info(`[API] ===== createBirthday SUCCESS =====`)
     
     // Инвалидируем кэш дней рождения
     cache.delete(CacheKeys.birthdays)
@@ -267,172 +107,76 @@ export const api = {
   },
 
   async updateBirthday(id: number, data: Partial<Birthday>): Promise<Birthday> {
-    const url = `${API_BASE_URL}/api/panel/birthdays/${id}`
-    logger.info(`[API] ===== updateBirthday START =====`)
-    logger.info(`[API] updateBirthday called with id=${id}, data:`, data)
-    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
-    logger.info(`[API] Full URL: ${url}`)
-    
-    const headers = getHeaders()
-    headers['Content-Type'] = 'application/json'
-    
-    const initData = getInitData()
-    logger.info(`[API] initData available: ${!!initData}`)
-    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
-    logger.info(`[API] updateBirthday headers:`, { 
-      'Content-Type': headers['Content-Type'],
-      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.BIRTHDAYS.BY_ID(id)), {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
     })
-    logger.info(`[API] Request body:`, JSON.stringify(data))
     
-    try {
-      logger.info(`[API] Sending PUT request to ${url}...`)
-      const response = await fetchWithErrorHandling(url, {
-        method: 'PUT',
-        headers: headers,
-        body: JSON.stringify(data),
-      })
-      logger.info(`[API] updateBirthday response received, status: ${response.status}`)
-      logger.info(`[API] updateBirthday response headers:`, Object.fromEntries(response.headers.entries()))
-      logger.info(`[API] ===== updateBirthday RESPONSE RECEIVED =====`)
-      
-      // Проверка статуса ответа
-      if (!response.ok) {
-        logger.error(`[API] updateBirthday received non-ok status: ${response.status} ${response.statusText}`)
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      // Проверка на наличие тела ответа перед чтением
-      // Статусы 204 No Content и 205 Reset Content не имеют тела
-      if (response.status === 204 || response.status === 205) {
-        logger.warn(`[API] updateBirthday received ${response.status} status with no body`)
-        throw new Error('Сервер вернул ответ без данных')
-      }
-      
-      // Проверка Content-Length header
-      const contentLength = response.headers.get('Content-Length')
-      if (contentLength === '0') {
-        logger.warn(`[API] updateBirthday received response with Content-Length: 0`)
-        throw new Error('Сервер вернул пустой ответ')
-      }
-      
-      logger.info(`[API] updateBirthday reading response body`)
-      const result = await response.json()
-      logger.info(`[API] updateBirthday response data:`, result)
-      
-      // Проверка, что ответ содержит ожидаемые данные
-      if (!result || typeof result !== 'object') {
-        logger.error(`[API] updateBirthday received invalid response data:`, result)
-        throw new Error('Сервер вернул невалидные данные')
-      }
-      
-      if (!result.id || !result.full_name) {
-        logger.error(`[API] updateBirthday response missing required fields:`, result)
-        throw new Error('Сервер вернул неполные данные')
-      }
-      
-      logger.info(`[API] updateBirthday success: id=${result.id}, full_name=${result.full_name}`)
-      logger.info(`[API] ===== updateBirthday SUCCESS =====`)
-      
-      // Инвалидируем кэш дней рождения
-      cache.delete(CacheKeys.birthdays)
-      cache.delete(CacheKeys.birthday(id))
-      cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
-      
-      return result
-    } catch (error) {
-      logger.error(`[API] ===== updateBirthday ERROR =====`)
-      logger.error(`[API] updateBirthday error:`, error)
-      logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
-      logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
-      if (error instanceof Error && error.stack) {
-        logger.error(`[API] Error stack:`, error.stack)
-      }
-      throw error
+    // Проверка на наличие тела ответа перед чтением
+    // Статусы 204 No Content и 205 Reset Content не имеют тела
+    if (response.status === 204 || response.status === 205) {
+      throw new Error('Сервер вернул ответ без данных')
     }
+    
+    // Проверка Content-Length header
+    const contentLength = response.headers.get('Content-Length')
+    if (contentLength === '0') {
+      throw new Error('Сервер вернул пустой ответ')
+    }
+    
+    const result = await response.json()
+    
+    // Проверка, что ответ содержит ожидаемые данные
+    if (!result || typeof result !== 'object' || !result.id || !result.full_name) {
+      throw new Error('Сервер вернул невалидные данные')
+    }
+    
+    // Инвалидируем кэш дней рождения
+    cache.delete(CacheKeys.birthdays)
+    cache.delete(CacheKeys.birthday(id))
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+    
+    return result
   },
 
   async deleteBirthday(id: number): Promise<void> {
-    const url = `${API_BASE_URL}/api/panel/birthdays/${id}`
-    logger.info(`[API] ===== deleteBirthday START =====`)
-    logger.info(`[API] deleteBirthday called with id=${id}`)
-    logger.info(`[API] API_BASE_URL: ${API_BASE_URL}`)
-    logger.info(`[API] Full URL: ${url}`)
-    
-    const headers = getHeaders()
-    const initData = getInitData()
-    logger.info(`[API] initData available: ${!!initData}`)
-    logger.info(`[API] initData length: ${initData ? initData.length : 0}`)
-    logger.info(`[API] deleteBirthday headers:`, { 
-      'Content-Type': headers['Content-Type'],
-      'X-Init-Data': headers['X-Init-Data'] ? `${headers['X-Init-Data'].substring(0, 20)}...` : 'missing'
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.BIRTHDAYS.BY_ID(id)), {
+      method: 'DELETE',
+      headers: getHeaders(),
     })
     
-    try {
-      logger.info(`[API] Sending DELETE request to ${url}...`)
-      const response = await fetchWithErrorHandling(url, {
-        method: 'DELETE',
-        headers: headers,
-      })
-      logger.info(`[API] deleteBirthday response received, status: ${response.status}`)
-      logger.info(`[API] deleteBirthday response headers:`, Object.fromEntries(response.headers.entries()))
-      logger.info(`[API] ===== deleteBirthday RESPONSE RECEIVED =====`)
-      
-      // Проверка статуса ответа
-      if (!response.ok) {
-        logger.error(`[API] deleteBirthday received non-ok status: ${response.status} ${response.statusText}`)
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      // DELETE запросы могут возвращать 204 No Content или 205 Reset Content без тела
-      // Не пытаемся читать тело ответа для этих статусов
-      if (response.status === 204 || response.status === 205) {
-        logger.info(`[API] deleteBirthday received ${response.status} status (no body expected)`)
-        logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
-        return
-      }
-      
-      // Если статус не 204/205, проверяем наличие тела ответа
-      const contentLength = response.headers.get('Content-Length')
-      if (contentLength && contentLength !== '0') {
-        logger.info(`[API] deleteBirthday reading response body`)
-        const result = await response.json()
-        logger.info(`[API] deleteBirthday response data:`, result)
-      } else if (contentLength === '0') {
-        logger.info(`[API] deleteBirthday received response with Content-Length: 0`)
-        return
-      }
-      
-      logger.info(`[API] deleteBirthday success: birthday ${id} deleted`)
-      logger.info(`[API] ===== deleteBirthday SUCCESS =====`)
-      
+    // DELETE запросы могут возвращать 204 No Content или 205 Reset Content без тела
+    // Не пытаемся читать тело ответа для этих статусов
+    if (response.status === 204 || response.status === 205) {
       // Инвалидируем кэш дней рождения
       cache.delete(CacheKeys.birthdays)
       cache.delete(CacheKeys.birthday(id))
       cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
-      
-      logger.info(`[API] deleteBirthday completed successfully`)
-    } catch (error) {
-      logger.error(`[API] ===== deleteBirthday ERROR =====`)
-      logger.error(`[API] deleteBirthday error:`, error)
-      logger.error(`[API] Error type: ${error instanceof Error ? error.constructor.name : typeof error}`)
-      logger.error(`[API] Error message: ${error instanceof Error ? error.message : String(error)}`)
-      if (error instanceof Error && error.stack) {
-        logger.error(`[API] Error stack:`, error.stack)
-      }
-      throw error
+      return
     }
+    
+    // Если статус не 204/205, проверяем наличие тела ответа
+    const contentLength = response.headers.get('Content-Length')
+    if (contentLength && contentLength !== '0') {
+      await response.json()
+    }
+    
+    // Инвалидируем кэш дней рождения
+    cache.delete(CacheKeys.birthdays)
+    cache.delete(CacheKeys.birthday(id))
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
   },
 
   async getResponsible(): Promise<Responsible[]> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.RESPONSIBLE.LIST), {
       headers: getHeaders(),
     })
     return response.json()
   },
 
   async createResponsible(data: Omit<Responsible, 'id'>): Promise<Responsible> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.RESPONSIBLE.LIST), {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(data),
@@ -441,7 +185,7 @@ export const api = {
   },
 
   async updateResponsible(id: number, data: Partial<Responsible>): Promise<Responsible> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible/${id}`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.RESPONSIBLE.BY_ID(id)), {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(data),
@@ -450,14 +194,14 @@ export const api = {
   },
 
   async deleteResponsible(id: number): Promise<void> {
-    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/responsible/${id}`, {
+    await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.RESPONSIBLE.BY_ID(id)), {
       method: 'DELETE',
       headers: getHeaders(),
     })
   },
 
   async assignResponsible(responsibleId: number, date: string): Promise<void> {
-    await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/assign-responsible`, {
+    await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.RESPONSIBLE.ASSIGN), {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ responsible_id: responsibleId, date }),
@@ -465,14 +209,14 @@ export const api = {
   },
 
   async searchPeople(query: string): Promise<Array<{ type: string; id: number; full_name: string; company: string; position: string }>> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/search?q=${encodeURIComponent(query)}`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.SEARCH.PEOPLE(query)), {
       headers: getHeaders(),
     })
     return response.json()
   },
 
   async generateGreeting(birthdayId: number, style: string, length: string, theme?: string): Promise<{ greeting: string }> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/generate-greeting`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.GREETING.GENERATE), {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ birthday_id: birthdayId, style, length, theme }),
@@ -481,7 +225,7 @@ export const api = {
   },
 
   async createCard(birthdayId: number, greetingText: string, qrUrl?: string): Promise<Blob> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/create-card`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.GREETING.CREATE_CARD), {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ birthday_id: birthdayId, greeting_text: greetingText, qr_url: qrUrl }),
@@ -490,7 +234,7 @@ export const api = {
   },
 
   async checkPanelAccess(): Promise<{ has_access: boolean }> {
-    const response = await fetchWithErrorHandling(`${API_BASE_URL}/api/panel/check-access`, {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.PANEL.CHECK_ACCESS), {
       headers: getHeaders(),
     })
     return response.json()

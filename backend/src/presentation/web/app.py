@@ -11,6 +11,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from src.infrastructure.config.cors import get_allowed_origins
+from src.infrastructure.utils.mask_sensitive import mask_sensitive_headers
 from src.presentation.web.routes.api import router
 
 logger = logging.getLogger(__name__)
@@ -60,28 +61,19 @@ async def log_requests(request: Request, call_next):
     if method in ["PUT", "DELETE"]:
         logger.info(f"[REQUEST] ===== {method} {path} =====")
         logger.info(f"[REQUEST] Query params: {dict(request.query_params)}")
-        headers_to_log = {}
-        for key, value in request.headers.items():
-            if key.lower() in ['x-init-data', 'authorization']:
-                headers_to_log[key] = f"{value[:20]}..." if len(value) > 20 else "***"
-            else:
-                headers_to_log[key] = value
+        headers_to_log = mask_sensitive_headers(dict(request.headers))
         logger.info(f"[REQUEST] Headers: {headers_to_log}")
     else:
         query_params = str(request.query_params) if request.query_params else ""
         logger.info(f"[REQUEST] {method} {path}{'?' + query_params if query_params else ''}")
         
-        # Для OPTIONS запросов логируем заголовки
+        # Для OPTIONS запросов логируем заголовки (с маскировкой)
         if method == "OPTIONS":
-            logger.debug(f"[OPTIONS] Headers: {dict(request.headers)}")
+            headers_to_log = mask_sensitive_headers(dict(request.headers))
+            logger.debug(f"[OPTIONS] Headers: {headers_to_log}")
         
         # Логируем заголовки (без чувствительных данных)
-        headers_to_log = {}
-        for key, value in request.headers.items():
-            if key.lower() in ['x-init-data', 'authorization']:
-                headers_to_log[key] = f"{value[:20]}..." if len(value) > 20 else "***"
-            else:
-                headers_to_log[key] = value
+        headers_to_log = mask_sensitive_headers(dict(request.headers))
         logger.debug(f"[REQUEST] Headers: {headers_to_log}")
     
     try:
@@ -114,7 +106,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         )
     
     logger.debug(f"[VALIDATION ERROR] Request body: {exc.body if hasattr(exc, 'body') else 'N/A'}")
-    logger.debug(f"[VALIDATION ERROR] Request headers: {dict(request.headers)}")
+    headers_to_log = mask_sensitive_headers(dict(request.headers))
+    logger.debug(f"[VALIDATION ERROR] Request headers: {headers_to_log}")
     
     return JSONResponse(
         status_code=422,

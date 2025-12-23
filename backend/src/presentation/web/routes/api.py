@@ -17,6 +17,7 @@ from src.infrastructure.config.rate_limits import (
     READ_LIMIT,
     WRITE_LIMIT,
 )
+from src.infrastructure.utils.mask_sensitive import mask_sensitive_headers
 from src.presentation.web.decorators import handle_api_errors
 from src.presentation.web.dependencies import (
     get_db_session,
@@ -526,7 +527,8 @@ async def update_birthday(
     logger.info(f"[API] ===== PUT /api/panel/birthdays/{birthday_id} - ENTRY POINT =====")
     logger.info(f"[API] Request method: {request.method}")
     logger.info(f"[API] Request path: {request.url.path}")
-    logger.info(f"[API] Request headers: {dict(request.headers)}")
+    headers_to_log = mask_sensitive_headers(dict(request.headers))
+    logger.info(f"[API] Request headers: {headers_to_log}")
     logger.info(f"[API] Session ID: {id(session)}")
     
     # Логирование после получения данных из Pydantic
@@ -606,7 +608,8 @@ async def delete_birthday(
     logger.info(f"[API] ===== DELETE /api/panel/birthdays/{birthday_id} - ENTRY POINT =====")
     logger.info(f"[API] Request method: {request.method}")
     logger.info(f"[API] Request path: {request.url.path}")
-    logger.info(f"[API] Request headers: {dict(request.headers)}")
+    headers_to_log = mask_sensitive_headers(dict(request.headers))
+    logger.info(f"[API] Request headers: {headers_to_log}")
     logger.info(f"[API] Session ID: {id(session)}")
     
     # Логирование после получения данных из Path
@@ -1021,7 +1024,8 @@ async def test_put_simple(request: Request):
     logger.info(f"[TEST] ===== PUT /api/test/put-simple - Request received =====")
     logger.info(f"[TEST] Request method: {request.method}")
     logger.info(f"[TEST] Request path: {request.url.path}")
-    logger.info(f"[TEST] Request headers: {dict(request.headers)}")
+    headers_to_log = mask_sensitive_headers(dict(request.headers))
+    logger.info(f"[TEST] Request headers: {headers_to_log}")
     return {"status": "ok", "method": "PUT", "message": "Request reached server"}
 
 @router.delete("/api/test/delete-simple")
@@ -1030,7 +1034,8 @@ async def test_delete_simple(request: Request):
     logger.info(f"[TEST] ===== DELETE /api/test/delete-simple - Request received =====")
     logger.info(f"[TEST] Request method: {request.method}")
     logger.info(f"[TEST] Request path: {request.url.path}")
-    logger.info(f"[TEST] Request headers: {dict(request.headers)}")
+    headers_to_log = mask_sensitive_headers(dict(request.headers))
+    logger.info(f"[TEST] Request headers: {headers_to_log}")
     return {"status": "ok", "method": "DELETE", "message": "Request reached server"}
 
 # Диагностический endpoint для проверки CORS

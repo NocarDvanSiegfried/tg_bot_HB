@@ -2,6 +2,7 @@ import { useCRUDManagement } from '../../hooks/useCRUDManagement'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
 import { logger } from '../../utils/logger'
+import { validateDate } from '../../utils/validation'
 import { API_BASE_URL } from '../../config/api'
 import './Panel.css'
 
@@ -28,25 +29,14 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       errors.push('Должность не может быть пустой')
     }
     
-    // Проверка формата birth_date
-    if (!data.birth_date) {
-      errors.push('Дата рождения обязательна')
-    } else {
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-      if (!dateRegex.test(data.birth_date)) {
-        errors.push('Неверный формат даты. Используйте формат YYYY-MM-DD')
-      } else {
-        const dateObj = new Date(data.birth_date + 'T00:00:00')
-        if (isNaN(dateObj.getTime())) {
-          errors.push('Неверная дата рождения. Проверьте правильность введённой даты')
-        } else {
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          if (dateObj > today) {
-            errors.push('Дата рождения не может быть в будущем')
-          }
-        }
+    // Проверка даты рождения с использованием утилиты
+    if (data.birth_date) {
+      const dateValidation = validateDate(data.birth_date)
+      if (!dateValidation.isValid) {
+        errors.push(...dateValidation.errors)
       }
+    } else {
+      errors.push('Дата рождения обязательна')
     }
     
     // Проверка длины комментария
