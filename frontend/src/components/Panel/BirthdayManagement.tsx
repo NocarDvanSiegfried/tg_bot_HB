@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useCRUDManagement } from '../../hooks/useCRUDManagement'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
@@ -49,32 +50,48 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
 
   // Нормализация даты для редактирования (специфичная логика)
   const normalizeBirthday = (birthday: Birthday): Partial<Birthday> => {
-    let normalizedBirthDate = birthday.birth_date
-    if (normalizedBirthDate) {
-      // Если дата в формате ISO (с временем), извлечь только дату
-      if (normalizedBirthDate.includes('T')) {
-        normalizedBirthDate = normalizedBirthDate.split('T')[0]
-      }
-      // Если дата в другом формате, попытаться преобразовать
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedBirthDate)) {
-        logger.warn(`[BirthdayManagement] Invalid birth_date format: ${normalizedBirthDate}, attempting to fix`)
-        try {
-          const date = new Date(normalizedBirthDate)
-          if (!isNaN(date.getTime())) {
-            normalizedBirthDate = date.toISOString().split('T')[0]
+    try {
+      let normalizedBirthDate = birthday.birth_date
+      if (normalizedBirthDate) {
+        // Если дата в формате ISO (с временем), извлечь только дату
+        if (normalizedBirthDate.includes('T')) {
+          normalizedBirthDate = normalizedBirthDate.split('T')[0]
+        }
+        // Если дата в другом формате, попытаться преобразовать
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedBirthDate)) {
+          logger.warn(`[BirthdayManagement] Invalid birth_date format: ${normalizedBirthDate}, attempting to fix`)
+          try {
+            const date = new Date(normalizedBirthDate)
+            if (!isNaN(date.getTime())) {
+              normalizedBirthDate = date.toISOString().split('T')[0]
+            } else {
+              logger.error(`[BirthdayManagement] Could not parse birth_date: ${normalizedBirthDate}`)
+              normalizedBirthDate = '' // Fallback to empty string
+            }
+          } catch (e) {
+            logger.error(`[BirthdayManagement] Error normalizing birth_date: ${e}`)
+            normalizedBirthDate = '' // Fallback to empty string
           }
-        } catch (e) {
-          logger.error(`[BirthdayManagement] Could not normalize birth_date: ${e}`)
         }
       }
-    }
-    
-    return {
-      full_name: birthday.full_name,
-      company: birthday.company,
-      position: birthday.position,
-      birth_date: normalizedBirthDate,
-      comment: birthday.comment || '',
+      
+      return {
+        full_name: birthday.full_name || '',
+        company: birthday.company || '',
+        position: birthday.position || '',
+        birth_date: normalizedBirthDate || '',
+        comment: birthday.comment || '',
+      }
+    } catch (error) {
+      logger.error(`[BirthdayManagement] Error in normalizeBirthday:`, error)
+      // Возвращаем безопасные значения по умолчанию
+      return {
+        full_name: birthday.full_name || '',
+        company: birthday.company || '',
+        position: birthday.position || '',
+        birth_date: birthday.birth_date || '',
+        comment: birthday.comment || '',
+      }
     }
   }
 
@@ -124,6 +141,13 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       `Вы уверены, что хотите удалить день рождения "${birthday.full_name}${birthday.company ? ` (${birthday.company})` : ''}"?\n\nЭто действие нельзя отменить.`,
     useMountedRef: true,
   })
+
+  // Диагностика изменений editingId (только в dev режиме)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      logger.info(`[BirthdayManagement] editingId changed to: ${editingId}`)
+    }
+  }, [editingId])
 
   // Диагностическая информация (специфичная для BirthdayManagement)
   const diagnosticInfo = {
@@ -241,26 +265,51 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
         <p>Загрузка...</p>
       ) : (
         <ul className="panel-list">
-          {birthdays.map((bd, index) => (
+          {birthdays.map((bd, index) => {
+            // Проверка валидности id
+            const isValidId = bd.id != null && typeof bd.id === 'number' && !isNaN(bd.id)
+            const isEditing = isValidId && editingId !== null && editingId === bd.id
+            
+            if (import.meta.env.DEV) {
+              logger.info(`[BirthdayManagement] Rendering birthday id=${bd.id}, editingId=${editingId}, isValidId=${isValidId}, isEditing=${isEditing}`)
+            }
+            return (
             <li key={bd.id ?? `birthday-${index}`} className="panel-list-item">
-              {editingId === bd.id ? (
+              {isEditing ? (
                 <div style={{ width: '100%' }}>
-                  <form
-                    noValidate
-                    onSubmit={async (e) => {
-                      e.preventDefault()
-                      logger.info(`[BirthdayManagement] Form submitted for birthday id=${bd.id}`)
-                      
-                      if (!bd.id) {
-                        logger.error('[BirthdayManagement] Cannot update: birthday id is missing')
-                        setError('Ошибка: ID дня рождения не найден')
-                        return
-                      }
-                      
-                      await handleUpdate(bd.id)
-                    }}
-                    style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
-                  >
+                  {!editFormData.full_name && !editFormData.company && !editFormData.position ? (
+                    <div style={{ 
+                      padding: '10px', 
+                      background: '#fee', 
+                      color: '#c00', 
+                      borderRadius: '4px',
+                      marginBottom: '10px'
+                    }}>
+                      ⚠️ Ошибка: данные для редактирования не загружены. Попробуйте обновить страницу.
+                      <button 
+                        onClick={handleCancelEdit}
+                        style={{ marginLeft: '10px', padding: '5px 10px' }}
+                      >
+                        Закрыть
+                      </button>
+                    </div>
+                  ) : (
+                    <form
+                      noValidate
+                      onSubmit={async (e) => {
+                        e.preventDefault()
+                        logger.info(`[BirthdayManagement] Form submitted for birthday id=${bd.id}`)
+                        
+                        if (!bd.id) {
+                          logger.error('[BirthdayManagement] Cannot update: birthday id is missing')
+                          setError('Ошибка: ID дня рождения не найден')
+                          return
+                        }
+                        
+                        await handleUpdate(bd.id)
+                      }}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+                    >
                     <input
                       type="text"
                       placeholder="ФИО"
@@ -318,6 +367,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       </button>
                     </div>
                   </form>
+                  )}
                 </div>
               ) : (
                 <>
@@ -328,19 +378,29 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <button 
-                      onClick={() => bd.id && handleEdit(bd.id)}
+                      onClick={() => {
+                        if (!bd.id) {
+                          logger.error('[BirthdayManagement] Cannot edit: birthday id is missing', bd)
+                          setError('Ошибка: ID дня рождения не найден')
+                          return
+                        }
+                        logger.info(`[BirthdayManagement] Edit button clicked for id=${bd.id}, current editingId=${editingId}`)
+                        handleEdit(bd.id)
+                        logger.info(`[BirthdayManagement] After handleEdit call, editingId should be=${bd.id}`)
+                      }}
                       disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
                       style={{
                         padding: '8px 16px',
-                        backgroundColor: 'var(--color-primary)',
+                        backgroundColor: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? '#ccc' : 'var(--color-primary)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        cursor: 'pointer',
+                        cursor: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? 'not-allowed' : 'pointer',
                         fontSize: '14px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        opacity: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? 0.6 : 1
                       }}
                     >
                       ✏️ Редактировать
@@ -374,7 +434,8 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                 </>
               )}
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </div>

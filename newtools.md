@@ -2595,7 +2595,6 @@ function Br() {
 }
 export {Br as default};
 
-
 .calendar-container {
     padding: 20px;
     max-width: 600px;

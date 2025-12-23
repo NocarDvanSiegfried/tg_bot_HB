@@ -245,22 +245,45 @@ export function useCRUDManagement<T extends { id: number }>(
    * Инициализация редактирования элемента
    */
   const handleEdit = (id: number) => {
+    // Проверка валидности id
+    if (typeof id !== 'number' || isNaN(id) || id <= 0) {
+      logger.error(`[CRUD] Invalid id provided: ${id}`)
+      setError(`Неверный ID элемента: ${id}`)
+      return
+    }
+    
     logger.info(`[CRUD] handleEdit called for id=${id}`)
     const item = items.find(i => i.id === id)
     
-    if (item) {
-      logger.info(`[CRUD] Found item to edit:`, item)
-      
+    if (!item) {
+      logger.error(`[CRUD] Item with id=${id} not found`)
+      setError(`Элемент с ID ${id} не найден`)
+      return
+    }
+    
+    logger.info(`[CRUD] Found item to edit:`, item)
+    
+    try {
       // Применяем нормализацию, если она указана
       const normalizedData = normalizeItem ? normalizeItem(item) : { ...item }
       
+      // Проверка, что нормализованные данные содержат необходимые поля
+      if (!normalizedData || Object.keys(normalizedData).length === 0) {
+        logger.error(`[CRUD] Normalized data is empty for id=${id}`)
+        setError('Ошибка: не удалось подготовить данные для редактирования')
+        return
+      }
+      
+      // Убеждаемся, что id присутствует в нормализованных данных (для сравнения)
+      const dataWithId = { ...normalizedData, id: item.id }
+      
       setEditingId(id)
-      setEditFormData(normalizedData)
+      setEditFormData(dataWithId)
       setError(null)
-      logger.info(`[CRUD] Edit form initialized for id=${id}`)
-    } else {
-      logger.error(`[CRUD] Item with id=${id} not found`)
-      setError(`Элемент с ID ${id} не найден`)
+      logger.info(`[CRUD] Edit form initialized for id=${id}, data keys:`, Object.keys(dataWithId))
+    } catch (error) {
+      logger.error(`[CRUD] Error during normalization for id=${id}:`, error)
+      setError('Ошибка при подготовке данных для редактирования')
     }
   }
 
