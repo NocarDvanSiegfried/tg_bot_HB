@@ -174,16 +174,17 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
           }}
           style={{
             padding: '12px 20px',
-            backgroundColor: 'var(--color-success)',
+            backgroundColor: creating || editingId !== null ? '#ccc' : 'var(--color-success)',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer',
+            cursor: creating || editingId !== null ? 'not-allowed' : 'pointer',
             fontSize: '16px',
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            opacity: creating || editingId !== null ? 0.6 : 1
           }}
           disabled={creating || editingId !== null}
         >
@@ -328,7 +329,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <button 
                       onClick={() => bd.id && handleEdit(bd.id)}
-                      disabled={deleting === bd.id || updating !== null || editingId !== null || showAddForm}
+                      disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
                       style={{
                         padding: '8px 16px',
                         backgroundColor: 'var(--color-primary)',
@@ -353,7 +354,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         }
                         handleDelete(bd.id)
                       }}
-                      disabled={deleting === bd.id || updating !== null || editingId !== null || showAddForm}
+                      disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
                       style={{
                         padding: '8px 16px',
                         backgroundColor: 'var(--color-danger)',
