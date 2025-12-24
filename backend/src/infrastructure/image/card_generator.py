@@ -17,10 +17,10 @@ class CardGeneratorImpl(CardGeneratorPort):
         self.width = 1200
         self.height = 800
         
-        # Цвета
-        self.text_color = (30, 30, 30)  # Тёмно-серый для лучшей читаемости
-        self.accent_color = (70, 130, 180)  # Синий для заголовков
-        self.subtitle_color = (100, 100, 100)  # Серый для подзаголовков
+        # Цвета (КОНТРАСТНЫЕ для читаемости)
+        self.text_color = (20, 20, 20)  # Очень тёмный для максимального контраста
+        self.accent_color = (50, 100, 150)  # Тёмно-синий для заголовков
+        self.subtitle_color = (80, 80, 80)  # Тёмно-серый для подзаголовков
         
         # Конфигурация шрифтов
         self.font_path = os.getenv("CARD_FONT_PATH", "arial.ttf")
@@ -54,42 +54,32 @@ class CardGeneratorImpl(CardGeneratorPort):
         return ImageFont.load_default()
 
     def _create_gradient_background(self) -> Image.Image:
-        """Создать градиентный фон для открытки с рамкой."""
-        img = Image.new("RGB", (self.width, self.height), (255, 255, 255))
+        """Создать универсальный градиентный фон для открытки с рамкой."""
+        # ОДИН УНИВЕРСАЛЬНЫЙ ШАБЛОН - без вариаций
+        img = Image.new("RGB", (self.width, self.height), (250, 250, 250))  # Светло-серый базовый
         draw = ImageDraw.Draw(img)
         
-        # Мягкий градиент от светло-голубого к кремовому
+        # Мягкий градиент от светло-голубого к светло-серому (УНИВЕРСАЛЬНЫЙ)
         for y in range(self.height):
-            # Градиент от (245, 250, 255) к (255, 252, 245)
+            # Градиент от (248, 252, 255) к (245, 248, 250)
             ratio = y / self.height
-            r = int(245 + (255 - 245) * ratio)
-            g = int(250 + (252 - 250) * ratio)
-            b = int(255 + (245 - 255) * ratio)
+            r = int(248 + (245 - 248) * ratio)
+            g = int(252 + (248 - 252) * ratio)
+            b = int(255 + (250 - 255) * ratio)
             draw.line([(0, y), (self.width, y)], fill=(r, g, b))
         
-        # Добавляем тонкую рамку для структуры
-        border_width = 3
-        border_color = (220, 230, 240)  # Светло-серый
+        # Рамка по периметру (ОБЯЗАТЕЛЬНА)
+        border_width = 4
+        border_color = (200, 210, 220)  # Нейтральный серый
         
-        # Верхняя и нижняя границы
-        draw.rectangle(
-            [(0, 0), (self.width, border_width)],
-            fill=border_color
-        )
-        draw.rectangle(
-            [(0, self.height - border_width), (self.width, self.height)],
-            fill=border_color
-        )
-        
-        # Левая и правая границы
-        draw.rectangle(
-            [(0, 0), (border_width, self.height)],
-            fill=border_color
-        )
-        draw.rectangle(
-            [(self.width - border_width, 0), (self.width, self.height)],
-            fill=border_color
-        )
+        # Верхняя граница
+        draw.rectangle([(0, 0), (self.width, border_width)], fill=border_color)
+        # Нижняя граница
+        draw.rectangle([(0, self.height - border_width), (self.width, self.height)], fill=border_color)
+        # Левая граница
+        draw.rectangle([(0, 0), (border_width, self.height)], fill=border_color)
+        # Правая граница
+        draw.rectangle([(self.width - border_width, 0), (self.width, self.height)], fill=border_color)
         
         return img
 
@@ -133,8 +123,8 @@ class CardGeneratorImpl(CardGeneratorPort):
         # Если не помещается даже с минимальным шрифтом, возвращаем минимальный
         return self.min_font_size, self._load_font(self.min_font_size)
 
-    def _wrap_text(self, text: str, font, max_width: int) -> list[str]:
-        """Перенос текста по словам с правильной обработкой."""
+    def _wrap_text(self, text: str, font, max_width: int, max_lines: int = 20) -> list[str]:
+        """Перенос текста по словам с жёстким ограничением ширины и количества строк."""
         # Разбиваем на абзацы
         paragraphs = text.split('\n')
         all_lines = []
@@ -144,10 +134,21 @@ class CardGeneratorImpl(CardGeneratorPort):
             if not paragraph:
                 continue
             
+            # Если достигнут лимит строк - обрезаем
+            if len(all_lines) >= max_lines:
+                all_lines.append("...")
+                break
+            
             words = paragraph.split()
             current_line = []
 
             for word in words:
+                # Если достигнут лимит строк - обрезаем
+                if len(all_lines) >= max_lines:
+                    if current_line:
+                        all_lines.append(" ".join(current_line) + "...")
+                    break
+                
                 test_line = " ".join(current_line + [word])
                 try:
                     bbox = font.getbbox(test_line)
@@ -162,8 +163,18 @@ class CardGeneratorImpl(CardGeneratorPort):
                     if current_line:
                         all_lines.append(" ".join(current_line))
                     current_line = [word]
+                    
+                    # Если одно слово длиннее max_width - разбиваем принудительно
+                    if len(word) * (font.size if hasattr(font, 'size') else 12) > max_width:
+                        # Разбиваем длинное слово
+                        chars_per_line = max_width // (font.size if hasattr(font, 'size') else 12)
+                        for i in range(0, len(word), chars_per_line):
+                            if len(all_lines) >= max_lines:
+                                break
+                            all_lines.append(word[i:i+chars_per_line])
+                        current_line = []
 
-            if current_line:
+            if current_line and len(all_lines) < max_lines:
                 all_lines.append(" ".join(current_line))
         
         return all_lines if all_lines else [text]
@@ -289,21 +300,28 @@ class CardGeneratorImpl(CardGeneratorPort):
         text_font = self._load_font(self.text_font_size)
         small_font = self._load_font(self.small_font_size)
 
-        # Отступы
-        padding_x = 80
-        padding_y = 60
+        # Отступы (минимум 64px как требуется)
+        padding_x = 64
+        padding_y = 64
         content_width = self.width - 2 * padding_x
         
-        # QR-код: фиксированный размер и позиция (по центру внизу)
-        qr_size = 150  # Увеличиваем размер для лучшей читаемости
-        qr_bottom_padding = 50  # Отступ от низа открытки
+        # QR-код: фиксированный размер и позиция (ЖЁСТКО ЗАХАРДКОЖЕНО)
+        qr_size = 150
+        qr_bottom_padding = 48  # ТОЧНО 48px от низа
         
-        # Позиция QR-кода: по центру горизонтально, внизу с отступом
-        qr_x = (self.width - qr_size) // 2  # Центр по горизонтали
-        qr_y = self.height - qr_size - qr_bottom_padding  # Внизу с отступом
+        # Позиция QR-кода: ЖЁСТКО ЗАХАРДКОЖЕНО (абсолютные координаты, БЕЗ anchor)
+        qr_x = (self.width - qr_size) // 2  # Центр по X
+        qr_y = self.height - qr_size - qr_bottom_padding  # Внизу с отступом 48px
         
-        # Ширина текста не зависит от QR-кода (QR внизу, текст выше)
-        text_max_width = content_width
+        # ЯВНОЕ ЛОГИРОВАНИЕ позиции QR-кода
+        logger.info(
+            f"[CardGeneratorImpl] QR code position calculated: "
+            f"qr_url={bool(qr_url)}, qr_x={qr_x}, qr_y={qr_y}, qr_size={qr_size}, "
+            f"canvas_size=({self.width}, {self.height})"
+        )
+        
+        # Максимальная ширина текста (жёстко ограничена)
+        text_max_width = content_width - 40  # Дополнительный отступ для читаемости
         
         y_offset = padding_y
 
@@ -395,28 +413,67 @@ class CardGeneratorImpl(CardGeneratorPort):
                     raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
                 raise
 
-        # QR-код (всегда по центру внизу открытки)
+        # QR-код (ОБЯЗАТЕЛЬНО должен быть нарисован, если передан)
+        qr_drawn = False
         if qr_url and qr_url.strip():
             try:
+                logger.info(f"[CardGeneratorImpl] Generating QR code for URL: {qr_url[:50]}...")
                 qr_img = self._generate_qr_code(qr_url.strip(), size=qr_size)
-                # Вставляем QR-код по центру внизу
+                
+                # Вставляем QR-код по абсолютным координатам (БЕЗ anchor)
                 img.paste(qr_img, (qr_x, qr_y))
-                logger.info(f"[CardGeneratorImpl] QR code generated and placed at ({qr_x}, {qr_y}), size={qr_size}")
+                qr_drawn = True
+                
+                logger.info(
+                    f"[CardGeneratorImpl] QR code SUCCESSFULLY drawn at absolute position: "
+                    f"x={qr_x}, y={qr_y}, size={qr_size}x{qr_size}, "
+                    f"canvas_size=({self.width}x{self.height})"
+                )
             except Exception as e:
-                logger.error(f"[CardGeneratorImpl] Failed to generate QR code: {e}", exc_info=True)
-                # НЕ пропускаем ошибку - QR-код критичен, если он запрошен
-                raise InvalidGreetingTextError(f"Не удалось сгенерировать QR-код: {str(e)}") from e
+                logger.error(
+                    f"[CardGeneratorImpl] FAILED to generate/draw QR code: {e}",
+                    exc_info=True
+                )
+                # КРИТИЧНО: если QR запрошен, но не нарисован - это ошибка
+                raise InvalidGreetingTextError(
+                    f"Не удалось сгенерировать QR-код: {str(e)}"
+                ) from e
+        else:
+            logger.info("[CardGeneratorImpl] QR code not requested (qr_url is empty or None)")
+        
+        # ПРОВЕРКА: если QR должен был быть нарисован, но не был - ошибка
+        if qr_url and qr_url.strip() and not qr_drawn:
+            logger.error("[CardGeneratorImpl] QR code was requested but NOT drawn!")
+            raise InvalidGreetingTextError("QR-код не был нарисован на открытке")
 
         # Сохраняем в bytes
-        img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format="PNG", optimize=True)
-        card_bytes = img_byte_arr.getvalue()
+        try:
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format="PNG", optimize=True)
+            card_bytes = img_byte_arr.getvalue()
+        except Exception as e:
+            logger.error(f"[CardGeneratorImpl] Failed to save image to bytes: {e}", exc_info=True)
+            raise InvalidGreetingTextError(f"Не удалось сохранить открытку: {str(e)}") from e
         
-        # Проверяем результат
-        if not card_bytes or len(card_bytes) < 100:
-            raise InvalidGreetingTextError("Сгенерированная открытка пуста или повреждена")
+        # КРИТИЧЕСКАЯ ПРОВЕРКА: картинка должна быть валидной
+        if not card_bytes:
+            logger.error("[CardGeneratorImpl] Generated card is EMPTY (0 bytes)")
+            raise InvalidGreetingTextError("Сгенерированная открытка пуста")
         
-        logger.info(f"[CardGeneratorImpl] Card generated successfully, size={len(card_bytes)} bytes")
+        if len(card_bytes) < 100:
+            logger.error(f"[CardGeneratorImpl] Generated card is too small: {len(card_bytes)} bytes")
+            raise InvalidGreetingTextError("Сгенерированная открытка повреждена (слишком маленький размер)")
+        
+        # Проверяем, что это валидный PNG (должен начинаться с PNG signature)
+        if not card_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+            logger.error("[CardGeneratorImpl] Generated card is not a valid PNG file")
+            raise InvalidGreetingTextError("Сгенерированная открытка повреждена (невалидный формат)")
+        
+        logger.info(
+            f"[CardGeneratorImpl] Card generated SUCCESSFULLY: "
+            f"size={len(card_bytes)} bytes, qr_drawn={qr_drawn}, "
+            f"canvas_size=({self.width}x{self.height})"
+        )
         return card_bytes
 
     def _generate_qr_code(self, url: str, size: int = 150) -> Image.Image:

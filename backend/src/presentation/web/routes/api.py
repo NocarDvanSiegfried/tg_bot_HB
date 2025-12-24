@@ -1175,23 +1175,49 @@ async def create_card(
             greeting_text=data.greeting_text,
             qr_url=data.qr_url,
         )
+        
+        # КРИТИЧЕСКАЯ ПРОВЕРКА: картинка должна быть валидной
+        if not card_bytes or len(card_bytes) < 100:
+            logger.error(
+                f"[API] Card generation returned invalid result: "
+                f"birthday_id={data.birthday_id}, size={len(card_bytes) if card_bytes else 0} bytes"
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="Не удалось сгенерировать открытку. Результат пуст или повреждён."
+            )
+        
         logger.info(
             f"[API] Card created successfully for birthday_id={data.birthday_id}, "
-            f"size={len(card_bytes)} bytes"
+            f"size={len(card_bytes)} bytes, has_qr={bool(data.qr_url)}"
         )
+        
         from fastapi.responses import Response
-        return Response(content=card_bytes, media_type="image/png")
+        return Response(
+            content=card_bytes,
+            media_type="image/png",
+            headers={
+                "Content-Disposition": f'attachment; filename="greeting-{data.birthday_id}-{int(__import__("time").time())}.png"'
+            }
+        )
     except BirthdayNotFoundError as e:
         logger.warning(
             f"[API] Birthday not found for card creation: birthday_id={data.birthday_id}, error={e}"
         )
+        raise
+    except HTTPException:
+        # Пробрасываем HTTPException как есть
         raise
     except Exception as e:
         logger.error(
             f"[API] Error creating card for birthday_id={data.birthday_id}: {type(e).__name__}: {e}",
             exc_info=True,
         )
-        raise
+        # ЯВНАЯ ОШИБКА вместо тихого сбоя
+        raise HTTPException(
+            status_code=500,
+            detail=f"Не удалось сгенерировать открытку: {str(e)}"
+        ) from e
 
 
 # Diagnostic endpoints

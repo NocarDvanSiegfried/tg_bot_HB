@@ -140,39 +140,27 @@ export default function GreetingModal({
     }
   }
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!cardUrl) return
 
     try {
-      // Для мобильных устройств (особенно Telegram WebView) нужно загружать через fetch
-      const response = await fetch(cardUrl)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.status}`)
+      // В Telegram Mini App sandbox iframe download ЗАПРЕЩЁН
+      // ЕДИНСТВЕННОЕ решение: использовать Telegram.WebApp.openLink
+      // Это выводит пользователя из sandbox и позволяет браузеру/Telegram скачать файл
+      
+      // Проверяем наличие Telegram WebApp API
+      if (window.Telegram?.WebApp?.openLink) {
+        // Используем Telegram API для открытия ссылки (выход из sandbox)
+        window.Telegram.WebApp.openLink(cardUrl, { try_instant_view: false })
+        logger.info('[GreetingModal] Opening card URL via Telegram.WebApp.openLink')
+      } else {
+        // Fallback для обычного браузера
+        window.open(cardUrl, '_blank')
+        logger.info('[GreetingModal] Opening card URL via window.open (fallback)')
       }
-      
-      const blob = await response.blob()
-      const blobUrl = URL.createObjectURL(blob)
-      
-      // Создаём временную ссылку для скачивания
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.download = `greeting-${birthdayName.replace(/\s+/g, '-')}-${Date.now()}.png`
-      
-      // Для мобильных устройств нужно добавить в DOM перед кликом
-      link.style.display = 'none'
-      document.body.appendChild(link)
-      
-      // Программный клик
-      link.click()
-      
-      // Очистка
-      setTimeout(() => {
-        document.body.removeChild(link)
-        URL.revokeObjectURL(blobUrl)
-      }, 100)
     } catch (error) {
-      logger.error('[GreetingModal] Failed to download card:', error)
-      setError('Не удалось скачать открытку. Попробуйте позже.')
+      logger.error('[GreetingModal] Failed to open card URL:', error)
+      setError('Не удалось открыть открытку. Попробуйте позже.')
     }
   }
 
