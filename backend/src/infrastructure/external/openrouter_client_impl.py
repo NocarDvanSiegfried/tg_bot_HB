@@ -133,34 +133,80 @@ class OpenRouterClientImpl(OpenRouterClient):
                     return content.strip()
                     
                 except httpx.HTTPStatusError as e:
+                    # Логируем полную информацию об ошибке
+                    response_text = ""
+                    try:
+                        response_text = e.response.text[:500]  # Первые 500 символов для диагностики
+                    except Exception:
+                        response_text = "Unable to read response text"
+                    
+                    error_message = f"HTTP {e.response.status_code}"
+                    if response_text:
+                        error_message += f": {response_text}"
+                    
                     logger.warning(
-                        f"[OpenRouterClientImpl] HTTP error {e.response.status_code}: {e.response.text[:200]}"
+                        f"[OpenRouterClientImpl] HTTP error {e.response.status_code}: {response_text}",
+                        extra={
+                            "status_code": e.response.status_code,
+                            "response_preview": response_text,
+                            "attempt": attempt + 1,
+                            "max_retries": self.max_retries,
+                        }
                     )
+                    
                     if attempt == self.max_retries - 1:
                         logger.error(
                             f"[OpenRouterClientImpl] All retry attempts exhausted, "
-                            f"HTTP status: {e.response.status_code}"
+                            f"HTTP status: {e.response.status_code}, response: {response_text[:200]}"
                         )
-                        raise OpenRouterHTTPError(e.response.status_code) from e
+                        # Передаем сообщение об ошибке в исключение
+                        raise OpenRouterHTTPError(e.response.status_code, error_message) from e
                     await asyncio.sleep(2**attempt)
                 except httpx.TimeoutException as e:
+                    timeout_message = f"Request timeout after {self.timeout}s (attempt {attempt + 1}/{self.max_retries})"
                     logger.warning(
-                        f"[OpenRouterClientImpl] Request timeout (attempt {attempt + 1}/{self.max_retries})"
+                        f"[OpenRouterClientImpl] {timeout_message}",
+                        extra={
+                            "timeout": self.timeout,
+                            "attempt": attempt + 1,
+                            "max_retries": self.max_retries,
+                        }
                     )
                     if attempt == self.max_retries - 1:
-                        logger.error("[OpenRouterClientImpl] All retry attempts exhausted, timeout")
-                        raise OpenRouterTimeoutError() from e
+                        logger.error(f"[OpenRouterClientImpl] All retry attempts exhausted, timeout: {self.timeout}s")
+                        raise OpenRouterTimeoutError(timeout_message) from e
                     await asyncio.sleep(2**attempt)
                 except OpenRouterAPIError:
                     # Если это уже наше доменное исключение, пробрасываем дальше
                     raise
-                except Exception as e:
+                except httpx.RequestError as e:
+                    # Ошибки сети (не HTTP статус, а проблемы с подключением)
+                    error_message = f"Network error: {str(e)}"
                     logger.error(
-                        f"[OpenRouterClientImpl] Unexpected error: {type(e).__name__}: {e}",
+                        f"[OpenRouterClientImpl] Network error (attempt {attempt + 1}/{self.max_retries}): {error_message}",
                         exc_info=True,
+                        extra={
+                            "error_type": type(e).__name__,
+                            "attempt": attempt + 1,
+                            "max_retries": self.max_retries,
+                        }
+                    )
+                    if attempt == self.max_retries - 1:
+                        raise OpenRouterAPIError(error_message) from e
+                    await asyncio.sleep(2**attempt)
+                except Exception as e:
+                    error_message = f"Unexpected error: {type(e).__name__}: {str(e)}"
+                    logger.error(
+                        f"[OpenRouterClientImpl] {error_message}",
+                        exc_info=True,
+                        extra={
+                            "error_type": type(e).__name__,
+                            "attempt": attempt + 1,
+                            "max_retries": self.max_retries,
+                        }
                     )
                     # Иначе оборачиваем в базовое исключение
-                    raise OpenRouterAPIError(f"OpenRouter API error: {str(e)}") from e
+                    raise OpenRouterAPIError(error_message) from e
 
     def _build_prompt(
         self,

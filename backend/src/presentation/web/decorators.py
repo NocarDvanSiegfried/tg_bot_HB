@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.exceptions.api_exceptions import (
     OpenRouterAPIError,
+    OpenRouterHTTPError,
     OpenRouterRateLimitError,
     OpenRouterTimeoutError,
 )
@@ -86,16 +87,71 @@ def handle_api_errors(func: Callable) -> Callable:
             logger.warning(f"[DECORATOR] Business rule error in {func.__name__}: {e}")
             raise HTTPException(status_code=400, detail=str(e)) from e
         except OpenRouterRateLimitError as e:
-            logger.error(f"[DECORATOR] OpenRouter rate limit error in {func.__name__}: {e}")
+            logger.error(
+                f"[DECORATOR] OpenRouter rate limit error in {func.__name__}: {e}",
+                extra={"error_type": "OpenRouterRateLimitError", "function": func.__name__}
+            )
             raise HTTPException(
-                status_code=503, detail="Service temporarily unavailable due to rate limiting"
+                status_code=503,
+                detail="Сервис генерации поздравлений временно недоступен из-за превышения лимита запросов. Попробуйте позже."
             ) from e
         except OpenRouterTimeoutError as e:
-            logger.error(f"[DECORATOR] OpenRouter timeout error in {func.__name__}: {e}")
-            raise HTTPException(status_code=504, detail="External service timeout") from e
+            logger.error(
+                f"[DECORATOR] OpenRouter timeout error in {func.__name__}: {e}",
+                extra={"error_type": "OpenRouterTimeoutError", "function": func.__name__}
+            )
+            raise HTTPException(
+                status_code=503,
+                detail="Сервис генерации поздравлений временно недоступен. Превышено время ожидания ответа. Попробуйте позже."
+            ) from e
+        except OpenRouterHTTPError as e:
+            # Различаем разные типы HTTP-ошибок
+            status_code = getattr(e, 'status_code', 0)
+            error_detail = str(e) if str(e) else "Сервис генерации поздравлений временно недоступен. Попробуйте позже."
+            
+            logger.error(
+                f"[DECORATOR] OpenRouter HTTP error in {func.__name__}: status_code={status_code}, error={e}",
+                extra={
+                    "error_type": "OpenRouterHTTPError",
+                    "http_status_code": status_code,
+                    "function": func.__name__,
+                }
+            )
+            
+            # Для 401/403 - ошибка авторизации
+            if status_code in (401, 403):
+                raise HTTPException(
+                    status_code=503,
+                    detail="Сервис генерации поздравлений временно недоступен. Ошибка авторизации в внешнем сервисе. Обратитесь к администратору."
+                ) from e
+            # Для 429 - rate limit
+            elif status_code == 429:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Сервис генерации поздравлений временно недоступен из-за превышения лимита запросов. Попробуйте позже."
+                ) from e
+            # Для 5xx - ошибка сервера внешнего сервиса
+            elif status_code >= 500:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Сервис генерации поздравлений временно недоступен. Внешний сервис вернул ошибку. Попробуйте позже."
+                ) from e
+            # Для остальных 4xx - общая ошибка
+            else:
+                raise HTTPException(
+                    status_code=503,
+                    detail=error_detail
+                ) from e
         except OpenRouterAPIError as e:
-            logger.error(f"[DECORATOR] OpenRouter API error in {func.__name__}: {e}")
-            raise HTTPException(status_code=502, detail="External service error") from e
+            logger.error(
+                f"[DECORATOR] OpenRouter API error in {func.__name__}: {e}",
+                extra={"error_type": "OpenRouterAPIError", "function": func.__name__},
+                exc_info=True
+            )
+            raise HTTPException(
+                status_code=503,
+                detail="Сервис генерации поздравлений временно недоступен. Попробуйте позже."
+            ) from e
         except ValueError as e:
             if session:
                 logger.info(f"[DECORATOR] Performing rollback for ValueError in {func.__name__}")

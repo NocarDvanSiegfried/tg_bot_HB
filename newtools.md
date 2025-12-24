@@ -1,1 +1,257 @@
-miniapp.micro-tab.ru:4443/?v=2025.12.24.04#tgWebAppData=query_id%3DAAF63kdiAwAAAHreR2Lzuw9u%26user%3D%257B%2522id%2522%253A8091328122%252C%2522first_name%2522%253A%2522Daren%2522%252C%2522last_name%2522%253A%2522Krystin%2522%252C%2522username%2522%253A%2522triumf_ykt%2522%252C%2522language_code%2522%253A%2522ru%2522%252C%2522allows_write_to_pm%2522%253Atrue%252C%2522photo_url%2522%253A%2522https%253A%255C%252F%255C%252Ft.me%255C%252Fi%255C%252Fuserpic%255C%252F320%255C%252F6NzUCWt2e6QM_IbAPmwh6qtUbc1x9kyoQjPM7clptS4WqxmdtvDQRlSA1AxvYSA4.svg%2522%257D%26auth_date%3D1766531250%26signature%3DMvJebx6joEdncOv9_KJH0P6l1-_RBnu4KZZZvQk3RHVxAZTrWj-PUN1ARdiTgcMpXqcdJqcSvDo-YCEV4F5LDw%26hash%3D374c90f3152493ff31e1bc8e47e97b793503eaa38cea04a4a2457b311d089ce9&tgWebAppVersion=9.1&tgWebAppPlatform=web&tgWebAppThemeParams=%7B%22bg_color%22%3A%22%23ffffff%22%2C%22button_color%22%3A%22%233390ec%22%2C%22button_text_color%22%3A%22%23ffffff%22%2C%22hint_color%22%3A%22%23707579%22%2C%22link_color%22%3A%22%2300488f%22%2C%22secondary_bg_color%22%3A%22%23f4f4f5%22%2C%22text_color%22%3A%22%23000000%22%2C%22header_bg_color%22%3A%22%23ffffff%22%2C%22accent_text_color%22%3A%22%233390ec%22%2C%22section_bg_color%22%3A%22%23ffffff%22%2C%22section_header_text_color%22%3A%22%233390ec%22%2C%22subtitle_text_color%22%3A%22%23707579%22%2C%22destructive_text_color%22%3A%22%23df3f40%22%7D:1 Access to fetch at 'https://api.micro-tab.ru:9443/api/birthdays' from origin 'https://miniapp.micro-tab.ru:4443' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. Calendar.94774564.js:1 GET https://api.micro-tab.ru:9443/api/birthdays net::ERR_FAILED 500 (Internal Server Error) (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 [API] ===== Fetch ERROR for GET https://api.micro-tab.ru:9443/api/birthdays ===== error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 [API] Error type: TypeError error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 [API] Error message: Failed to fetch error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 [API] Error stack: TypeError: Failed to fetch at Calendar.94774564.js:1:30371 at Generator.next (<anonymous>) at Calendar.94774564.js:1:695 at new Promise (<anonymous>) at C (Calendar.94774564.js:1:515) at I (Calendar.94774564.js:1:29955) at Calendar.94774564.js:1:31091 at Generator.next (<anonymous>) at Calendar.94774564.js:1:695 at new Promise (<anonymous>) error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 [API] Network error - возможно CORS или сеть: Failed to fetch error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 getBirthdays @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 Failed to load items: Error: Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API. at Calendar.94774564.js:1:30591 at Generator.throw (<anonymous>) at s (Calendar.94774564.js:1:597) error @ index.60d1d84e.js:67 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 index.60d1d84e.js:67 CRUD operation error: Error: Network error: не удалось подключиться к серверу. Проверьте подключение к интернету и URL API. at Calendar.94774564.js:1:30591 at Generator.throw (<anonymous>) at s (Calendar.94774564.js:1:597) error @ index.60d1d84e.js:67 fe @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 de @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 dl @ index.60d1d84e.js:40 qt @ index.60d1d84e.js:40 $d @ index.60d1d84e.js:40 St @ index.60d1d84e.js:40 Qu @ index.60d1d84e.js:40 vt @ index.60d1d84e.js:38 (анонимная) @ index.60d1d84e.js:40 Calendar.94774564.js:1 POST https://api.micro-tab.ru:9443/api/birthdays 500 (Internal Server Error) (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 [API] Error response for POST https://api.micro-tab.ru:9443/api/birthdays: {detail: 'Internal server error'} error @ index.60d1d84e.js:67 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 ha @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 [API] ===== Fetch ERROR for POST https://api.micro-tab.ru:9443/api/birthdays ===== error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 [API] Error type: Error error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 [API] Error message: Ошибка сервера. Пожалуйста, попробуйте позже. error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 [API] Error stack: Error: Ошибка сервера. Пожалуйста, попробуйте позже. at Calendar.94774564.js:1:30528 at Generator.next (<anonymous>) at i (Calendar.94774564.js:1:553) error @ index.60d1d84e.js:67 ga @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 i @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 I @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createBirthday @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 createItem @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:5 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 Failed to create item: Error: Ошибка сервера. Пожалуйста, попробуйте позже. at Calendar.94774564.js:1:30591 at Generator.next (<anonymous>) at i (Calendar.94774564.js:1:553) error @ index.60d1d84e.js:67 (анонимная) @ Calendar.94774564.js:5 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 index.60d1d84e.js:67 CRUD operation error: Error: Ошибка сервера. Пожалуйста, попробуйте позже. at Calendar.94774564.js:1:30591 at Generator.next (<anonymous>) at i (Calendar.94774564.js:1:553) error @ index.60d1d84e.js:67 fe @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:5 s @ Calendar.94774564.js:1 Promise.then d @ Calendar.94774564.js:1 (анонимная) @ Calendar.94774564.js:1 C @ Calendar.94774564.js:1 handleSubmit @ Calendar.94774564.js:5 lf @ index.60d1d84e.js:37 uf @ index.60d1d84e.js:37 sf @ index.60d1d84e.js:37 mu @ index.60d1d84e.js:37 aa @ index.60d1d84e.js:37 (анонимная) @ index.60d1d84e.js:37 Li @ index.60d1d84e.js:40 Ms @ index.60d1d84e.js:37 Fl @ index.60d1d84e.js:37 li @ index.60d1d84e.js:37 _f @ index.60d1d84e.js:37 URL запроса https://api.micro-tab.ru:9443/api/calendar/month/2025/12 Метод запроса GET Код статуса 500 Internal Server Error Удаленный адрес 127.0.0.1:10809 Правило для URL перехода strict-origin-when-cross-origin access-control-allow-credentials true access-control-allow-origin https://miniapp.micro-tab.ru:4443 access-control-expose-headers * connection keep-alive content-length 34 content-type application/json date Tue, 23 Dec 2025 23:07:33 GMT server nginx/1.24.0 (Ubuntu) vary Origin accept */* accept-encoding gzip, deflate, br, zstd accept-language ru,en-US;q=0.9,en;q=0.8 connection keep-alive content-type application/json host api.micro-tab.ru:9443 origin https://miniapp.micro-tab.ru:4443 referer https://miniapp.micro-tab.ru:4443/ sec-ch-ua "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24" sec-ch-ua-mobile ?0 sec-ch-ua-platform "Windows" sec-fetch-dest empty sec-fetch-mode cors sec-fetch-site same-site user-agent Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 x-init-data query_id=AAF63kdiAwAAAHreR2Lzuw9u&user=%7B%22id%22%3A8091328122%2C%22first_name%22%3A%22Daren%22%2C%22last_name%22%3A%22Krystin%22%2C%22username%22%3A%22triumf_ykt%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F6NzUCWt2e6QM_IbAPmwh6qtUbc1x9kyoQjPM7clptS4WqxmdtvDQRlSA1AxvYSA4.svg%22%7D&auth_date=1766531250&signature=MvJebx6joEdncOv9_KJH0P6l1-_RBnu4KZZZvQk3RHVxAZTrWj-PUN1ARdiTgcMpXqcdJqcSvDo-YCEV4F5LDw&hash=374c90f3152493ff31e1bc8e47e97b793503eaa38cea04a4a2457b311d089ce9 RL запроса https://api.micro-tab.ru:9443/api/birthdays Метод запроса GET Код статуса 500 Internal Server Error Правило для URL перехода strict-origin-when-cross-origin connection keep-alive content-length 21 content-type text/plain; charset=utf-8 date Tue, 23 Dec 2025 23:07:39 GMT server nginx/1.24.0 (Ubuntu) accept */* accept-encoding gzip, deflate, br, zstd accept-language ru,en-US;q=0.9,en;q=0.8 connection keep-alive content-type application/json host api.micro-tab.ru:9443 origin https://miniapp.micro-tab.ru:4443 referer https://miniapp.micro-tab.ru:4443/ sec-ch-ua "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24" sec-ch-ua-mobile ?0 sec-ch-ua-platform "Windows" sec-fetch-dest empty sec-fetch-mode cors sec-fetch-site same-site user-agent Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 x-init-data query_id=AAF63kdiAwAAAHreR2Lzuw9u&user=%7B%22id%22%3A8091328122%2C%22first_name%22%3A%22Daren%22%2C%22last_name%22%3A%22Krystin%22%2C%22username%22%3A%22triumf_ykt%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F6NzUCWt2e6QM_IbAPmwh6qtUbc1x9kyoQjPM7clptS4WqxmdtvDQRlSA1AxvYSA4.svg%22%7D&auth_date=1766531250&signature=MvJebx6joEdncOv9_KJH0P6l1-_RBnu4KZZZvQk3RHVxAZTrWj-PUN1ARdiTgcMpXqcdJqcSvDo-YCEV4F5LDw&hash=374c90f3152493ff31e1bc8e47e97b793503eaa38cea04a4a2457b311d089ce9
+POST https://api.micro-tab.ru:9443/api/panel/generate-greeting 502 (Bad Gateway)
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [API] Error response for POST https://api.micro-tab.ru:9443/api/panel/generate-greeting: {detail: 'External service error'}
+error @ index.6d269de4.js:67
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+Da @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [API] ===== Fetch ERROR for POST https://api.micro-tab.ru:9443/api/panel/generate-greeting =====
+error @ index.6d269de4.js:67
+Ca @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [API] Error type: Error
+error @ index.6d269de4.js:67
+Ca @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [API] Error message: Ошибка сервера. Пожалуйста, попробуйте позже.
+error @ index.6d269de4.js:67
+Ca @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [API] Error stack: Error: Ошибка сервера. Пожалуйста, попробуйте позже.
+    at Calendar.ce2e3b7b.js:1:30666
+    at Generator.next (<anonymous>)
+    at s (Calendar.ce2e3b7b.js:1:553)
+error @ index.6d269de4.js:67
+Ca @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+s @ Calendar.ce2e3b7b.js:1
+Promise.then
+c @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+te @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+generateGreeting @ Calendar.ce2e3b7b.js:1
+(анонимная) @ Calendar.ce2e3b7b.js:5
+(анонимная) @ Calendar.ce2e3b7b.js:1
+_ @ Calendar.ce2e3b7b.js:1
+J @ Calendar.ce2e3b7b.js:5
+uf @ index.6d269de4.js:37
+af @ index.6d269de4.js:37
+cf @ index.6d269de4.js:37
+vu @ index.6d269de4.js:37
+fa @ index.6d269de4.js:37
+(анонимная) @ index.6d269de4.js:37
+Ri @ index.6d269de4.js:40
+Ds @ index.6d269de4.js:37
+Ul @ index.6d269de4.js:37
+oi @ index.6d269de4.js:37
+Pf @ index.6d269de4.js:37
+index.6d269de4.js:67 [GreetingModal] Failed to generate greeting: Error: Ошибка сервера. Пожалуйста, попробуйте позже.
+    at Calendar.ce2e3b7b.js:1:30729
+    at Generator.next (<anonymous>)
+    at s (Calendar.ce2e3b7b.js:1:553)
+
+
+URL запроса
+https://api.micro-tab.ru:9443/api/panel/generate-greeting
+Метод запроса
+POST
+Код статуса
+502 Bad Gateway
+Удаленный адрес
+127.0.0.1:10809
+Правило для URL перехода
+strict-origin-when-cross-origin
+access-control-allow-credentials
+true
+access-control-allow-origin
+https://miniapp.micro-tab.ru:4443
+access-control-expose-headers
+*
+connection
+keep-alive
+content-length
+35
+content-type
+application/json
+date
+Wed, 24 Dec 2025 20:28:31 GMT
+server
+nginx/1.24.0 (Ubuntu)
+vary
+Origin
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+ru,en-US;q=0.9,en;q=0.8
+connection
+keep-alive
+content-length
+55
+content-type
+application/json
+host
+api.micro-tab.ru:9443
+origin
+https://miniapp.micro-tab.ru:4443
+referer
+https://miniapp.micro-tab.ru:4443/
+sec-ch-ua
+"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-site
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+x-init-data

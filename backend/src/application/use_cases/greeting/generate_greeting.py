@@ -76,8 +76,22 @@ class GenerateGreetingUseCase:
             )
             return greeting_text
         except Exception as e:
+            # Логируем детальную информацию об ошибке для диагностики
+            error_type = type(e).__name__
+            error_message = str(e)
+            
             logger.error(
-                f"[GenerateGreetingUseCase] Error generating greeting via OpenRouter: {type(e).__name__}: {e}",
+                f"[GenerateGreetingUseCase] Error generating greeting via OpenRouter: {error_type}: {error_message}",
+                extra={
+                    "error_type": error_type,
+                    "error_message": error_message,
+                    "birthday_id": birthday_id,
+                    "person_name": birthday.full_name,
+                    "style": style,
+                    "length": length,
+                    "theme": theme,
+                },
                 exc_info=True,
             )
+            # Пробрасываем исключение дальше для обработки в декораторе
             raise
