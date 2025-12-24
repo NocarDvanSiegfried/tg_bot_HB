@@ -19,9 +19,23 @@ function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreet
   // Диагностика: проверяем, передан ли обработчик
   useEffect(() => {
     if (import.meta.env.DEV) {
-      console.log('[DateView] onGenerateGreeting provided:', !!onGenerateGreeting)
+      console.log('[DateView] onGenerateGreeting provided:', !!onGenerateGreeting, {
+        type: typeof onGenerateGreeting,
+        isFunction: typeof onGenerateGreeting === 'function'
+      })
     }
   }, [onGenerateGreeting])
+  
+  // Диагностика: проверяем данные о днях рождения
+  useEffect(() => {
+    if (import.meta.env.DEV && data) {
+      console.log('[DateView] Birthdays data:', {
+        count: data.birthdays.length,
+        hasOnGenerateGreeting: !!onGenerateGreeting,
+        birthdays: data.birthdays.map(b => ({ id: b.id, name: b.full_name }))
+      })
+    }
+  }, [data, onGenerateGreeting])
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
@@ -102,10 +116,7 @@ function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreet
                   >
                     🤖 Поздравить
                   </button>
-                ) : (
-                  // Диагностика в dev режиме
-                  import.meta.env.DEV && console.log('[DateView] onGenerateGreeting is not provided for:', bd.full_name)
-                )}
+                ) : null}
               </div>
               <div className="birthday-card-body">
                 <p className="birthday-company-position">{bd.company}, {bd.position}</p>
@@ -148,6 +159,40 @@ function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreet
   )
 }
 
-// Мемоизация компонента для оптимизации рендеринга
-export default memo(DateView)
+// Мемоизация компонента с кастомной функцией сравнения для правильной работы с функциями
+export default memo(DateView, (prevProps, nextProps) => {
+  // Сравниваем все пропсы
+  const dateEqual = prevProps.date.getTime() === nextProps.date.getTime()
+  const loadingEqual = prevProps.loading === nextProps.loading
+  const errorEqual = prevProps.error === nextProps.error
+  
+  // Для data делаем глубокое сравнение только ключевых полей
+  const dataEqual = 
+    prevProps.data === nextProps.data || 
+    (prevProps.data?.date === nextProps.data?.date &&
+     prevProps.data?.birthdays?.length === nextProps.data?.birthdays?.length &&
+     prevProps.data?.holidays?.length === nextProps.data?.holidays?.length)
+  
+  // Функции всегда считаем разными, чтобы компонент обновлялся при изменении onGenerateGreeting
+  const functionsEqual = prevProps.onGenerateGreeting === nextProps.onGenerateGreeting &&
+                          prevProps.onHolidaysClick === nextProps.onHolidaysClick
+  
+  // Компонент должен обновиться, если что-то изменилось
+  const shouldUpdate = !(dateEqual && loadingEqual && errorEqual && dataEqual && functionsEqual)
+  
+  // Диагностика в dev режиме
+  if (import.meta.env.DEV && shouldUpdate) {
+    console.log('[DateView] memo: Component will update', {
+      dateEqual,
+      loadingEqual,
+      errorEqual,
+      dataEqual,
+      functionsEqual,
+      hasOnGenerateGreeting: !!nextProps.onGenerateGreeting
+    })
+  }
+  
+  // Возвращаем true, если компонент НЕ должен обновиться (memo работает наоборот)
+  return !shouldUpdate
+})
 

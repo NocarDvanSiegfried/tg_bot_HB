@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 // Оптимизированные импорты из date-fns для tree-shaking
 import format from 'date-fns/format'
 import startOfMonth from 'date-fns/startOfMonth'
@@ -259,8 +259,8 @@ export default function Calendar() {
     setCurrentDate(new Date(currentDate.getTime()))
   }
 
-  // Обработчик генерации поздравления
-  const handleGenerateGreeting = async (id: number, name: string, company: string, position: string) => {
+  // Обработчик генерации поздравления (мемоизирован для стабильности ссылки)
+  const handleGenerateGreeting = useCallback(async (id: number, name: string, company: string, position: string) => {
     // Диагностика
     console.log('[Calendar] handleGenerateGreeting called:', { id, name, hasPanelAccess, checkingAccess })
     
@@ -297,7 +297,7 @@ export default function Calendar() {
     // Если доступ есть, открываем модальное окно
     console.log('[Calendar] Opening greeting modal')
     setGreetingModal({ isOpen: true, birthdayId: id, name, company, position })
-  }
+  }, [hasPanelAccess, checkingAccess]) // setGreetingModal стабильна, не нужна в зависимостях
 
   // Закрытие модального окна
   const handleCloseGreetingModal = () => {
