@@ -159,6 +159,13 @@
   max-width: 800px;
   margin: 0 auto;
   padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.birthday-management .back-button {
+  align-self: flex-start;
+  margin-bottom: var(--spacing-lg);
 }
 
 .birthday-management-title {
@@ -167,6 +174,7 @@
   margin: 0 0 var(--spacing-xl) 0;
   color: var(--color-text-primary);
   transition: var(--transition-theme);
+  align-self: stretch;
 }
 
 .diagnostic-info {
@@ -185,6 +193,8 @@
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
   align-items: stretch;
+  width: 100%;
+  align-self: stretch;
 }
 
 .birthday-search-input,
@@ -219,6 +229,8 @@
 /* Кнопка добавления */
 .birthday-add-button-container {
   margin-bottom: var(--spacing-lg);
+  align-self: flex-start;
+  width: 100%;
 }
 
 .birthday-add-button {
@@ -250,21 +262,31 @@
 .birthday-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   background: var(--color-bg-primary, white);
   border: 1px solid var(--color-border, #e0e0e0);
   border-radius: var(--border-radius-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   animation: fadeIn 0.3s ease-in;
   gap: var(--spacing-lg);
   transition: var(--transition-theme);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .birthday-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-border, rgba(255, 255, 255, 0.1));
 }
 
 .birthday-card-content {
   flex: 1;
   min-width: 0; /* Позволяет контенту сжиматься */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .birthday-card-name {
@@ -291,14 +313,15 @@
   font-size: 13px;
   color: var(--color-text-muted);
   font-style: italic;
-  margin-top: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
+  margin: 0;
+  opacity: 0.8;
 }
 
 .birthday-card-responsible {
   font-size: 12px;
   color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
+  margin: 0;
+  opacity: 0.7;
 }
 
 .birthday-card-responsible strong {
@@ -312,6 +335,8 @@
   gap: var(--spacing-sm);
   flex-shrink: 0;
   align-items: stretch;
+  justify-content: flex-start;
+  min-width: 140px;
 }
 
 .birthday-action-button {
@@ -325,9 +350,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xs);
-  min-width: 140px;
+  width: 100%;
+  min-height: 36px;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .birthday-edit-button {
@@ -340,12 +367,16 @@
 }
 
 .birthday-delete-button {
-  background-color: var(--color-danger);
-  color: white;
+  background-color: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  font-weight: 400;
 }
 
 .birthday-delete-button:hover:not(:disabled) {
-  background-color: var(--color-danger-hover);
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: var(--color-danger-hover);
+  color: var(--color-danger-hover);
 }
 
 .birthday-action-button:disabled {
@@ -356,60 +387,59 @@
 
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
+  .birthday-management {
+    padding: var(--spacing-lg);
+  }
+
+  .birthday-management-title {
+    font-size: 20px;
+    margin-bottom: var(--spacing-lg);
+  }
+
   .birthday-controls-panel {
     flex-direction: column;
     gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .birthday-search-input,
+  .birthday-filter-select {
+    width: 100%;
+  }
+
+  .birthday-add-button-container {
+    width: 100%;
+  }
+
+  .birthday-add-button {
+    width: 100%;
   }
 
   .birthday-card {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
   }
 
   .birthday-card-actions {
     flex-direction: row;
     justify-content: stretch;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+    width: 100%;
+    min-width: auto;
   }
 
   .birthday-action-button {
     flex: 1;
-    min-width: auto;
+    min-width: 0;
+    width: auto;
   }
 
-  /* Увеличить отступы для мобильных в тёмной теме */
-  .calendar-container {
-    padding: var(--spacing-lg);
-  }
-
-  .date-view {
-    padding: var(--spacing-lg);
-    margin-top: var(--spacing-lg);
-  }
-
-  .birthday-management {
-    padding: var(--spacing-lg);
-  }
-
-  /* Меньше визуального шума на мобильных */
-  .calendar-day {
-    border-width: 1px;
-    min-height: 45px;
-    padding: var(--spacing-sm);
-  }
-
-  .calendar-day-header {
-    padding: var(--spacing-sm);
-  }
-
-  /* Мягкие границы для мобильных */
-  .birthday-card,
-  .holiday-card {
-    border-width: 1px;
-    box-shadow: none;
+  .back-button {
+    width: 100%;
+    margin-bottom: var(--spacing-md);
   }
 }
 
