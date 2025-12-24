@@ -54,18 +54,42 @@ class CardGeneratorImpl(CardGeneratorPort):
         return ImageFont.load_default()
 
     def _create_gradient_background(self) -> Image.Image:
-        """Создать градиентный фон для открытки."""
+        """Создать градиентный фон для открытки с рамкой."""
         img = Image.new("RGB", (self.width, self.height), (255, 255, 255))
         draw = ImageDraw.Draw(img)
         
-        # Мягкий градиент от светло-голубого к белому
+        # Мягкий градиент от светло-голубого к кремовому
         for y in range(self.height):
-            # Градиент от (240, 248, 255) к (255, 255, 255)
+            # Градиент от (245, 250, 255) к (255, 252, 245)
             ratio = y / self.height
-            r = int(240 + (255 - 240) * ratio)
-            g = int(248 + (255 - 248) * ratio)
-            b = int(255)
+            r = int(245 + (255 - 245) * ratio)
+            g = int(250 + (252 - 250) * ratio)
+            b = int(255 + (245 - 255) * ratio)
             draw.line([(0, y), (self.width, y)], fill=(r, g, b))
+        
+        # Добавляем тонкую рамку для структуры
+        border_width = 3
+        border_color = (220, 230, 240)  # Светло-серый
+        
+        # Верхняя и нижняя границы
+        draw.rectangle(
+            [(0, 0), (self.width, border_width)],
+            fill=border_color
+        )
+        draw.rectangle(
+            [(0, self.height - border_width), (self.width, self.height)],
+            fill=border_color
+        )
+        
+        # Левая и правая границы
+        draw.rectangle(
+            [(0, 0), (border_width, self.height)],
+            fill=border_color
+        )
+        draw.rectangle(
+            [(self.width - border_width, 0), (self.width, self.height)],
+            fill=border_color
+        )
         
         return img
 
@@ -270,14 +294,16 @@ class CardGeneratorImpl(CardGeneratorPort):
         padding_y = 60
         content_width = self.width - 2 * padding_x
         
-        # QR-код: фиксированный размер и позиция
-        qr_size = 120
-        qr_margin = 20
-        qr_x = self.width - qr_size - qr_margin
-        qr_y = self.height - qr_size - qr_margin
+        # QR-код: фиксированный размер и позиция (по центру внизу)
+        qr_size = 150  # Увеличиваем размер для лучшей читаемости
+        qr_bottom_padding = 50  # Отступ от низа открытки
         
-        # Учитываем QR-код при расчёте ширины текста
-        text_max_width = content_width - (qr_size + qr_margin if qr_url else 0)
+        # Позиция QR-кода: по центру горизонтально, внизу с отступом
+        qr_x = (self.width - qr_size) // 2  # Центр по горизонтали
+        qr_y = self.height - qr_size - qr_bottom_padding  # Внизу с отступом
+        
+        # Ширина текста не зависит от QR-кода (QR внизу, текст выше)
+        text_max_width = content_width
         
         y_offset = padding_y
 
@@ -331,8 +357,8 @@ class CardGeneratorImpl(CardGeneratorPort):
         y_offset += 70
 
         # Поздравительный текст
-        # Рассчитываем доступную высоту
-        max_text_height = qr_y - y_offset - 40 if qr_url else self.height - y_offset - 40
+        # Рассчитываем доступную высоту (учитываем место для QR-кода внизу)
+        max_text_height = (qr_y - y_offset - 40) if qr_url else (self.height - y_offset - 40)
         
         # Подбираем размер шрифта под текст
         optimal_font_size, optimal_font = self._calculate_font_size_for_text(
@@ -369,13 +395,17 @@ class CardGeneratorImpl(CardGeneratorPort):
                     raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
                 raise
 
-        # QR-код (всегда в правом нижнем углу)
-        if qr_url:
+        # QR-код (всегда по центру внизу открытки)
+        if qr_url and qr_url.strip():
             try:
-                qr_img = self._generate_qr_code(qr_url, size=qr_size)
+                qr_img = self._generate_qr_code(qr_url.strip(), size=qr_size)
+                # Вставляем QR-код по центру внизу
                 img.paste(qr_img, (qr_x, qr_y))
+                logger.info(f"[CardGeneratorImpl] QR code generated and placed at ({qr_x}, {qr_y}), size={qr_size}")
             except Exception as e:
-                logger.warning(f"[CardGeneratorImpl] Failed to generate QR code: {e}")
+                logger.error(f"[CardGeneratorImpl] Failed to generate QR code: {e}", exc_info=True)
+                # НЕ пропускаем ошибку - QR-код критичен, если он запрошен
+                raise InvalidGreetingTextError(f"Не удалось сгенерировать QR-код: {str(e)}") from e
 
         # Сохраняем в bytes
         img_byte_arr = io.BytesIO()
@@ -389,16 +419,22 @@ class CardGeneratorImpl(CardGeneratorPort):
         logger.info(f"[CardGeneratorImpl] Card generated successfully, size={len(card_bytes)} bytes")
         return card_bytes
 
-    def _generate_qr_code(self, url: str, size: int = 120) -> Image.Image:
-        """Сгенерировать QR-код."""
+    def _generate_qr_code(self, url: str, size: int = 150) -> Image.Image:
+        """Сгенерировать QR-код с высоким качеством."""
+        # Используем более высокую коррекцию ошибок для надёжности
         qr = qrcode.QRCode(
-            version=1,
-            box_size=10,
-            border=4,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            version=None,  # Автоматический выбор версии
+            box_size=8,  # Уменьшаем box_size для более чёткого изображения
+            border=2,  # Уменьшаем border для компактности
+            error_correction=qrcode.constants.ERROR_CORRECT_M,  # Средняя коррекция ошибок
         )
         qr.add_data(url)
         qr.make(fit=True)
+        
+        # Генерируем QR-код с высоким разрешением
         qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_img = qr_img.resize((size, size), Image.Resampling.LANCZOS)
+        
+        # Используем NEAREST для сохранения чёткости (без размытия)
+        qr_img = qr_img.resize((size, size), Image.Resampling.NEAREST)
+        
         return qr_img

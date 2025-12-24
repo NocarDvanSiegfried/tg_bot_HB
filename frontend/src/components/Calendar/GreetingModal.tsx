@@ -140,15 +140,40 @@ export default function GreetingModal({
     }
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!cardUrl) return
 
-    const link = document.createElement('a')
-    link.href = cardUrl
-    link.download = `greeting-${birthdayName.replace(/\s+/g, '-')}-${Date.now()}.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    try {
+      // Для мобильных устройств (особенно Telegram WebView) нужно загружать через fetch
+      const response = await fetch(cardUrl)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status}`)
+      }
+      
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      
+      // Создаём временную ссылку для скачивания
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = `greeting-${birthdayName.replace(/\s+/g, '-')}-${Date.now()}.png`
+      
+      // Для мобильных устройств нужно добавить в DOM перед кликом
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      
+      // Программный клик
+      link.click()
+      
+      // Очистка
+      setTimeout(() => {
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl)
+      }, 100)
+    } catch (error) {
+      logger.error('[GreetingModal] Failed to download card:', error)
+      setError('Не удалось скачать открытку. Попробуйте позже.')
+    }
   }
 
   if (!isOpen) return null
