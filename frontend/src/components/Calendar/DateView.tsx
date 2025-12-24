@@ -11,9 +11,10 @@ interface DateViewProps {
   data: CalendarData | null
   loading: boolean
   error?: string | null
+  onHolidaysClick?: () => void
 }
 
-function DateView({ date, data, loading, error }: DateViewProps) {
+function DateView({ date, data, loading, error, onHolidaysClick }: DateViewProps) {
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
@@ -94,7 +95,12 @@ function DateView({ date, data, loading, error }: DateViewProps) {
 
       {/* Секция профессиональных праздников - показываем всегда */}
       <div className="date-section">
-        <h4>🎉 Профессиональные праздники</h4>
+        <h4
+          onClick={onHolidaysClick}
+          className={onHolidaysClick ? 'holidays-header-clickable' : ''}
+        >
+          🎉 Профессиональные праздники
+        </h4>
         {data.holidays.length > 0 ? (
           data.holidays.map((holiday) => (
             <div key={holiday.id} className="holiday-item">

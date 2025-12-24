@@ -267,6 +267,10 @@ export default function Calendar() {
           data={calendarData} 
           loading={loading}
           error={error}
+          onHolidaysClick={() => {
+            setShowHolidayManagement(true)
+            setSelectedDate(null) // Закрываем DateView при переходе
+          }}
         />
       )}
 

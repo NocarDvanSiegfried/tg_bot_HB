@@ -215,14 +215,24 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             disabled={creating}
             maxLength={255}
           />
-          <input
-            type="date"
-            placeholder="Дата праздника"
-            value={(formData.date as string) || ''}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            required
-            disabled={creating}
-          />
+          <div>
+            <input
+              type="date"
+              placeholder="Дата праздника"
+              value={(formData.date as string) || ''}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              required
+              disabled={creating}
+            />
+            <small style={{ 
+              display: 'block', 
+              marginTop: '4px', 
+              color: 'var(--color-text-muted, var(--color-secondary, #666))',
+              fontSize: '0.875em'
+            }}>
+              ℹ️ Год не важен, праздник будет ежегодным
+            </small>
+          </div>
           <textarea
             placeholder="Комментарий (необязательно)"
             value={(formData.description as string) || ''}
@@ -294,13 +304,23 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                       disabled={updating === holiday.id || showAddForm}
                       maxLength={255}
                     />
-                    <input
-                      type="date"
-                      placeholder="Дата праздника"
-                      value={(editFormData.date as string) || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
-                      disabled={updating === holiday.id || showAddForm}
-                    />
+                    <div>
+                      <input
+                        type="date"
+                        placeholder="Дата праздника"
+                        value={(editFormData.date as string) || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                        disabled={updating === holiday.id || showAddForm}
+                      />
+                      <small style={{ 
+                        display: 'block', 
+                        marginTop: '4px', 
+                        color: 'var(--color-text-muted, var(--color-secondary, #666))',
+                        fontSize: '0.875em'
+                      }}>
+                        ℹ️ Год не важен, праздник будет ежегодным
+                      </small>
+                    </div>
                     <textarea
                       placeholder="Комментарий (необязательно)"
                       value={(editFormData.description as string) || ''}
