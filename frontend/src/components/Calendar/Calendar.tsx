@@ -36,6 +36,7 @@ export default function Calendar() {
   const [renderError, setRenderError] = useState<string | null>(null)
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
+  const [allHolidays, setAllHolidays] = useState<Array<{ day: number; month: number }>>([]) // Праздники для подсветки в календаре
   const [activeSection, setActiveSection] = useState<'calendar' | 'birthdays' | 'holidays'>('calendar') // Активный раздел навигации
 
   // Логирование для отладки
@@ -79,6 +80,26 @@ export default function Calendar() {
     loadMonthBirthdays()
   }, [currentDate])
 
+  // Загрузка всех праздников для подсветки в календаре
+  useEffect(() => {
+    const loadHolidays = async () => {
+      try {
+        const holidays = await api.getHolidays()
+        // Преобразуем в формат для быстрой проверки (день + месяц)
+        const holidaysMap = holidays.map(h => ({
+          day: h.day || (h.date ? new Date(h.date).getDate() : 0),
+          month: h.month || (h.date ? new Date(h.date).getMonth() + 1 : 0)
+        })).filter(h => h.day > 0 && h.month > 0)
+        setAllHolidays(holidaysMap)
+      } catch (error) {
+        logger.error('[Calendar] Failed to load holidays:', error)
+        setAllHolidays([])
+      }
+    }
+    
+    loadHolidays()
+  }, [currentDate, activeSection]) // Перезагружаем при изменении месяца или возврате из управления праздниками
+
   // Безопасное вычисление дней месяца с обработкой ошибок
   const getDays = (): Date[] => {
     try {
@@ -113,11 +134,20 @@ export default function Calendar() {
 
   // Проверка, есть ли праздник в определенный день (по дню и месяцу)
   const hasHoliday = (day: Date): boolean => {
-    // Пока используем простую проверку - если есть данные календаря для этого дня
-    // В будущем можно добавить загрузку праздников за месяц
-    if (!calendarData) return false
-    const dayStr = format(day, 'yyyy-MM-dd')
-    return calendarData.date === dayStr && calendarData.holidays.length > 0
+    const dayNum = day.getDate()
+    const monthNum = day.getMonth() + 1
+    
+    // Проверяем загруженные праздники
+    const hasHolidayInList = allHolidays.some(h => h.day === dayNum && h.month === monthNum)
+    
+    // Также проверяем данные календаря для выбранного дня
+    if (calendarData) {
+      const dayStr = format(day, 'yyyy-MM-dd')
+      const hasHolidayInCalendar = calendarData.date === dayStr && calendarData.holidays.length > 0
+      return hasHolidayInList || hasHolidayInCalendar
+    }
+    
+    return hasHolidayInList
   }
 
   // Улучшенное сравнение дат для выделения (без учета времени)
@@ -192,7 +222,8 @@ export default function Calendar() {
   // Обработчик возврата из управления праздниками
   const handleBackFromHolidayManagement = () => {
     setActiveSection('calendar')
-    // Не сбрасываем календарь, просто возвращаемся
+    // Обновляем календарь для отображения изменений в праздниках
+    setCurrentDate(new Date(currentDate.getTime()))
   }
 
   // Если открыто управление днями рождения, показываем компонент управления

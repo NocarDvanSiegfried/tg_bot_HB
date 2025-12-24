@@ -43,9 +43,23 @@ export default function BirthdayDateInput({
   const updateDate = (newDay: string, newMonth: string, newYear: string) => {
     // Валидация: все поля должны быть заполнены
     if (newDay && newMonth && newYear) {
+      // Год должен быть ровно 4 цифры
+      if (newYear.length !== 4) {
+        onChange('')
+        return
+      }
+      
       const dayNum = parseInt(newDay, 10)
       const monthNum = parseInt(newMonth, 10)
       const yearNum = parseInt(newYear, 10)
+      
+      // Проверка диапазона года
+      const currentYear = new Date().getFullYear()
+      const minYear = 1900
+      if (yearNum < minYear || yearNum > currentYear) {
+        onChange('')
+        return
+      }
 
       // Проверка валидности даты
       const date = new Date(yearNum, monthNum - 1, dayNum)
@@ -58,7 +72,7 @@ export default function BirthdayDateInput({
         onChange(formattedDate)
       } else {
         // Невалидная дата - не вызываем onChange
-        return
+        onChange('')
       }
     } else {
       // Если не все поля заполнены, отправляем пустую строку
@@ -79,7 +93,26 @@ export default function BirthdayDateInput({
   }
 
   const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newYear = e.target.value.replace(/\D/g, '').slice(0, 4)
+    let newYear = e.target.value.replace(/\D/g, '')
+    
+    // Ограничиваем до 4 цифр
+    if (newYear.length > 4) {
+      newYear = newYear.slice(0, 4)
+    }
+    
+    // Валидация: год должен быть в разумном диапазоне
+    if (newYear.length === 4) {
+      const yearNum = parseInt(newYear, 10)
+      const currentYear = new Date().getFullYear()
+      const minYear = 1900
+      
+      if (yearNum < minYear || yearNum > currentYear) {
+        // Не устанавливаем невалидный год, но оставляем в поле для исправления
+        setYear(newYear)
+        return
+      }
+    }
+    
     setYear(newYear)
     updateDate(day, month, newYear)
   }
@@ -161,8 +194,11 @@ export default function BirthdayDateInput({
             onChange={handleYearChange}
             disabled={disabled}
             maxLength={4}
+            minLength={4}
             className={error ? 'error' : ''}
             required
+            pattern="[0-9]{4}"
+            title="Год должен содержать ровно 4 цифры (например, 1990)"
           />
         </div>
       </div>

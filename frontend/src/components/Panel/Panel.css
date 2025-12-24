@@ -103,6 +103,21 @@
   transition: var(--transition-theme);
 }
 
+/* Тёмная тема для форм */
+[data-theme="dark"] .panel-form input,
+[data-theme="dark"] .panel-form textarea {
+  background: var(--color-bg-secondary-dark, #242424);
+  border-color: var(--color-border-dark, rgba(255, 255, 255, 0.2));
+  color: var(--color-text-primary-dark, rgba(255, 255, 255, 0.9));
+}
+
+[data-theme="dark"] .panel-form input:focus,
+[data-theme="dark"] .panel-form textarea:focus {
+  border-color: var(--color-primary-dark, #4a9eff);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+  background: var(--color-bg-tertiary-dark, #2d2d2d);
+}
+
 .panel-form input:focus,
 .panel-form textarea:focus {
   outline: none;
@@ -484,8 +499,24 @@
 /* Улучшенные стили для тёмной темы */
 [data-theme="dark"] .birthday-card {
   background: var(--color-bg-secondary-dark, #242424);
-  border-color: var(--color-border-dark, rgba(255, 255, 255, 0.15));
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border-color: var(--color-border-dark, rgba(255, 255, 255, 0.2));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .birthday-card-content {
+  color: var(--color-text-primary-dark, rgba(255, 255, 255, 0.9));
+}
+
+[data-theme="dark"] .birthday-card-name {
+  color: var(--color-text-primary-dark, rgba(255, 255, 255, 0.95));
+}
+
+[data-theme="dark"] .birthday-card-company-position {
+  color: var(--color-text-secondary-dark, rgba(255, 255, 255, 0.7));
+}
+
+[data-theme="dark"] .birthday-card-date {
+  color: var(--color-text-secondary-dark, rgba(255, 255, 255, 0.7));
 }
 
 [data-theme="dark"] .birthday-edit-button {
@@ -558,13 +589,20 @@
     justify-content: stretch;
     gap: var(--spacing-sm);
     width: 100%;
-    min-width: auto;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .birthday-action-button {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     width: auto;
+    max-width: 100%;
+    padding: var(--spacing-sm, 8px) var(--spacing-xs, 4px);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .back-button {

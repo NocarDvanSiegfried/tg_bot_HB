@@ -147,18 +147,22 @@
 
 /* Улучшения для тёмной темы */
 [data-theme="dark"] .calendar-day {
-  background: var(--color-bg-secondary, #242424);
-  border-color: var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-bg-secondary-dark, #242424);
+  border-color: var(--color-border-dark, rgba(255, 255, 255, 0.15));
+  color: var(--color-text-primary-dark, rgba(255, 255, 255, 0.9));
 }
 
 [data-theme="dark"] .calendar-day:hover {
-  background-color: var(--color-bg-tertiary, #2d2d2d);
-  border-color: var(--color-primary);
+  background-color: var(--color-bg-tertiary-dark, #2d2d2d);
+  border-color: var(--color-primary-dark, #4a9eff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .calendar-day.selected {
-  background-color: rgba(74, 158, 255, 0.2);
-  border-color: var(--color-primary);
+  background-color: rgba(74, 158, 255, 0.25);
+  border-color: var(--color-primary-dark, #4a9eff);
+  color: var(--color-primary-dark, #4a9eff);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.3);
 }
 
 [data-theme="dark"] .calendar-day.today {
