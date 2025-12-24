@@ -103,7 +103,7 @@ function DateView({ date, data, loading, error }: DateViewProps) {
             </div>
           ))
         ) : (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>Нет профессиональных праздников</p>
+          <p style={{ color: 'var(--color-text-muted, var(--color-secondary, #666))', fontStyle: 'italic' }}>Нет профессиональных праздников</p>
         )}
       </div>
 

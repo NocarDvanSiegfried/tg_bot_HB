@@ -44,11 +44,11 @@ class GetCalendarDataUseCase:
             ],
             "holidays": [
                 {
-                    "id": h.id,
+                    "id": h.id if h.id is not None else idx,  # Используем индекс если id=None
                     "name": h.name,
                     "description": h.description,
                 }
-                for h in holidays
+                for idx, h in enumerate(holidays)
             ],
             "responsible": (
                 {

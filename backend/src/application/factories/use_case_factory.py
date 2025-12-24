@@ -21,7 +21,7 @@ from src.application.use_cases.responsible.get_all_responsible import GetAllResp
 from src.application.use_cases.responsible.update_responsible import UpdateResponsibleUseCase
 from src.application.use_cases.search.search_people import SearchPeopleUseCase
 from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
-from src.infrastructure.database.repositories.holiday_repository_impl import HolidayRepositoryImpl
+from src.infrastructure.database.repositories.holiday_file_repository import HolidayFileRepository
 from src.infrastructure.database.repositories.panel_access_repository_impl import (
     PanelAccessRepositoryImpl,
 )
@@ -55,7 +55,7 @@ class UseCaseFactory:
     @property
     def holiday_repo(self):
         if self._holiday_repo is None:
-            self._holiday_repo = HolidayRepositoryImpl(self.session)
+            self._holiday_repo = HolidayFileRepository()
         return self._holiday_repo
 
     @property
