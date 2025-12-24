@@ -11,6 +11,7 @@ import { logger } from '../../utils/logger'
 import BirthdayManagement from '../Panel/BirthdayManagement'
 import HolidayManagement from '../Panel/HolidayManagement'
 import NavigationBar from '../Navigation/NavigationBar'
+import GreetingModal from './GreetingModal'
 import './Calendar.css'
 import '../Panel/Panel.css'
 
@@ -38,12 +39,37 @@ export default function Calendar() {
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
   const [allHolidays, setAllHolidays] = useState<Array<{ day: number; month: number }>>([]) // Праздники для подсветки в календаре
   const [activeSection, setActiveSection] = useState<'calendar' | 'birthdays' | 'holidays'>('calendar') // Активный раздел навигации
+  const [greetingModal, setGreetingModal] = useState<{
+    isOpen: boolean
+    birthdayId: number
+    name: string
+    company: string
+    position: string
+  } | null>(null)
+  const [hasPanelAccess, setHasPanelAccess] = useState(false)
 
   // Логирование для отладки
   useEffect(() => {
     if (import.meta.env.DEV) {
       logger.info('[Calendar] Component mounted')
     }
+  }, [])
+
+  // Проверка доступа к панели
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const result = await api.checkPanelAccess()
+        setHasPanelAccess(result.has_access)
+        if (import.meta.env.DEV) {
+          logger.info('[Calendar] Panel access check:', result.has_access)
+        }
+      } catch (error) {
+        logger.error('[Calendar] Failed to check panel access:', error)
+        setHasPanelAccess(false)
+      }
+    }
+    checkAccess()
   }, [])
 
   // Загрузка дней рождения за месяц
@@ -226,6 +252,20 @@ export default function Calendar() {
     setCurrentDate(new Date(currentDate.getTime()))
   }
 
+  // Обработчик генерации поздравления
+  const handleGenerateGreeting = (id: number, name: string, company: string, position: string) => {
+    if (!hasPanelAccess) {
+      logger.warn('[Calendar] Attempt to generate greeting without panel access')
+      return
+    }
+    setGreetingModal({ isOpen: true, birthdayId: id, name, company, position })
+  }
+
+  // Закрытие модального окна
+  const handleCloseGreetingModal = () => {
+    setGreetingModal(null)
+  }
+
   // Если открыто управление днями рождения, показываем компонент управления
   if (activeSection === 'birthdays') {
     return (
@@ -364,6 +404,19 @@ export default function Calendar() {
             setActiveSection('holidays')
             setSelectedDate(null) // Закрываем DateView при переходе
           }}
+          onGenerateGreeting={hasPanelAccess ? handleGenerateGreeting : undefined}
+        />
+      )}
+
+      {/* Модальное окно генерации поздравлений */}
+      {greetingModal && (
+        <GreetingModal
+          isOpen={greetingModal.isOpen}
+          birthdayId={greetingModal.birthdayId}
+          birthdayName={greetingModal.name}
+          birthdayCompany={greetingModal.company}
+          birthdayPosition={greetingModal.position}
+          onClose={handleCloseGreetingModal}
         />
       )}
     </div>

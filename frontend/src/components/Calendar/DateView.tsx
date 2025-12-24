@@ -12,9 +12,10 @@ interface DateViewProps {
   loading: boolean
   error?: string | null
   onHolidaysClick?: () => void
+  onGenerateGreeting?: (birthdayId: number, birthdayName: string, company: string, position: string) => void
 }
 
-function DateView({ date, data, loading, error, onHolidaysClick }: DateViewProps) {
+function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreeting }: DateViewProps) {
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
@@ -79,6 +80,15 @@ function DateView({ date, data, loading, error, onHolidaysClick }: DateViewProps
             <div key={bd.id} className="birthday-card">
               <div className="birthday-card-header">
                 <strong className="birthday-name">{bd.full_name}</strong>
+                {onGenerateGreeting && (
+                  <button 
+                    className="greeting-button"
+                    onClick={() => onGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)}
+                    title="Сгенерировать поздравление"
+                  >
+                    🤖 Поздравить
+                  </button>
+                )}
               </div>
               <div className="birthday-card-body">
                 <p className="birthday-company-position">{bd.company}, {bd.position}</p>

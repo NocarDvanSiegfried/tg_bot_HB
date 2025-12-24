@@ -6,6 +6,7 @@ import { logger } from '../../utils/logger'
 import { validateDate } from '../../utils/validation'
 import { API_BASE_URL } from '../../config/api'
 import BirthdayDateInput from '../DatePicker/BirthdayDateInput'
+import GreetingModal from '../Calendar/GreetingModal'
 import './Panel.css'
 
 interface BirthdayManagementProps {
@@ -105,6 +106,16 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   // Состояние для ошибок даты в формах
   const [dateError, setDateError] = useState<string | null>(null)
 
+  // Состояние для модального окна генерации поздравлений
+  const [greetingModal, setGreetingModal] = useState<{
+    isOpen: boolean
+    birthdayId: number
+    name: string
+    company: string
+    position: string
+  } | null>(null)
+  const [hasPanelAccess, setHasPanelAccess] = useState(false)
+
   // Использование общего хука для CRUD операций
   const {
     items: allBirthdays,
@@ -184,6 +195,37 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       logger.info(`[BirthdayManagement] editingId changed to: ${editingId}`)
     }
   }, [editingId])
+
+  // Проверка доступа к панели
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const result = await api.checkPanelAccess()
+        setHasPanelAccess(result.has_access)
+        if (import.meta.env.DEV) {
+          logger.info('[BirthdayManagement] Panel access check:', result.has_access)
+        }
+      } catch (error) {
+        logger.error('[BirthdayManagement] Failed to check panel access:', error)
+        setHasPanelAccess(false)
+      }
+    }
+    checkAccess()
+  }, [])
+
+  // Обработчик генерации поздравления
+  const handleGenerateGreeting = (id: number, name: string, company: string, position: string) => {
+    if (!hasPanelAccess) {
+      logger.warn('[BirthdayManagement] Attempt to generate greeting without panel access')
+      return
+    }
+    setGreetingModal({ isOpen: true, birthdayId: id, name, company, position })
+  }
+
+  // Закрытие модального окна
+  const handleCloseGreetingModal = () => {
+    setGreetingModal(null)
+  }
 
   // Диагностическая информация (специфичная для BirthdayManagement)
   const diagnosticInfo = {
@@ -499,6 +541,23 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     )}
                   </div>
                   <div className="birthday-card-actions">
+                    {hasPanelAccess && (
+                      <button 
+                        className="birthday-action-button birthday-greeting-button"
+                        onClick={() => {
+                          if (!bd.id) {
+                            logger.error('[BirthdayManagement] Cannot generate greeting: birthday id is missing')
+                            setError('Ошибка: ID дня рождения не найден')
+                            return
+                          }
+                          handleGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)
+                        }}
+                        disabled={deleting === bd.id || updating === bd.id || showAddForm}
+                        title="Сгенерировать поздравление"
+                      >
+                        🤖 Поздравить
+                      </button>
+                    )}
                     <button 
                       className="birthday-action-button birthday-edit-button"
                       onClick={() => {
@@ -536,6 +595,18 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             )
           })}
         </ul>
+      )}
+
+      {/* Модальное окно генерации поздравлений */}
+      {greetingModal && (
+        <GreetingModal
+          isOpen={greetingModal.isOpen}
+          birthdayId={greetingModal.birthdayId}
+          birthdayName={greetingModal.name}
+          birthdayCompany={greetingModal.company}
+          birthdayPosition={greetingModal.position}
+          onClose={handleCloseGreetingModal}
+        />
       )}
     </div>
   )

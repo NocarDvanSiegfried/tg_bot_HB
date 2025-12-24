@@ -468,6 +468,15 @@
   box-sizing: border-box;
 }
 
+.birthday-greeting-button {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.birthday-greeting-button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
 .birthday-edit-button {
   background-color: var(--color-primary);
   color: white;
@@ -517,6 +526,15 @@
 
 [data-theme="dark"] .birthday-card-date {
   color: var(--color-text-secondary-dark, rgba(255, 255, 255, 0.7));
+}
+
+[data-theme="dark"] .birthday-greeting-button {
+  background-color: var(--color-primary-dark, #4a9eff);
+  color: white;
+}
+
+[data-theme="dark"] .birthday-greeting-button:hover:not(:disabled) {
+  background-color: var(--color-primary, #64b5f6);
 }
 
 [data-theme="dark"] .birthday-edit-button {

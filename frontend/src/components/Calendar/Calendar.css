@@ -305,7 +305,12 @@
 }
 
 .birthday-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .birthday-card-header .birthday-name {
@@ -314,6 +319,62 @@
   color: var(--color-text-primary);
   margin: 0;
   transition: var(--transition-theme);
+  flex: 1;
+  min-width: 0;
+}
+
+.greeting-button {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.greeting-button:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.greeting-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Тёмная тема для кнопки поздравления */
+[data-theme="dark"] .greeting-button {
+  background: var(--color-primary-dark, #4a9eff);
+  color: white;
+}
+
+[data-theme="dark"] .greeting-button:hover:not(:disabled) {
+  background: var(--color-primary, #64b5f6);
+}
+
+/* Мобильная адаптация для кнопки */
+@media (max-width: 768px) {
+  .greeting-button {
+    font-size: 12px;
+    padding: var(--spacing-xs) var(--spacing-xs);
+  }
+  
+  .birthday-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .greeting-button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .birthday-card-body {

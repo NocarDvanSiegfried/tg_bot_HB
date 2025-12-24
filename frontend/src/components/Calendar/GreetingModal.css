@@ -1,0 +1,268 @@
+.greeting-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+.greeting-modal-content {
+  background: var(--color-bg-primary);
+  border-radius: var(--border-radius-md);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-theme);
+}
+
+.greeting-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.greeting-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
+}
+
+.greeting-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.greeting-modal-close:hover {
+  color: var(--color-text-primary);
+}
+
+.greeting-modal-body {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.greeting-employee-info {
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-theme);
+}
+
+.greeting-employee-info p {
+  margin: var(--spacing-xs) 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm, 14px);
+  transition: var(--transition-theme);
+}
+
+.greeting-employee-info strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.greeting-params {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.greeting-param-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.greeting-param-group label {
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: var(--transition-theme);
+}
+
+.greeting-param-group select,
+.greeting-param-group input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base, 16px);
+  transition: var(--transition-theme);
+}
+
+.greeting-param-group select:focus,
+.greeting-param-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+.greeting-param-group select:disabled,
+.greeting-param-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.greeting-generate-button,
+.greeting-create-card-button,
+.greeting-download-button {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.greeting-generate-button:hover:not(:disabled),
+.greeting-create-card-button:hover:not(:disabled),
+.greeting-download-button:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.greeting-generate-button:disabled,
+.greeting-create-card-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.greeting-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.greeting-result label {
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: var(--transition-theme);
+}
+
+.greeting-result textarea {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base, 16px);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: var(--transition-theme);
+}
+
+.greeting-result textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+.greeting-result textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.greeting-card-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-theme);
+}
+
+.greeting-card-preview p {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: var(--transition-theme);
+}
+
+.greeting-card-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.greeting-error {
+  padding: var(--spacing-md);
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm, 14px);
+  transition: var(--transition-theme);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .greeting-modal-overlay {
+    padding: var(--spacing-sm);
+    align-items: flex-start;
+    padding-top: var(--spacing-lg);
+  }
+
+  .greeting-modal-content {
+    max-height: 95vh;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  }
+
+  .greeting-modal-header {
+    padding: var(--spacing-md);
+  }
+
+  .greeting-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .greeting-modal-body {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .greeting-params {
+    gap: var(--spacing-sm);
+  }
+
+  .greeting-generate-button,
+  .greeting-create-card-button,
+  .greeting-download-button {
+    padding: var(--spacing-md);
+    font-size: 15px;
+  }
+}
+
