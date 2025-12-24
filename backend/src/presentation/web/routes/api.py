@@ -599,8 +599,10 @@ async def list_holidays_user(
         {
             "id": h.id if h.id is not None else 0,  # Используем 0 если id=None
             "name": h.name,
+            "day": h.date.day,
+            "month": h.date.month,
             "description": h.description,
-            "date": h.date.isoformat(),
+            "date": h.date.isoformat(),  # Для обратной совместимости
         }
         for h in holidays
     ]
@@ -647,8 +649,10 @@ async def create_holiday_user(
     return {
         "id": holiday.id,
         "name": holiday.name,
+        "day": holiday.date.day,
+        "month": holiday.date.month,
         "description": holiday.description,
-        "date": holiday.date.isoformat(),
+        "date": holiday.date.isoformat(),  # Для обратной совместимости
     }
 
 
@@ -697,8 +701,10 @@ async def update_holiday_user(
     return {
         "id": holiday.id,
         "name": holiday.name,
+        "day": holiday.date.day,
+        "month": holiday.date.month,
         "description": holiday.description,
-        "date": holiday.date.isoformat(),
+        "date": holiday.date.isoformat(),  # Для обратной совместимости
     }
 
 

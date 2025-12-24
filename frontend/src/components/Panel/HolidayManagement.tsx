@@ -49,14 +49,18 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     return errors
   }
 
-  // Нормализация даты для редактирования (извлекаем день и месяц из date строки)
+  // Нормализация даты для редактирования (поддержка обоих вариантов: day/month и date)
   const normalizeHoliday = (holiday: Holiday): any => {
     try {
       let day: number | undefined
       let month: number | undefined
       
-      if (holiday.date) {
-        // Парсим дату из ISO формата (YYYY-MM-DD)
+      // Приоритет: day и month из API ответа
+      if (holiday.day !== undefined && holiday.month !== undefined) {
+        day = holiday.day
+        month = holiday.month
+      } else if (holiday.date) {
+        // Fallback: извлечение из date (для обратной совместимости)
         const dateStr = holiday.date.includes('T') ? holiday.date.split('T')[0] : holiday.date
         const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/)
         
@@ -425,7 +429,10 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                   <div>
                     <strong>{holiday.name}</strong>
                     <br />
-                    {holiday.date} {holiday.description && `(${holiday.description})`}
+                    {holiday.day && holiday.month 
+                      ? `${String(holiday.day).padStart(2, '0')}.${String(holiday.month).padStart(2, '0')}`
+                      : holiday.date || 'Дата не указана'
+                    } {holiday.description && `(${holiday.description})`}
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <button 
