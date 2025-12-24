@@ -15,6 +15,24 @@ class InvalidDateError(ValidationError):
     pass
 
 
+class InvalidGreetingTextError(ValidationError):
+    """Ошибка невалидного текста поздравления."""
+
+    pass
+
+
+class TextTooLongError(ValidationError):
+    """Текст поздравления слишком длинный для генерации открытки."""
+
+    pass
+
+
+class EmptyGreetingTextError(ValidationError):
+    """Текст поздравления пустой."""
+
+    pass
+
+
 
 
 

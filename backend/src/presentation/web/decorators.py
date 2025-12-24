@@ -20,7 +20,12 @@ from src.domain.exceptions.not_found import (
     BirthdayNotFoundError,
     ResponsibleNotFoundError,
 )
-from src.domain.exceptions.validation import ValidationError
+from src.domain.exceptions.validation import (
+    EmptyGreetingTextError,
+    InvalidGreetingTextError,
+    TextTooLongError,
+    ValidationError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +77,13 @@ def handle_api_errors(func: Callable) -> Callable:
                 logger.info(f"[DECORATOR] Rollback completed for NotFoundError")
             logger.warning(f"[DECORATOR] Resource not found in {func.__name__}: {e}")
             raise HTTPException(status_code=404, detail=str(e)) from e
+        except (EmptyGreetingTextError, InvalidGreetingTextError, TextTooLongError) as e:
+            if session:
+                logger.info(f"[DECORATOR] Performing rollback for greeting text validation error in {func.__name__}")
+                await session.rollback()
+                logger.info(f"[DECORATOR] Rollback completed for greeting text validation error")
+            logger.warning(f"[DECORATOR] Greeting text validation error in {func.__name__}: {e}")
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except ValidationError as e:
             if session:
                 logger.info(f"[DECORATOR] Performing rollback for ValidationError in {func.__name__}")
