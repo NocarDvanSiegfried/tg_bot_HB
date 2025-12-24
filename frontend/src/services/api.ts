@@ -1,5 +1,6 @@
 import { Birthday } from '../types/birthday'
 import { Responsible } from '../types/responsible'
+import { Holiday } from '../types/holiday'
 import { logger } from '../utils/logger'
 import { cache, CacheKeys, CacheTTL } from '../utils/cache'
 import { API_ENDPOINTS } from './api/endpoints'
@@ -239,6 +240,92 @@ export const api = {
       headers: getHeaders(),
     })
     return response.json()
+  },
+
+  async getHolidays(): Promise<Holiday[]> {
+    const cacheKey = CacheKeys.holidays
+    
+    // Проверяем кэш
+    const cached = cache.get<Holiday[]>(cacheKey)
+    if (cached) {
+      logger.info('[API] Cache hit for holidays')
+      return cached
+    }
+    
+    // Загружаем данные
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.LIST), {
+      headers: getHeaders(),
+    })
+    const data = await response.json()
+    
+    // Сохраняем в кэш
+    cache.set(cacheKey, data, CacheTTL.holidays)
+    
+    return data
+  },
+
+  async createHoliday(data: Omit<Holiday, 'id'>): Promise<Holiday> {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.LIST), {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    })
+    const result = await response.json()
+    
+    // Инвалидируем кэш праздников
+    cache.delete(CacheKeys.holidays)
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+    
+    return result
+  },
+
+  async updateHoliday(id: number, data: Partial<Holiday>): Promise<Holiday> {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.BY_ID(id)), {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    })
+    
+    // Проверка на наличие тела ответа перед чтением
+    if (response.status === 204 || response.status === 205) {
+      throw new Error('Сервер вернул ответ без данных')
+    }
+    
+    const contentLength = response.headers.get('Content-Length')
+    if (contentLength === '0') {
+      throw new Error('Сервер вернул пустой ответ')
+    }
+    
+    const result = await response.json()
+    
+    // Проверка, что ответ содержит ожидаемые данные
+    if (!result || typeof result !== 'object' || !result.id || !result.name) {
+      throw new Error('Сервер вернул невалидные данные')
+    }
+    
+    // Инвалидируем кэш праздников
+    cache.delete(CacheKeys.holidays)
+    cache.delete(CacheKeys.holiday(id))
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
+    
+    return result
+  },
+
+  async deleteHoliday(id: number): Promise<void> {
+    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.BY_ID(id)), {
+      method: 'DELETE',
+      headers: getHeaders(),
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to delete holiday: ${errorText}`)
+    }
+    
+    // Инвалидируем кэш праздников
+    cache.delete(CacheKeys.holidays)
+    cache.delete(CacheKeys.holiday(id))
+    cache.invalidatePattern('^calendar:') // Инвалидируем все месяцы календаря
   },
 }
 

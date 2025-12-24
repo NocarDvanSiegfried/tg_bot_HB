@@ -68,6 +68,34 @@ class BirthdayUpdate(BaseModel):
         return v.strip() if v else None
 
 
+class HolidayCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255, description="Название праздника")
+    holiday_date: date = Field(..., description="Дата праздника (день и месяц, год игнорируется)")
+    description: str | None = Field(None, max_length=1000, description="Комментарий")
+
+    @field_validator("name")
+    @classmethod
+    def validate_not_empty(cls, v: str) -> str:
+        """Проверка, что строка не пустая после удаления пробелов."""
+        if not v or not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
+
+class HolidayUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=255, description="Название праздника")
+    holiday_date: date | None = Field(None, description="Дата праздника")
+    description: str | None = Field(None, max_length=1000, description="Комментарий")
+
+    @field_validator("name")
+    @classmethod
+    def validate_not_empty_if_provided(cls, v: str | None) -> str | None:
+        """Проверка, что строка не пустая, если предоставлена."""
+        if v is not None and (not v or not v.strip()):
+            raise ValueError("Field cannot be empty if provided")
+        return v.strip() if v else None
+
+
 class ResponsibleCreate(BaseModel):
     full_name: str = Field(..., min_length=1, max_length=200, description="Полное имя")
     company: str = Field(..., min_length=1, max_length=200, description="Компания")
@@ -528,6 +556,124 @@ async def delete_birthday_user(
     use_case = use_cases["delete"]
 
     await use_case.execute(birthday_id)
+    await session.commit()
+    return {"status": "deleted"}
+
+
+# Holiday endpoints (USER API для Mini App)
+@router.get("/api/holidays")
+@limiter.limit(READ_LIMIT)
+async def list_holidays_user(
+    request: Request,
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth, без panel access
+    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+):
+    """Список всех праздников (для Mini App)."""
+    use_cases = factory.create_holiday_use_cases()
+    use_case = use_cases["get_all"]
+    holidays = await use_case.execute()
+    return [
+        {
+            "id": h.id if h.id is not None else 0,  # Используем 0 если id=None
+            "name": h.name,
+            "description": h.description,
+            "date": h.date.isoformat(),
+        }
+        for h in holidays
+    ]
+
+
+@router.post("/api/holidays")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def create_holiday_user(
+    request: Request,
+    data: HolidayCreate,
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Создать праздник (для Mini App)."""
+    use_cases = factory.create_holiday_use_cases()
+    use_case = use_cases["create"]
+
+    # Нормализуем дату: используем только день и месяц, год устанавливаем в текущий
+    from datetime import date as date_class
+    normalized_date = date_class(
+        date_class.today().year,
+        data.holiday_date.month,
+        data.holiday_date.day,
+    )
+
+    holiday = await use_case.execute(
+        name=data.name,
+        date=normalized_date,
+        description=data.description,
+    )
+    await session.commit()
+    return {
+        "id": holiday.id,
+        "name": holiday.name,
+        "description": holiday.description,
+        "date": holiday.date.isoformat(),
+    }
+
+
+@router.put("/api/holidays/{holiday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def update_holiday_user(
+    request: Request,
+    holiday_id: int = Path(..., gt=0, description="ID праздника"),
+    data: HolidayUpdate = Body(..., description="Данные для обновления праздника"),
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Обновить праздник (для Mini App)."""
+    use_cases = factory.create_holiday_use_cases()
+    use_case = use_cases["update"]
+
+    # Нормализуем дату если она предоставлена
+    normalized_date = None
+    if data.holiday_date:
+        from datetime import date as date_class
+        normalized_date = date_class(
+            date_class.today().year,
+            data.holiday_date.month,
+            data.holiday_date.day,
+        )
+
+    holiday = await use_case.execute(
+        holiday_id=holiday_id,
+        name=data.name,
+        date=normalized_date,
+        description=data.description,
+    )
+    await session.commit()
+    return {
+        "id": holiday.id,
+        "name": holiday.name,
+        "description": holiday.description,
+        "date": holiday.date.isoformat(),
+    }
+
+
+@router.delete("/api/holidays/{holiday_id}")
+@limiter.limit(WRITE_LIMIT)
+@handle_api_errors
+async def delete_holiday_user(
+    request: Request,
+    holiday_id: int = Path(..., gt=0, description="ID праздника"),
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth
+    factory: UseCaseFactory = Depends(get_use_case_factory),
+):
+    """Удалить праздник (для Mini App)."""
+    use_cases = factory.create_holiday_use_cases()
+    use_case = use_cases["delete"]
+
+    await use_case.execute(holiday_id)
     await session.commit()
     return {"status": "deleted"}
 

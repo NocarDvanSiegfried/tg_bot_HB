@@ -25,7 +25,9 @@ class GetCalendarDataUseCase:
         birthdays = await self.birthday_repository.get_by_day_and_month(
             check_date.day, check_date.month
         )
-        holidays = await self.holiday_repository.get_by_date(check_date)
+        holidays = await self.holiday_repository.get_by_day_and_month(
+            check_date.day, check_date.month
+        )
         responsible = await self.responsible_repository.get_by_date(check_date)
 
         return {

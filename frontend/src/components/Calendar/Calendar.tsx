@@ -9,6 +9,7 @@ import { api, CalendarData, MonthBirthdays } from '../../services/api'
 import DateView from './DateView'
 import { logger } from '../../utils/logger'
 import BirthdayManagement from '../Panel/BirthdayManagement'
+import HolidayManagement from '../Panel/HolidayManagement'
 import './Calendar.css'
 import '../Panel/Panel.css'
 
@@ -35,6 +36,7 @@ export default function Calendar() {
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
   const [showManagement, setShowManagement] = useState(false) // Состояние для переключения между календарем и управлением
+  const [showHolidayManagement, setShowHolidayManagement] = useState(false) // Состояние для переключения между календарем и управлением праздниками
 
   // Логирование для отладки
   useEffect(() => {
@@ -212,6 +214,13 @@ export default function Calendar() {
         >
           ➕ Управление
         </button>
+        <button
+          onClick={() => setShowHolidayManagement(true)}
+          className="management-button"
+          title="Управление профессиональными праздниками"
+        >
+          🎉 Праздники
+        </button>
       </div>
 
       <div className="calendar-grid">
@@ -259,6 +268,14 @@ export default function Calendar() {
           loading={loading}
           error={error}
         />
+      )}
+
+      {showManagement && (
+        <BirthdayManagement onBack={() => setShowManagement(false)} />
+      )}
+
+      {showHolidayManagement && (
+        <HolidayManagement onBack={() => setShowHolidayManagement(false)} />
       )}
     </div>
   )

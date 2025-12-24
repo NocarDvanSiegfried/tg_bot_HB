@@ -20,8 +20,14 @@ from src.application.use_cases.responsible.delete_responsible import DeleteRespo
 from src.application.use_cases.responsible.get_all_responsible import GetAllResponsibleUseCase
 from src.application.use_cases.responsible.update_responsible import UpdateResponsibleUseCase
 from src.application.use_cases.search.search_people import SearchPeopleUseCase
+from src.application.use_cases.holiday.create_holiday import CreateHolidayUseCase
+from src.application.use_cases.holiday.update_holiday import UpdateHolidayUseCase
+from src.application.use_cases.holiday.delete_holiday import DeleteHolidayUseCase
+from src.application.use_cases.holiday.get_all_holidays import GetAllHolidaysUseCase
 from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
+from src.infrastructure.database.repositories.holiday_composite_repository import HolidayCompositeRepository
 from src.infrastructure.database.repositories.holiday_file_repository import HolidayFileRepository
+from src.infrastructure.database.repositories.holiday_repository_impl import HolidayRepositoryImpl
 from src.infrastructure.database.repositories.panel_access_repository_impl import (
     PanelAccessRepositoryImpl,
 )
@@ -55,7 +61,9 @@ class UseCaseFactory:
     @property
     def holiday_repo(self):
         if self._holiday_repo is None:
-            self._holiday_repo = HolidayFileRepository()
+            file_repo = HolidayFileRepository()
+            db_repo = HolidayRepositoryImpl(self.session)
+            self._holiday_repo = HolidayCompositeRepository(file_repo, db_repo)
         return self._holiday_repo
 
     @property
@@ -119,6 +127,15 @@ class UseCaseFactory:
             "delete": DeleteResponsibleUseCase(self.responsible_repo),
             "assign_to_date": AssignResponsibleToDateUseCase(self.responsible_repo),
             "get_all": GetAllResponsibleUseCase(self.responsible_repo),
+        }
+
+    def create_holiday_use_cases(self):
+        """Создать use-cases для работы с праздниками."""
+        return {
+            "create": CreateHolidayUseCase(self.holiday_repo),
+            "update": UpdateHolidayUseCase(self.holiday_repo),
+            "delete": DeleteHolidayUseCase(self.holiday_repo),
+            "get_all": GetAllHolidaysUseCase(self.holiday_repo),
         }
 
     def create_search_use_case(self):

@@ -33,6 +33,16 @@ export const API_ENDPOINTS = {
   },
 
   /**
+   * Endpoints для управления профессиональными праздниками (USER API для Mini App)
+   */
+  HOLIDAYS: {
+    /** Список всех праздников */
+    LIST: '/api/holidays',
+    /** Конкретный праздник по ID */
+    BY_ID: (id: number) => `/api/holidays/${id}`,
+  },
+
+  /**
    * Endpoints для управления ответственными лицами
    */
   RESPONSIBLE: {

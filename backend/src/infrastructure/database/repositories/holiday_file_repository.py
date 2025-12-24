@@ -91,6 +91,27 @@ class HolidayFileRepository(HolidayRepository):
         
         return holidays
 
+    async def get_by_day_and_month(self, day: int, month: int) -> list[ProfessionalHoliday]:
+        """Получить праздники в указанный день и месяц (любой год)."""
+        data = self._load_data()
+        date_key = f"{month:02d}-{day:02d}"
+        
+        holidays_data = data.get(date_key, [])
+        
+        holidays = []
+        for holiday_data in holidays_data:
+            # Используем текущий год для создания даты
+            holiday_date = date(date.today().year, month, day)
+            holiday = ProfessionalHoliday(
+                id=None,
+                name=holiday_data.get("name", ""),
+                description=holiday_data.get("description"),
+                date=holiday_date,
+            )
+            holidays.append(holiday)
+        
+        return holidays
+
     async def get_all(self) -> list[ProfessionalHoliday]:
         """
         Получить все праздники.

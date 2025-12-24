@@ -21,6 +21,11 @@ class HolidayRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_day_and_month(self, day: int, month: int) -> list[ProfessionalHoliday]:
+        """Получить праздники в указанный день и месяц (любой год)."""
+        pass
+
+    @abstractmethod
     async def update(self, holiday: ProfessionalHoliday) -> ProfessionalHoliday:
         """Обновить праздник."""
         pass

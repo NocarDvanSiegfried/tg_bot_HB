@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import select
+from sqlalchemy import extract, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.holiday_repository import HolidayRepository
@@ -37,6 +37,17 @@ class HolidayRepositoryImpl(
         result = await self.session.execute(
             select(ProfessionalHolidayModel).where(
                 ProfessionalHolidayModel.holiday_date == check_date
+            )
+        )
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
+    async def get_by_day_and_month(self, day: int, month: int) -> list[ProfessionalHoliday]:
+        """Получить праздники в указанный день и месяц (любой год)."""
+        result = await self.session.execute(
+            select(ProfessionalHolidayModel).where(
+                extract("day", ProfessionalHolidayModel.holiday_date) == day,
+                extract("month", ProfessionalHolidayModel.holiday_date) == month,
             )
         )
         models = result.scalars().all()

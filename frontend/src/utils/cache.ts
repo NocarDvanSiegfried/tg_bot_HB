@@ -81,6 +81,8 @@ export const CacheKeys = {
   birthday: (id: number) => `birthday:${id}`,
   responsibles: 'responsibles:all',
   responsible: (id: number) => `responsible:${id}`,
+  holidays: 'holidays:all',
+  holiday: (id: number) => `holiday:${id}`,
 } as const
 
 /**
@@ -92,5 +94,7 @@ export const CacheTTL = {
   birthday: 5 * 60 * 1000, // 5 минут
   responsibles: 5 * 60 * 1000, // 5 минут
   responsible: 5 * 60 * 1000, // 5 минут
+  holidays: 5 * 60 * 1000, // 5 минут
+  holiday: 5 * 60 * 1000, // 5 минут
 } as const
 
