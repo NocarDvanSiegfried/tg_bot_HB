@@ -5,6 +5,7 @@ import { Birthday } from '../../types/birthday'
 import { logger } from '../../utils/logger'
 import { validateDate } from '../../utils/validation'
 import { API_BASE_URL } from '../../config/api'
+import BirthdayDatePicker from '../DatePicker/BirthdayDatePicker'
 import './Panel.css'
 
 interface BirthdayManagementProps {
@@ -285,11 +286,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             required
             disabled={creating}
           />
-          <input
-            type="date"
+          <BirthdayDatePicker
             value={(formData.birth_date as string) || ''}
-            onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-            required
+            onChange={(date) => setFormData({ ...formData, birth_date: date })}
             disabled={creating}
           />
           <textarea
@@ -381,10 +380,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
                       disabled={updating === bd.id || showAddForm}
                     />
-                    <input
-                      type="date"
+                    <BirthdayDatePicker
                       value={(editFormData.birth_date as string) || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, birth_date: e.target.value })}
+                      onChange={(date) => setEditFormData({ ...editFormData, birth_date: date })}
                       disabled={updating === bd.id || showAddForm}
                     />
                     <textarea
