@@ -174,8 +174,7 @@
 }
 
 .birthday-item,
-.holiday-item,
-.responsible-item {
+.holiday-item {
   padding: 10px;
   margin-bottom: 10px;
   background: white;
@@ -183,14 +182,25 @@
 }
 
 .birthday-item p,
-.holiday-item p,
-.responsible-item p {
+.holiday-item p {
   margin: 5px 0;
 }
 
 .comment {
   font-style: italic;
-  color: #666;
+  color: var(--color-text-muted, var(--color-secondary, #666));
+}
+
+.responsible-person {
+  color: var(--color-text-muted, var(--color-secondary, #666));
+  font-size: 0.9em; /* на 1 шаг меньше основного текста */
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.responsible-person strong {
+  font-weight: 600; /* полужирный */
+  color: var(--color-text-muted, var(--color-secondary, #666));
 }
 
 .error-message {

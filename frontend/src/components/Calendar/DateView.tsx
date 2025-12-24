@@ -58,7 +58,6 @@ function DateView({ date, data, loading, error }: DateViewProps) {
       date: format(date, 'yyyy-MM-dd'),
       birthdaysCount: data.birthdays.length,
       holidaysCount: data.holidays.length,
-      hasResponsible: !!data.responsible,
       birthdays: data.birthdays.map(b => ({
         id: b.id,
         name: b.full_name,
@@ -81,7 +80,11 @@ function DateView({ date, data, loading, error }: DateViewProps) {
               <p>{bd.company}, {bd.position}</p>
               <p>Исполняется {bd.age} лет</p>
               {bd.comment && <p className="comment">Комментарий: {bd.comment}</p>}
-              {bd.responsible && <p className="responsible">Ответственное лицо: {bd.responsible}</p>}
+              {bd.responsible && (
+                <p className="responsible-person">
+                  👤 <strong>Ответственный:</strong> {bd.responsible}
+                </p>
+              )}
             </div>
           ))
         ) : (
@@ -104,18 +107,6 @@ function DateView({ date, data, loading, error }: DateViewProps) {
         )}
       </div>
 
-      {/* Секция ответственного лица - показываем всегда */}
-      <div className="date-section">
-        <h4>👤 Ответственное лицо</h4>
-        {data.responsible ? (
-          <div className="responsible-item">
-            <p><strong>{data.responsible.full_name}</strong></p>
-            <p>{data.responsible.company}, {data.responsible.position}</p>
-          </div>
-        ) : (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>Ответственный не назначен</p>
-        )}
-      </div>
     </div>
   )
 }
