@@ -284,20 +284,20 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
 
       {/* Кнопка добавления */}
       <div className="holiday-add-button-container">
-        <button
-          type="button"
-          className="holiday-add-button"
-          onClick={() => {
-            if (showAddForm) {
+        {!showAddForm && (
+          <button
+            type="button"
+            className="holiday-add-button"
+            onClick={() => {
               setFormData({ name: '', day: '' as any, month: '' as any, description: '' })
               setError(null)
-            }
-            setShowAddForm(!showAddForm)
-          }}
-          disabled={creating || editingId !== null}
-        >
-          {showAddForm ? '✖️ Отменить' : '➕ Добавить праздник'}
-        </button>
+              setShowAddForm(true)
+            }}
+            disabled={creating || editingId !== null}
+          >
+            ➕ Добавить праздник
+          </button>
+        )}
       </div>
 
       {/* Форма добавления */}
@@ -353,9 +353,23 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             disabled={creating}
             maxLength={1000}
           />
-          <button type="submit" disabled={creating}>
-            {creating ? '⏳ Добавление...' : '💾 Добавить'}
-          </button>
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="form-cancel-button"
+              onClick={() => {
+                setShowAddForm(false)
+                setFormData({ name: '', day: '' as any, month: '' as any, description: '' })
+                setError(null)
+              }}
+              disabled={creating}
+            >
+              Отменить
+            </button>
+            <button type="submit" className="form-submit-button" disabled={creating}>
+              {creating ? '⏳ Добавление...' : '💾 Добавить'}
+            </button>
+          </div>
         </form>
       )}
 
@@ -474,7 +488,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                                   }
                                   handleEdit(holiday.id)
                                 }}
-                                disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                                disabled={deleting === holiday.id || updating === holiday.id || showAddForm || !isValidId}
                               >
                                 ✏️ Редактировать
                               </button>
@@ -487,7 +501,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                                   }
                                   handleDelete(holiday.id)
                                 }}
-                                disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                                disabled={deleting === holiday.id || updating === holiday.id || showAddForm || !isValidId}
                               >
                                 {deleting === holiday.id ? '⏳ Удаление...' : '🗑️ Удалить'}
                               </button>

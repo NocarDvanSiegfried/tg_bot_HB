@@ -17,6 +17,7 @@ export interface ValidationResult {
  * - Формат даты (YYYY-MM-DD)
  * - Валидность даты
  * - Что дата не в будущем
+ * - Что год указан (обязателен)
  * 
  * @param date - дата в формате YYYY-MM-DD
  * @returns ValidationResult с результатами валидации
@@ -34,6 +35,14 @@ export function validateDate(date: string): ValidationResult {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/
   if (!dateRegex.test(date)) {
     errors.push('Неверный формат даты. Используйте формат YYYY-MM-DD')
+    return { isValid: false, errors }
+  }
+  
+  // Проверка, что год указан (обязателен)
+  const [yearStr] = date.split('-')
+  const year = parseInt(yearStr, 10)
+  if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
+    errors.push('Год рождения обязателен и должен быть в диапазоне 1900-' + new Date().getFullYear())
     return { isValid: false, errors }
   }
   

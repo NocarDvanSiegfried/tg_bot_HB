@@ -5,7 +5,7 @@ import { Birthday } from '../../types/birthday'
 import { logger } from '../../utils/logger'
 import { validateDate } from '../../utils/validation'
 import { API_BASE_URL } from '../../config/api'
-import BirthdayDatePicker from '../DatePicker/BirthdayDatePicker'
+import BirthdayDateInput from '../DatePicker/BirthdayDateInput'
 import './Panel.css'
 
 interface BirthdayManagementProps {
@@ -101,6 +101,9 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   // Состояния для поиска и фильтров
   const [searchQuery, setSearchQuery] = useState('')
   const [filterMonth, setFilterMonth] = useState<number | ''>('')
+  
+  // Состояние для ошибок даты в формах
+  const [dateError, setDateError] = useState<string | null>(null)
 
   // Использование общего хука для CRUD операций
   const {
@@ -243,22 +246,23 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       ) : null}
 
       {/* Кнопка добавления */}
-      <div className="birthday-add-button-container">
-        <button
-          type="button"
-          className="birthday-add-button"
-          onClick={() => {
-            if (showAddForm) {
+      {!showAddForm && (
+        <div className="birthday-add-button-container">
+          <button
+            type="button"
+            className="birthday-add-button"
+            onClick={() => {
               setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '', responsible: '' })
               setError(null)
-            }
-            setShowAddForm(!showAddForm)
-          }}
-          disabled={creating || editingId !== null}
-        >
-          {showAddForm ? '✖️ Отменить' : '➕ Добавить'}
-        </button>
-      </div>
+              setDateError(null)
+              setShowAddForm(true)
+            }}
+            disabled={creating || editingId !== null}
+          >
+            ➕ Добавить день рождения
+          </button>
+        </div>
+      )}
 
       {showAddForm && (
         <form className="panel-form" onSubmit={handleSubmit}>
@@ -286,10 +290,26 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             required
             disabled={creating}
           />
-          <BirthdayDatePicker
+          <BirthdayDateInput
             value={(formData.birth_date as string) || ''}
-            onChange={(date) => setFormData({ ...formData, birth_date: date })}
+            onChange={(date) => {
+              setFormData({ ...formData, birth_date: date })
+              // Очищаем ошибку при изменении даты
+              if (dateError) setDateError(null)
+              // Валидируем дату в реальном времени
+              if (date) {
+                const validation = validateDate(date)
+                if (!validation.isValid) {
+                  setDateError(validation.errors[0])
+                } else {
+                  setDateError(null)
+                }
+              } else {
+                setDateError(null)
+              }
+            }}
             disabled={creating}
+            error={dateError || (error && error.includes('дата') ? error : undefined)}
           />
           <textarea
             placeholder="Комментарий (необязательно)"
@@ -304,9 +324,24 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
             disabled={creating}
           />
-          <button type="submit" disabled={creating}>
-            {creating ? '⏳ Добавление...' : 'Добавить'}
-          </button>
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="form-cancel-button"
+              onClick={() => {
+                setShowAddForm(false)
+                setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '', responsible: '' })
+                setError(null)
+                setDateError(null)
+              }}
+              disabled={creating}
+            >
+              Отменить
+            </button>
+            <button type="submit" className="form-submit-button" disabled={creating}>
+              {creating ? '⏳ Добавление...' : 'Добавить'}
+            </button>
+          </div>
         </form>
       )}
 
@@ -380,10 +415,26 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
                       disabled={updating === bd.id || showAddForm}
                     />
-                    <BirthdayDatePicker
+                    <BirthdayDateInput
                       value={(editFormData.birth_date as string) || ''}
-                      onChange={(date) => setEditFormData({ ...editFormData, birth_date: date })}
+                      onChange={(date) => {
+                        setEditFormData({ ...editFormData, birth_date: date })
+                        // Очищаем ошибку при изменении даты
+                        if (dateError) setDateError(null)
+                        // Валидируем дату в реальном времени
+                        if (date) {
+                          const validation = validateDate(date)
+                          if (!validation.isValid) {
+                            setDateError(validation.errors[0])
+                          } else {
+                            setDateError(null)
+                          }
+                        } else {
+                          setDateError(null)
+                        }
+                      }}
                       disabled={updating === bd.id || showAddForm}
+                      error={dateError || (error && error.includes('дата') ? error : undefined)}
                     />
                     <textarea
                       placeholder="Комментарий (необязательно)"
@@ -417,7 +468,14 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                       <button type="submit" disabled={updating === bd.id || showAddForm}>
                         {updating === bd.id ? '⏳ Сохранение...' : 'Сохранить'}
                       </button>
-                      <button type="button" onClick={handleCancelEdit} disabled={updating === bd.id || showAddForm}>
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          handleCancelEdit()
+                          setDateError(null) // Очищаем ошибки при отмене
+                        }} 
+                        disabled={updating === bd.id || showAddForm}
+                      >
                         Отмена
                       </button>
                     </div>
@@ -435,7 +493,8 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     )}
                     {bd.responsible && (
                       <div className="birthday-card-responsible">
-                        👤 <strong>Ответственный:</strong> {bd.responsible}
+                        <span>👤</span>
+                        <span><strong>Ответственный:</strong> {bd.responsible}</span>
                       </div>
                     )}
                   </div>
@@ -452,7 +511,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         handleEdit(bd.id)
                         logger.info(`[BirthdayManagement] After handleEdit call, editingId should be=${bd.id}`)
                       }}
-                      disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
+                      disabled={deleting === bd.id || updating === bd.id || showAddForm}
                     >
                       ✏️ Редактировать
                     </button>
@@ -466,7 +525,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         }
                         handleDelete(bd.id)
                       }}
-                      disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
+                      disabled={deleting === bd.id || updating === bd.id || showAddForm}
                     >
                       {deleting === bd.id ? '⏳ Удаление...' : '🗑️ Удалить'}
                     </button>

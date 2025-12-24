@@ -269,6 +269,8 @@ export default function Calendar() {
               'calendar-day',
               dayIsSelected ? 'selected' : '',
               dayIsToday ? 'today' : '',
+              dayHasBirthday ? 'has-birthday' : '',
+              dayHasHoliday ? 'has-holiday' : '',
             ].filter(Boolean).join(' ')
 
             // Определяем индикаторы

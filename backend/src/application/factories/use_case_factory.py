@@ -25,8 +25,6 @@ from src.application.use_cases.holiday.update_holiday import UpdateHolidayUseCas
 from src.application.use_cases.holiday.delete_holiday import DeleteHolidayUseCase
 from src.application.use_cases.holiday.get_all_holidays import GetAllHolidaysUseCase
 from src.infrastructure.database.repositories.birthday_repository_impl import BirthdayRepositoryImpl
-from src.infrastructure.database.repositories.holiday_composite_repository import HolidayCompositeRepository
-from src.infrastructure.database.repositories.holiday_file_repository import HolidayFileRepository
 from src.infrastructure.database.repositories.holiday_repository_impl import HolidayRepositoryImpl
 from src.infrastructure.database.repositories.panel_access_repository_impl import (
     PanelAccessRepositoryImpl,
@@ -61,9 +59,7 @@ class UseCaseFactory:
     @property
     def holiday_repo(self):
         if self._holiday_repo is None:
-            file_repo = HolidayFileRepository()
-            db_repo = HolidayRepositoryImpl(self.session)
-            self._holiday_repo = HolidayCompositeRepository(file_repo, db_repo)
+            self._holiday_repo = HolidayRepositoryImpl(self.session)
         return self._holiday_repo
 
     @property

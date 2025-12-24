@@ -109,14 +109,18 @@
   transform: scale(1.02);
 }
 
-.calendar-day.has-birthday {
+.calendar-day.has-birthday,
+.calendar-day.has-holiday {
   border-color: var(--color-warning);
   background: var(--color-bg-primary, white);
+  border-width: 2px;
 }
 
-.calendar-day.has-birthday:hover {
+.calendar-day.has-birthday:hover,
+.calendar-day.has-holiday:hover {
   background-color: var(--color-bg-tertiary, #f0f0f0);
   border-color: var(--color-warning);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
 }
 
 .calendar-day.selected.has-birthday {
@@ -182,26 +186,47 @@
 }
 
 .indicator-badge {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1;
-  opacity: 0.8;
+  opacity: 1;
   transition: opacity 0.2s ease;
+  display: inline-block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .indicator-badge.birthday {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .indicator-badge.holiday {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .indicator-badge.combined {
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .calendar-day.selected .indicator-badge {
-  opacity: 0.9;
+  opacity: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Улучшенная видимость в тёмной теме */
+[data-theme="dark"] .indicator-badge {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+  opacity: 1;
+}
+
+[data-theme="dark"] .calendar-day.has-birthday,
+[data-theme="dark"] .calendar-day.has-holiday {
+  border-color: var(--color-warning-dark, #ffb74d);
+  background: var(--color-bg-secondary-dark, #242424);
+}
+
+[data-theme="dark"] .calendar-day.has-birthday:hover,
+[data-theme="dark"] .calendar-day.has-holiday:hover {
+  background-color: var(--color-bg-tertiary-dark, #2d2d2d);
+  border-color: var(--color-warning-dark, #ffb74d);
 }
 
 /* Старые индикаторы заменены на новые */

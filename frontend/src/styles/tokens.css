@@ -72,6 +72,28 @@
   /* Тёмная тема - Границы */
   --color-border: rgba(255, 255, 255, 0.1);
   --color-border-light: rgba(255, 255, 255, 0.05);
+  --color-border-dark: rgba(255, 255, 255, 0.15);
+  
+  /* Тёмная тема - Дополнительные цвета */
+  --color-bg-secondary-dark: #242424;
+  --color-bg-tertiary-dark: #2d2d2d;
+  --color-bg-disabled-dark: #1a1a1a;
+  --color-text-disabled-dark: rgba(255, 255, 255, 0.3);
+  --color-text-primary-dark: rgba(255, 255, 255, 0.9);
+  --color-text-secondary-dark: rgba(255, 255, 255, 0.6);
+  --color-primary-dark: #4a9eff;
+  --color-danger-dark: #f44336;
+  --color-danger-hover-dark: #ef5350;
+  --color-error-dark: #ef5350;
+  
+  /* Font sizes */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
 }
 
 /* Тёмная тема - через системные настройки (fallback) */
@@ -100,6 +122,28 @@
     /* Тёмная тема - Границы */
     --color-border: rgba(255, 255, 255, 0.1);
     --color-border-light: rgba(255, 255, 255, 0.05);
+    --color-border-dark: rgba(255, 255, 255, 0.15);
+    
+    /* Тёмная тема - Дополнительные цвета */
+    --color-bg-secondary-dark: #242424;
+    --color-bg-tertiary-dark: #2d2d2d;
+    --color-bg-disabled-dark: #1a1a1a;
+    --color-text-disabled-dark: rgba(255, 255, 255, 0.3);
+    --color-text-primary-dark: rgba(255, 255, 255, 0.9);
+    --color-text-secondary-dark: rgba(255, 255, 255, 0.6);
+    --color-primary-dark: #4a9eff;
+    --color-danger-dark: #f44336;
+    --color-danger-hover-dark: #ef5350;
+    --color-error-dark: #ef5350;
+    
+    /* Font sizes */
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    
+    /* Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
   }
 }
 
