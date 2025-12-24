@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useCRUDManagement } from '../../hooks/useCRUDManagement'
 import { api } from '../../services/api'
 import { Birthday } from '../../types/birthday'
@@ -97,9 +97,13 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     }
   }
 
+  // Состояния для поиска и фильтров
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterMonth, setFilterMonth] = useState<number | ''>('')
+
   // Использование общего хука для CRUD операций
   const {
-    items: birthdays,
+    items: allBirthdays,
     loading,
     creating,
     updating,
@@ -145,6 +149,31 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     useMountedRef: true,
   })
 
+  // Фильтрация и поиск
+  const birthdays = useMemo(() => {
+    let filtered = [...allBirthdays]
+
+    // Поиск по имени, компании, должности
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(bd => 
+        bd.full_name.toLowerCase().includes(query) ||
+        bd.company.toLowerCase().includes(query) ||
+        bd.position.toLowerCase().includes(query)
+      )
+    }
+
+    // Фильтр по месяцу
+    if (filterMonth !== '') {
+      filtered = filtered.filter(bd => {
+        const birthDate = new Date(bd.birth_date)
+        return birthDate.getMonth() + 1 === filterMonth
+      })
+    }
+
+    return filtered
+  }, [allBirthdays, searchQuery, filterMonth])
+
   // Диагностика изменений editingId (только в dev режиме)
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -188,6 +217,46 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
           ⚠️ {error}
         </div>
       )}
+
+      {/* Поиск и фильтры */}
+      <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <input
+          type="text"
+          placeholder="🔍 Поиск по имени, компании, должности..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '10px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}
+        />
+        <select
+          value={filterMonth}
+          onChange={(e) => setFilterMonth(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+          style={{
+            width: '100%',
+            padding: '10px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}
+        >
+          <option value="">Все месяцы</option>
+          {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+            <option key={m} value={m}>
+              {new Date(2000, m-1, 1).toLocaleString('ru', { month: 'long' })}
+            </option>
+          ))}
+        </select>
+        {searchQuery || filterMonth !== '' ? (
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+            Найдено: {birthdays.length} из {allBirthdays.length}
+          </div>
+        ) : null}
+      </div>
 
       <div style={{ marginBottom: '20px' }}>
         <button
@@ -393,7 +462,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     <br />
                     {bd.birth_date} {bd.comment && `(${bd.comment})`}
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button 
                       onClick={() => {
                         if (!bd.id) {

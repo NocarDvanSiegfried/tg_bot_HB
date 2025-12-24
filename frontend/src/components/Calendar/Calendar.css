@@ -70,7 +70,7 @@
 
 .calendar-day {
   padding: 10px;
-  border: 2px solid #ddd;
+  border: 1px solid #e0e0e0;
   background: white;
   cursor: pointer;
   text-align: center;
@@ -90,11 +90,10 @@
 }
 
 .calendar-day.selected {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary-dark);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
-  font-weight: bold;
+  background-color: rgba(0, 123, 255, 0.2);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  font-weight: 600;
 }
 
 .calendar-day.selected:hover {
@@ -127,10 +126,7 @@
   background: linear-gradient(to bottom, #d4edda 0%, #ffffff 100%);
 }
 
-.calendar-day.today.has-birthday:not(.selected) {
-  background: linear-gradient(to bottom, #fff3cd 0%, #d4edda 50%, #ffffff 100%);
-  border-color: var(--color-warning);
-}
+/* Удаляем старые стили для today.has-birthday */
 
 .calendar-day.today.selected {
   border-color: var(--color-primary-dark);
@@ -142,15 +138,7 @@
   line-height: 1.2;
 }
 
-.calendar-day .birthday-indicator {
-  font-size: 12px;
-  margin-top: 2px;
-  line-height: 1;
-}
-
-.calendar-day.selected .birthday-indicator {
-  filter: brightness(0) invert(1);
-}
+/* Старые индикаторы заменены на новые */
 
 .date-view {
   margin-top: var(--spacing-xl);
@@ -186,6 +174,29 @@
 }
 
 .birthday-item,
+/* Карточки праздников */
+.holiday-card {
+  background: white;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.holiday-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.holiday-description {
+  color: var(--color-text-muted, var(--color-secondary, #666));
+  font-size: 0.9em;
+  margin: 0;
+}
+
 .holiday-item {
   padding: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
@@ -227,5 +238,25 @@
 .error-message p {
   margin: 0 0 10px 0;
   font-size: 16px;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Пустые состояния */
+.empty-state {
+  color: var(--color-text-muted, var(--color-secondary, #666));
+  font-style: italic;
+  margin: var(--spacing-md) 0;
+  text-align: center;
 }
 

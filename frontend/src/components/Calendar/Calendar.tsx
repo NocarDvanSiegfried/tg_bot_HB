@@ -10,6 +10,7 @@ import DateView from './DateView'
 import { logger } from '../../utils/logger'
 import BirthdayManagement from '../Panel/BirthdayManagement'
 import HolidayManagement from '../Panel/HolidayManagement'
+import NavigationBar from '../Navigation/NavigationBar'
 import './Calendar.css'
 import '../Panel/Panel.css'
 
@@ -35,8 +36,7 @@ export default function Calendar() {
   const [renderError, setRenderError] = useState<string | null>(null)
   const [monthBirthdays, setMonthBirthdays] = useState<MonthBirthdays | null>(null)
   const [, setLoadingMonth] = useState(false) // Используется для управления состоянием загрузки месяца
-  const [showManagement, setShowManagement] = useState(false) // Состояние для переключения между календарем и управлением
-  const [showHolidayManagement, setShowHolidayManagement] = useState(false) // Состояние для переключения между календарем и управлением праздниками
+  const [activeSection, setActiveSection] = useState<'calendar' | 'birthdays' | 'holidays'>('calendar') // Активный раздел навигации
 
   // Логирование для отладки
   useEffect(() => {
@@ -111,6 +111,15 @@ export default function Calendar() {
     return hasBD
   }
 
+  // Проверка, есть ли праздник в определенный день (по дню и месяцу)
+  const hasHoliday = (day: Date): boolean => {
+    // Пока используем простую проверку - если есть данные календаря для этого дня
+    // В будущем можно добавить загрузку праздников за месяц
+    if (!calendarData) return false
+    const dayStr = format(day, 'yyyy-MM-dd')
+    return calendarData.date === dayStr && calendarData.holidays.length > 0
+  }
+
   // Улучшенное сравнение дат для выделения (без учета времени)
   const isSelected = (day: Date): boolean => {
     if (!selectedDate) return false
@@ -160,22 +169,50 @@ export default function Calendar() {
     setCalendarData(null)
   }
 
+  // Обработчик изменения раздела навигации
+  const handleSectionChange = (section: 'calendar' | 'birthdays' | 'holidays') => {
+    setActiveSection(section)
+    // При переходе в календарь не сбрасываем выбранную дату
+    if (section === 'calendar') {
+      // Оставляем selectedDate как есть
+    } else {
+      // При переходе в другие разделы закрываем DateView
+      setSelectedDate(null)
+    }
+  }
+
   // Обработчик возврата из управления днями рождения
   const handleBackFromManagement = () => {
-    setShowManagement(false)
+    setActiveSection('calendar')
     // Обновить календарь для отображения изменений (новые/измененные/удаленные дни рождения)
     // Изменение currentDate заставит useEffect перезапуститься и загрузить актуальные данные
     setCurrentDate(new Date(currentDate.getTime()))
   }
 
-  // Если открыто управление, показываем компонент управления
-  if (showManagement) {
-    return <BirthdayManagement onBack={handleBackFromManagement} />
+  // Обработчик возврата из управления праздниками
+  const handleBackFromHolidayManagement = () => {
+    setActiveSection('calendar')
+    // Не сбрасываем календарь, просто возвращаемся
+  }
+
+  // Если открыто управление днями рождения, показываем компонент управления
+  if (activeSection === 'birthdays') {
+    return (
+      <>
+        <NavigationBar activeSection={activeSection} onSectionChange={handleSectionChange} />
+        <BirthdayManagement onBack={handleBackFromManagement} />
+      </>
+    )
   }
 
   // Если открыто управление праздниками, показываем компонент управления праздниками
-  if (showHolidayManagement) {
-    return <HolidayManagement onBack={() => setShowHolidayManagement(false)} />
+  if (activeSection === 'holidays') {
+    return (
+      <>
+        <NavigationBar activeSection={activeSection} onSectionChange={handleSectionChange} />
+        <HolidayManagement onBack={handleBackFromHolidayManagement} />
+      </>
+    )
   }
 
   // Если есть ошибка рендеринга, показываем сообщение
@@ -208,24 +245,11 @@ export default function Calendar() {
 
   return (
     <div className="calendar-container">
+      <NavigationBar activeSection={activeSection} onSectionChange={handleSectionChange} />
       <div className="calendar-header">
         <button onClick={handlePrevMonth}>◀️</button>
         <h2>{format(currentDate, 'MMMM yyyy')}</h2>
         <button onClick={handleNextMonth}>▶️</button>
-        <button
-          onClick={() => setShowManagement(true)}
-          className="management-button"
-          title="Управление днями рождения"
-        >
-          ➕ Управление
-        </button>
-        <button
-          onClick={() => setShowHolidayManagement(true)}
-          className="management-button"
-          title="Управление профессиональными праздниками"
-        >
-          🎉 Праздники
-        </button>
       </div>
 
       <div className="calendar-grid">
@@ -238,24 +262,55 @@ export default function Calendar() {
         {days.length > 0 ? (
           days.map((day) => {
             const dayHasBirthday = hasBirthday(day)
+            const dayHasHoliday = hasHoliday(day)
             const dayIsSelected = isSelected(day)
             const dayIsToday = isTodayDay(day)
             const dayClasses = [
               'calendar-day',
               dayIsSelected ? 'selected' : '',
               dayIsToday ? 'today' : '',
-              dayHasBirthday ? 'has-birthday' : '',
             ].filter(Boolean).join(' ')
+
+            // Определяем индикаторы
+            const indicators = []
+            if (dayHasBirthday && dayHasHoliday) {
+              indicators.push('both')
+            } else if (dayHasBirthday) {
+              indicators.push('birthday')
+            } else if (dayHasHoliday) {
+              indicators.push('holiday')
+            }
+
+            const title = dayHasBirthday && dayHasHoliday 
+              ? 'Есть дни рождения и праздники'
+              : dayHasBirthday 
+              ? 'Есть дни рождения'
+              : dayHasHoliday
+              ? 'Есть праздники'
+              : dayIsToday 
+              ? 'Сегодня'
+              : ''
 
             return (
               <button
                 key={day.toISOString()}
                 className={dayClasses}
                 onClick={() => handleDateClick(day)}
-                title={dayHasBirthday ? 'Есть дни рождения' : dayIsToday ? 'Сегодня' : ''}
+                title={title}
               >
                 <span className="day-number">{format(day, 'd')}</span>
-                {dayHasBirthday && <span className="birthday-indicator">🎂</span>}
+                {indicators.length > 0 && (
+                  <span className={`day-indicators ${indicators.join(' ')}`}>
+                    {indicators.includes('both') ? (
+                      <span className="indicator-badge combined">🎂🎉</span>
+                    ) : (
+                      <>
+                        {indicators.includes('birthday') && <span className="indicator-badge birthday">🎂</span>}
+                        {indicators.includes('holiday') && <span className="indicator-badge holiday">🎉</span>}
+                      </>
+                    )}
+                  </span>
+                )}
               </button>
             )
           })
@@ -273,7 +328,7 @@ export default function Calendar() {
           loading={loading}
           error={error}
           onHolidaysClick={() => {
-            setShowHolidayManagement(true)
+            setActiveSection('holidays')
             setSelectedDate(null) // Закрываем DateView при переходе
           }}
         />

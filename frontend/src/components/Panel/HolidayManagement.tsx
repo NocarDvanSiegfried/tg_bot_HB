@@ -189,7 +189,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
   return (
     <div className="panel-section">
       <button className="back-button" onClick={onBack}>🔙 Назад</button>
-      <h3>Профессиональные праздники</h3>
+      <h2>🎉 Профессиональные праздники</h2>
 
       {/* Диагностическая информация (только в dev режиме) */}
       {import.meta.env.DEV && (
@@ -434,12 +434,28 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                         {error}
                       </div>
                     )}
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                      <button type="submit" disabled={updating === holiday.id || showAddForm}>
-                        {updating === holiday.id ? '⏳ Сохранение...' : 'Сохранить'}
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                      <button type="button" onClick={handleCancelEdit} disabled={updating === holiday.id || showAddForm} style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#f0f0f0',
+                        color: '#333',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        cursor: updating === holiday.id || showAddForm ? 'not-allowed' : 'pointer',
+                        fontSize: '14px'
+                      }}>
+                        Отменить
                       </button>
-                      <button type="button" onClick={handleCancelEdit} disabled={updating === holiday.id || showAddForm}>
-                        Отмена
+                      <button type="submit" disabled={updating === holiday.id || showAddForm} style={{
+                        padding: '8px 16px',
+                        backgroundColor: updating === holiday.id || showAddForm ? '#ccc' : 'var(--color-primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: updating === holiday.id || showAddForm ? 'not-allowed' : 'pointer',
+                        fontSize: '14px'
+                      }}>
+                        {updating === holiday.id ? '⏳ Сохранение...' : '💾 Сохранить'}
                       </button>
                     </div>
                   </form>

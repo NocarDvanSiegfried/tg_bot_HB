@@ -76,20 +76,24 @@ function DateView({ date, data, loading, error, onHolidaysClick }: DateViewProps
         <h4>🎂 Дни рождения</h4>
         {data.birthdays.length > 0 ? (
           data.birthdays.map((bd) => (
-            <div key={bd.id} className="birthday-item">
-              <p><strong>{bd.full_name}</strong></p>
-              <p>{bd.company}, {bd.position}</p>
-              <p>Исполняется {bd.age} лет</p>
-              {bd.comment && <p className="comment">Комментарий: {bd.comment}</p>}
-              {bd.responsible && (
-                <p className="responsible-person">
-                  👤 <strong>Ответственный:</strong> {bd.responsible}
-                </p>
-              )}
+            <div key={bd.id} className="birthday-card">
+              <div className="birthday-card-header">
+                <strong className="birthday-name">{bd.full_name}</strong>
+              </div>
+              <div className="birthday-card-body">
+                <p className="birthday-company-position">{bd.company}, {bd.position}</p>
+                <p className="birthday-age">Исполняется {bd.age} лет</p>
+                {bd.comment && <p className="birthday-comment">{bd.comment}</p>}
+                {bd.responsible && (
+                  <p className="birthday-responsible">
+                    👤 <strong>Ответственный:</strong> {bd.responsible}
+                  </p>
+                )}
+              </div>
             </div>
           ))
         ) : (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>Нет дней рождения на эту дату</p>
+          <p className="empty-state">Нет дней рождения на эту дату</p>
         )}
       </div>
 
@@ -103,13 +107,13 @@ function DateView({ date, data, loading, error, onHolidaysClick }: DateViewProps
         </h4>
         {data.holidays.length > 0 ? (
           data.holidays.map((holiday) => (
-            <div key={holiday.id} className="holiday-item">
-              <p><strong>{holiday.name}</strong></p>
-              {holiday.description && <p>{holiday.description}</p>}
+            <div key={holiday.id} className="holiday-card">
+              <p className="holiday-name"><strong>{holiday.name}</strong></p>
+              {holiday.description && <p className="holiday-description">{holiday.description}</p>}
             </div>
           ))
         ) : (
-          <p style={{ color: 'var(--color-text-muted, var(--color-secondary, #666))', fontStyle: 'italic' }}>Нет профессиональных праздников</p>
+          <p className="empty-state">Нет профессиональных праздников</p>
         )}
       </div>
 

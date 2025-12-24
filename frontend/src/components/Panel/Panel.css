@@ -152,3 +152,26 @@
   background-color: #5a6268;
 }
 
+/* Анимация появления */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Пустые состояния */
+.panel-empty-state {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-muted, var(--color-secondary, #666));
+  font-style: italic;
+  background: #f9f9f9;
+  border-radius: var(--border-radius-md);
+  margin: var(--spacing-md) 0;
+}
+
