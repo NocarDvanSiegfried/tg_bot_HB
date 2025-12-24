@@ -1,17 +1,18 @@
-import { useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useCRUDManagement } from '../../hooks/useCRUDManagement'
 import { api } from '../../services/api'
 import { Holiday } from '../../types/holiday'
 import { logger } from '../../utils/logger'
-import { API_BASE_URL } from '../../config/api'
 import './Panel.css'
 
 interface HolidayManagementProps {
   onBack: () => void
 }
 
+type SortOption = 'date' | 'name' | 'month'
+
 export default function HolidayManagement({ onBack }: HolidayManagementProps) {
-  // Валидация для Holiday (специфичная логика)
+  // Валидация для Holiday
   const validateHoliday = (data: any): string[] => {
     const errors: string[] = []
     
@@ -23,11 +24,9 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       errors.push('Название праздника не может быть длиннее 255 символов')
     }
     
-    // Преобразуем day и month в числа для проверки (они могут быть строками)
     const dayNum = typeof data.day === 'string' ? parseInt(data.day, 10) : data.day
     const monthNum = typeof data.month === 'string' ? parseInt(data.month, 10) : data.month
     
-    // Проверка дня и месяца
     if (dayNum === undefined || dayNum === null || isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
       errors.push('День должен быть от 1 до 31')
     }
@@ -36,7 +35,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       errors.push('Месяц должен быть от 1 до 12')
     }
     
-    // Проверка корректности даты (например, 31 февраля недопустимо)
     if (dayNum && monthNum && !isNaN(dayNum) && !isNaN(monthNum)) {
       const daysInMonth = new Date(2000, monthNum, 0).getDate()
       if (dayNum > daysInMonth) {
@@ -44,7 +42,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       }
     }
     
-    // Проверка длины комментария
     if (data.description && data.description.length > 1000) {
       errors.push('Комментарий не может быть длиннее 1000 символов')
     }
@@ -52,18 +49,16 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     return errors
   }
 
-  // Нормализация даты для редактирования (поддержка обоих вариантов: day/month и date)
+  // Нормализация даты для редактирования
   const normalizeHoliday = (holiday: Holiday): any => {
     try {
       let day: number | undefined
       let month: number | undefined
       
-      // Приоритет: day и month из API ответа
       if (holiday.day !== undefined && holiday.month !== undefined) {
         day = holiday.day
         month = holiday.month
       } else if (holiday.date) {
-        // Fallback: извлечение из date (для обратной совместимости)
         const dateStr = holiday.date.includes('T') ? holiday.date.split('T')[0] : holiday.date
         const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/)
         
@@ -71,7 +66,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
           month = parseInt(dateMatch[2], 10)
           day = parseInt(dateMatch[3], 10)
         } else {
-          // Попытка парсинга через Date
           const date = new Date(holiday.date)
           if (!isNaN(date.getTime())) {
             month = date.getMonth() + 1
@@ -88,7 +82,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       }
     } catch (error) {
       logger.error(`[HolidayManagement] Error in normalizeHoliday:`, error)
-      // Возвращаем безопасные значения по умолчанию
       return {
         name: holiday.name || '',
         day: '',
@@ -98,9 +91,14 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     }
   }
 
+  // Состояния для поиска, сортировки и фильтрации
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortOption, setSortOption] = useState<SortOption>('date')
+  const [filterMonth, setFilterMonth] = useState<number | ''>('')
+
   // Использование общего хука для CRUD операций
   const {
-    items: holidays,
+    items: allHolidays,
     loading,
     creating,
     updating,
@@ -122,7 +120,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
   } = useCRUDManagement<Holiday>({
     loadData: api.getHolidays,
     createItem: async (data) => {
-      // Преобразуем day и month в числа перед отправкой (они хранятся как строки)
       const dayStr = data.day as string | number | undefined
       const monthStr = data.month as string | number | undefined
       
@@ -142,7 +139,6 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       return api.createHoliday(holidayData)
     },
     updateItem: async (id: number, data: any) => {
-      // Преобразуем данные для обновления, конвертируя строки в числа
       const updateData: any = {}
       if (data.name !== undefined) updateData.name = data.name
       if (data.day !== undefined) {
@@ -170,53 +166,127 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     useMountedRef: true,
   })
 
-  // Диагностика изменений editingId (только в dev режиме)
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      logger.info(`[HolidayManagement] editingId changed to: ${editingId}`)
-    }
-  }, [editingId])
+  // Фильтрация, поиск и сортировка
+  const processedHolidays = useMemo(() => {
+    let filtered = [...allHolidays]
 
-  // Диагностическая информация (специфичная для HolidayManagement)
-  const diagnosticInfo = {
-    apiUrl: API_BASE_URL,
-    hasInitData: typeof window !== 'undefined' && !!window.Telegram?.WebApp?.initData,
-    initDataLength: typeof window !== 'undefined' && window.Telegram?.WebApp?.initData 
-      ? window.Telegram.WebApp.initData.length 
-      : 0,
-  }
+    // Поиск по названию
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(h => 
+        h.name.toLowerCase().includes(query) ||
+        (h.description && h.description.toLowerCase().includes(query))
+      )
+    }
+
+    // Фильтр по месяцу
+    if (filterMonth !== '') {
+      filtered = filtered.filter(h => {
+        const month = h.month || (h.date ? new Date(h.date).getMonth() + 1 : 0)
+        return month === filterMonth
+      })
+    }
+
+    // Сортировка
+    filtered.sort((a, b) => {
+      if (sortOption === 'name') {
+        return a.name.localeCompare(b.name, 'ru')
+      } else if (sortOption === 'month') {
+        const monthA = a.month || (a.date ? new Date(a.date).getMonth() + 1 : 0)
+        const monthB = b.month || (b.date ? new Date(b.date).getMonth() + 1 : 0)
+        if (monthA !== monthB) return monthA - monthB
+        const dayA = a.day || (a.date ? new Date(a.date).getDate() : 0)
+        const dayB = b.day || (b.date ? new Date(b.date).getDate() : 0)
+        return dayA - dayB
+      } else { // 'date' - по дате (месяц, затем день)
+        const monthA = a.month || (a.date ? new Date(a.date).getMonth() + 1 : 0)
+        const monthB = b.month || (b.date ? new Date(b.date).getMonth() + 1 : 0)
+        if (monthA !== monthB) return monthA - monthB
+        const dayA = a.day || (a.date ? new Date(a.date).getDate() : 0)
+        const dayB = b.day || (b.date ? new Date(b.date).getDate() : 0)
+        return dayA - dayB
+      }
+    })
+
+    return filtered
+  }, [allHolidays, searchQuery, sortOption, filterMonth])
+
+  // Группировка по месяцам
+  const groupedHolidays = useMemo(() => {
+    const groups: Record<number, Holiday[]> = {}
+    
+    processedHolidays.forEach(holiday => {
+      const month = holiday.month || (holiday.date ? new Date(holiday.date).getMonth() + 1 : 0)
+      if (!groups[month]) {
+        groups[month] = []
+      }
+      groups[month].push(holiday)
+    })
+    
+    return groups
+  }, [processedHolidays])
+
+  const monthNames = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  ]
 
   return (
-    <div className="panel-section">
+    <div className="holiday-management">
       <button className="back-button" onClick={onBack}>🔙 Назад</button>
-      <h2>🎉 Профессиональные праздники</h2>
-
-      {/* Диагностическая информация (только в dev режиме) */}
-      {import.meta.env.DEV && (
-        <div style={{ 
-          padding: '10px', 
-          marginBottom: '10px', 
-          background: '#e3f2fd', 
-          color: '#1976d2', 
-          borderRadius: '4px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}>
-          <strong>🔍 Диагностика:</strong><br/>
-          API URL: {diagnosticInfo.apiUrl}<br/>
-          InitData: {diagnosticInfo.hasInitData ? `✅ (${diagnosticInfo.initDataLength} символов)` : '❌ отсутствует'}
-        </div>
-      )}
+      
+      <h2 className="holiday-management-title">🎉 Профессиональные праздники</h2>
 
       {error && (
-        <div className="error-message" style={{ padding: '10px', marginBottom: '10px', background: '#fee', color: '#c00', borderRadius: '4px', whiteSpace: 'pre-line' }}>
+        <div className="error-message" style={{ whiteSpace: 'pre-line' }}>
           ⚠️ {error}
         </div>
       )}
 
-      <div style={{ marginBottom: '20px' }}>
+      {/* Панель управления: поиск, сортировка, фильтр */}
+      <div className="holiday-controls-panel">
+        <input
+          type="text"
+          className="holiday-search-input"
+          placeholder="🔍 Поиск по названию..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          className="holiday-sort-select"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value as SortOption)}
+        >
+          <option value="date">📅 По дате</option>
+          <option value="month">📆 По месяцам</option>
+          <option value="name">🔤 По алфавиту</option>
+        </select>
+        <select
+          className="holiday-filter-select"
+          value={filterMonth}
+          onChange={(e) => setFilterMonth(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+        >
+          <option value="">Все месяцы</option>
+          {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+            <option key={m} value={m}>
+              {monthNames[m - 1]}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Счетчик результатов */}
+      {(searchQuery || filterMonth !== '' || sortOption !== 'date') && (
+        <div className="holiday-results-count">
+          Найдено: {processedHolidays.length} из {allHolidays.length}
+        </div>
+      )}
+
+      {/* Кнопка добавления */}
+      <div className="holiday-add-button-container">
         <button
           type="button"
+          className="holiday-add-button"
           onClick={() => {
             if (showAddForm) {
               setFormData({ name: '', day: '' as any, month: '' as any, description: '' })
@@ -224,26 +294,13 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             }
             setShowAddForm(!showAddForm)
           }}
-          style={{
-            padding: '12px 20px',
-            backgroundColor: creating || editingId !== null ? '#ccc' : 'var(--color-success)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: creating || editingId !== null ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            opacity: creating || editingId !== null ? 0.6 : 1
-          }}
           disabled={creating || editingId !== null}
         >
-          {showAddForm ? '✖️ Отменить' : '➕ Добавить'}
+          {showAddForm ? '✖️ Отменить' : '➕ Добавить праздник'}
         </button>
       </div>
 
+      {/* Форма добавления */}
       {showAddForm && (
         <form className="panel-form" onSubmit={handleSubmit}>
           <input
@@ -255,45 +312,40 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             disabled={creating}
             maxLength={255}
           />
-          <div>
-            <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
-            <select
-              value={(formData.month !== undefined && formData.month !== null) ? String(formData.month) : ''}
-              onChange={(e) => setFormData({ ...formData, month: (e.target.value || '') as any })}
-              required
-              disabled={creating}
-              style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-            >
-              <option value="">Выберите месяц</option>
-              {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
-                <option key={m} value={m}>
-                  {new Date(2000, m-1, 1).toLocaleString('ru', { month: 'long' })}
-                </option>
-              ))}
-            </select>
+          <div className="holiday-date-inputs">
+            <div>
+              <label>Месяц:</label>
+              <select
+                value={(formData.month !== undefined && formData.month !== null) ? String(formData.month) : ''}
+                onChange={(e) => setFormData({ ...formData, month: (e.target.value || '') as any })}
+                required
+                disabled={creating}
+              >
+                <option value="">Выберите месяц</option>
+                {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                  <option key={m} value={m}>
+                    {monthNames[m - 1]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>День:</label>
+              <input
+                type="number"
+                min="1"
+                max="31"
+                placeholder="День"
+                value={String(formData.day || '')}
+                onChange={(e) => setFormData({ ...formData, day: (e.target.value || '') as any })}
+                required
+                disabled={creating}
+              />
+            </div>
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>День:</label>
-            <input
-              type="number"
-              min="1"
-              max="31"
-              placeholder="День месяца"
-              value={String(formData.day || '')}
-              onChange={(e) => setFormData({ ...formData, day: (e.target.value || '') as any })}
-              required
-              disabled={creating}
-              style={{ width: '100%', padding: '8px' }}
-            />
-            <small style={{ 
-              display: 'block', 
-              marginTop: '4px', 
-              color: 'var(--color-text-muted, var(--color-secondary, #666))',
-              fontSize: '0.875em'
-            }}>
-              ℹ️ Праздник будет ежегодным
-            </small>
-          </div>
+          <small className="holiday-hint">
+            ℹ️ Праздник будет ежегодным
+          </small>
           <textarea
             placeholder="Комментарий (необязательно)"
             value={(formData.description as string) || ''}
@@ -302,234 +354,273 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             maxLength={1000}
           />
           <button type="submit" disabled={creating}>
-            {creating ? '⏳ Добавление...' : 'Добавить'}
+            {creating ? '⏳ Добавление...' : '💾 Добавить'}
           </button>
         </form>
       )}
 
+      {/* Список праздников */}
       {loading ? (
         <p>Загрузка...</p>
+      ) : processedHolidays.length === 0 ? (
+        <div className="panel-empty-state">
+          {allHolidays.length === 0 
+            ? 'Нет праздников. Добавьте первый праздник!'
+            : 'Праздники не найдены по заданным критериям.'}
+        </div>
+      ) : sortOption === 'month' ? (
+        // Группировка по месяцам
+        <div className="holiday-groups">
+          {Object.keys(groupedHolidays)
+            .map(Number)
+            .sort((a, b) => a - b)
+            .map(month => (
+              <div key={month} className="holiday-month-group">
+                <h3 className="holiday-month-title">{monthNames[month - 1]}</h3>
+                <ul className="holiday-list">
+                  {groupedHolidays[month].map((holiday, index) => {
+                    const isValidId = holiday.id != null && typeof holiday.id === 'number' && !isNaN(holiday.id) && holiday.id > 0
+                    const isEditing = isValidId && editingId !== null && editingId === holiday.id
+                    
+                    return (
+                      <li key={holiday.id ?? `holiday-${index}`} className="holiday-card">
+                        {isEditing ? (
+                          <div className="holiday-edit-form">
+                            <form
+                              noValidate
+                              onSubmit={async (e) => {
+                                e.preventDefault()
+                                if (!holiday.id) {
+                                  setError('Ошибка: ID праздника не найден')
+                                  return
+                                }
+                                await handleUpdate(holiday.id)
+                              }}
+                            >
+                              <input
+                                type="text"
+                                placeholder="Название праздника"
+                                value={(editFormData.name as string) || ''}
+                                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                                disabled={updating === holiday.id || showAddForm}
+                                maxLength={255}
+                              />
+                              <div className="holiday-date-inputs">
+                                <div>
+                                  <label>Месяц:</label>
+                                  <select
+                                    value={String(editFormData.month || '')}
+                                    onChange={(e) => setEditFormData({ ...editFormData, month: (e.target.value || '') as any })}
+                                    disabled={updating === holiday.id || showAddForm}
+                                  >
+                                    <option value="">Выберите месяц</option>
+                                    {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                                      <option key={m} value={m}>
+                                        {monthNames[m - 1]}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label>День:</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    placeholder="День"
+                                    value={String(editFormData.day || '')}
+                                    onChange={(e) => setEditFormData({ ...editFormData, day: (e.target.value || '') as any })}
+                                    disabled={updating === holiday.id || showAddForm}
+                                  />
+                                </div>
+                              </div>
+                              <textarea
+                                placeholder="Комментарий (необязательно)"
+                                value={(editFormData.description as string) || ''}
+                                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                                disabled={updating === holiday.id || showAddForm}
+                                maxLength={1000}
+                              />
+                              <div className="holiday-form-actions">
+                                <button type="button" onClick={handleCancelEdit} disabled={updating === holiday.id || showAddForm}>
+                                  Отменить
+                                </button>
+                                <button type="submit" disabled={updating === holiday.id || showAddForm}>
+                                  {updating === holiday.id ? '⏳ Сохранение...' : '💾 Сохранить'}
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        ) : (
+                          <div className="holiday-card-content">
+                            <div className="holiday-card-header">
+                              <strong className="holiday-name">{holiday.name}</strong>
+                              <span className="holiday-date">
+                                {holiday.day && holiday.month 
+                                  ? `${String(holiday.day).padStart(2, '0')}.${String(holiday.month).padStart(2, '0')}`
+                                  : holiday.date || 'Дата не указана'}
+                              </span>
+                            </div>
+                            {holiday.description && (
+                              <p className="holiday-description">{holiday.description}</p>
+                            )}
+                            <div className="holiday-card-actions">
+                              <button
+                                className="holiday-edit-button"
+                                onClick={() => {
+                                  if (!holiday.id || holiday.id === 0) {
+                                    setError('Ошибка: ID праздника не найден')
+                                    return
+                                  }
+                                  handleEdit(holiday.id)
+                                }}
+                                disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                              >
+                                ✏️ Редактировать
+                              </button>
+                              <button
+                                className="holiday-delete-button"
+                                onClick={() => {
+                                  if (!holiday.id || holiday.id === 0) {
+                                    setError('Ошибка: ID праздника не найден')
+                                    return
+                                  }
+                                  handleDelete(holiday.id)
+                                }}
+                                disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                              >
+                                {deleting === holiday.id ? '⏳ Удаление...' : '🗑️ Удалить'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+        </div>
       ) : (
-        <ul className="panel-list">
-          {holidays.map((holiday, index) => {
-            // Проверка валидности id
+        // Обычный список (без группировки)
+        <ul className="holiday-list">
+          {processedHolidays.map((holiday, index) => {
             const isValidId = holiday.id != null && typeof holiday.id === 'number' && !isNaN(holiday.id) && holiday.id > 0
             const isEditing = isValidId && editingId !== null && editingId === holiday.id
             
-            if (import.meta.env.DEV) {
-              logger.info(`[HolidayManagement] Rendering holiday id=${holiday.id}, editingId=${editingId}, isValidId=${isValidId}, isEditing=${isEditing}`)
-            }
-            
             return (
-            <li key={holiday.id ?? `holiday-${index}`} className="panel-list-item">
-              {isEditing ? (
-                <div style={{ width: '100%' }}>
-                  {!editFormData.name ? (
-                    <div style={{ 
-                      padding: '10px', 
-                      background: '#fee', 
-                      color: '#c00', 
-                      borderRadius: '4px',
-                      marginBottom: '10px'
-                    }}>
-                      ⚠️ Ошибка: данные для редактирования не загружены. Попробуйте обновить страницу.
-                      <button 
-                        onClick={handleCancelEdit}
-                        style={{ marginLeft: '10px', padding: '5px 10px' }}
-                      >
-                        Закрыть
-                      </button>
-                    </div>
-                  ) : (
+              <li key={holiday.id ?? `holiday-${index}`} className="holiday-card">
+                {isEditing ? (
+                  <div className="holiday-edit-form">
                     <form
                       noValidate
                       onSubmit={async (e) => {
                         e.preventDefault()
-                        logger.info(`[HolidayManagement] Form submitted for holiday id=${holiday.id}`)
-                        
                         if (!holiday.id) {
-                          logger.error('[HolidayManagement] Cannot update: holiday id is missing')
                           setError('Ошибка: ID праздника не найден')
                           return
                         }
-                        
                         await handleUpdate(holiday.id)
                       }}
-                      style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
                     >
-                    <input
-                      type="text"
-                      placeholder="Название праздника"
-                      value={(editFormData.name as string) || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                      disabled={updating === holiday.id || showAddForm}
-                      maxLength={255}
-                    />
-                    <div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
-                      <select
-                        value={String(editFormData.month || '')}
-                        onChange={(e) => setEditFormData({ ...editFormData, month: (e.target.value || '') as any })}
-                        disabled={updating === holiday.id || showAddForm}
-                        style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-                      >
-                        <option value="">Выберите месяц</option>
-                        {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
-                          <option key={m} value={m}>
-                            {new Date(2000, m-1, 1).toLocaleString('ru', { month: 'long' })}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>День:</label>
                       <input
-                        type="number"
-                        min="1"
-                        max="31"
-                        placeholder="День месяца"
-                        value={String(editFormData.day || '')}
-                        onChange={(e) => setEditFormData({ ...editFormData, day: (e.target.value || '') as any })}
+                        type="text"
+                        placeholder="Название праздника"
+                        value={(editFormData.name as string) || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                         disabled={updating === holiday.id || showAddForm}
-                        style={{ width: '100%', padding: '8px' }}
+                        maxLength={255}
                       />
-                      <small style={{ 
-                        display: 'block', 
-                        marginTop: '4px', 
-                        color: 'var(--color-text-muted, var(--color-secondary, #666))',
-                        fontSize: '0.875em'
-                      }}>
-                        ℹ️ Праздник будет ежегодным
-                      </small>
-                    </div>
-                      <small style={{ 
-                        display: 'block', 
-                        marginTop: '4px', 
-                        color: 'var(--color-text-muted, var(--color-secondary, #666))',
-                        fontSize: '0.875em'
-                      }}>
-                        ℹ️ Год не важен, праздник будет ежегодным
-                      </small>
-                    </div>
-                    <textarea
-                      placeholder="Комментарий (необязательно)"
-                      value={(editFormData.description as string) || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                      disabled={updating === holiday.id || showAddForm}
-                      maxLength={1000}
-                    />
-                    {error && (
-                      <div style={{ 
-                        color: 'red', 
-                        backgroundColor: '#ffebee', 
-                        padding: '10px', 
-                        borderRadius: '4px',
-                        border: '1px solid #f44336',
-                        marginTop: '5px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        whiteSpace: 'pre-line'
-                      }}>
-                        {error}
+                      <div className="holiday-date-inputs">
+                        <div>
+                          <label>Месяц:</label>
+                          <select
+                            value={String(editFormData.month || '')}
+                            onChange={(e) => setEditFormData({ ...editFormData, month: (e.target.value || '') as any })}
+                            disabled={updating === holiday.id || showAddForm}
+                          >
+                            <option value="">Выберите месяц</option>
+                            {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                              <option key={m} value={m}>
+                                {monthNames[m - 1]}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label>День:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="31"
+                            placeholder="День"
+                            value={String(editFormData.day || '')}
+                            onChange={(e) => setEditFormData({ ...editFormData, day: (e.target.value || '') as any })}
+                            disabled={updating === holiday.id || showAddForm}
+                          />
+                        </div>
                       </div>
+                      <textarea
+                        placeholder="Комментарий (необязательно)"
+                        value={(editFormData.description as string) || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                        disabled={updating === holiday.id || showAddForm}
+                        maxLength={1000}
+                      />
+                      <div className="holiday-form-actions">
+                        <button type="button" onClick={handleCancelEdit} disabled={updating === holiday.id || showAddForm}>
+                          Отменить
+                        </button>
+                        <button type="submit" disabled={updating === holiday.id || showAddForm}>
+                          {updating === holiday.id ? '⏳ Сохранение...' : '💾 Сохранить'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="holiday-card-content">
+                    <div className="holiday-card-header">
+                      <strong className="holiday-name">{holiday.name}</strong>
+                      <span className="holiday-date">
+                        {holiday.day && holiday.month 
+                          ? `${String(holiday.day).padStart(2, '0')}.${String(holiday.month).padStart(2, '0')}`
+                          : holiday.date || 'Дата не указана'}
+                      </span>
+                    </div>
+                    {holiday.description && (
+                      <p className="holiday-description">{holiday.description}</p>
                     )}
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                      <button type="button" onClick={handleCancelEdit} disabled={updating === holiday.id || showAddForm} style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#f0f0f0',
-                        color: '#333',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        cursor: updating === holiday.id || showAddForm ? 'not-allowed' : 'pointer',
-                        fontSize: '14px'
-                      }}>
-                        Отменить
+                    <div className="holiday-card-actions">
+                      <button
+                        className="holiday-edit-button"
+                        onClick={() => {
+                          if (!holiday.id || holiday.id === 0) {
+                            setError('Ошибка: ID праздника не найден')
+                            return
+                          }
+                          handleEdit(holiday.id)
+                        }}
+                        disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                      >
+                        ✏️ Редактировать
                       </button>
-                      <button type="submit" disabled={updating === holiday.id || showAddForm} style={{
-                        padding: '8px 16px',
-                        backgroundColor: updating === holiday.id || showAddForm ? '#ccc' : 'var(--color-primary)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: updating === holiday.id || showAddForm ? 'not-allowed' : 'pointer',
-                        fontSize: '14px'
-                      }}>
-                        {updating === holiday.id ? '⏳ Сохранение...' : '💾 Сохранить'}
+                      <button
+                        className="holiday-delete-button"
+                        onClick={() => {
+                          if (!holiday.id || holiday.id === 0) {
+                            setError('Ошибка: ID праздника не найден')
+                            return
+                          }
+                          handleDelete(holiday.id)
+                        }}
+                        disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
+                      >
+                        {deleting === holiday.id ? '⏳ Удаление...' : '🗑️ Удалить'}
                       </button>
                     </div>
-                  </form>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <strong>{holiday.name}</strong>
-                    <br />
-                    {holiday.day && holiday.month 
-                      ? `${String(holiday.day).padStart(2, '0')}.${String(holiday.month).padStart(2, '0')}`
-                      : holiday.date || 'Дата не указана'
-                    } {holiday.description && `(${holiday.description})`}
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <button 
-                      onClick={() => {
-                        if (!holiday.id || holiday.id === 0) {
-                          logger.error('[HolidayManagement] Cannot edit: holiday id is missing or invalid', holiday)
-                          setError('Ошибка: ID праздника не найден')
-                          return
-                        }
-                        logger.info(`[HolidayManagement] Edit button clicked for id=${holiday.id}, current editingId=${editingId}`)
-                        handleEdit(holiday.id)
-                        logger.info(`[HolidayManagement] After handleEdit call, editingId should be=${holiday.id}`)
-                      }}
-                      disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId ? '#ccc' : 'var(--color-primary)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId ? 'not-allowed' : 'pointer',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        opacity: deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId ? 0.6 : 1
-                      }}
-                    >
-                      ✏️ Редактировать
-                    </button>
-                    <button 
-                      onClick={() => {
-                        if (!holiday.id || holiday.id === 0) {
-                          logger.error('[HolidayManagement] Cannot delete: holiday id is missing or invalid')
-                          setError('Ошибка: ID праздника не найден')
-                          return
-                        }
-                        handleDelete(holiday.id)
-                      }}
-                      disabled={deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: 'var(--color-danger)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        opacity: deleting === holiday.id || updating === holiday.id || editingId === holiday.id || showAddForm || !isValidId ? 0.6 : 1
-                      }}
-                    >
-                      {deleting === holiday.id ? '⏳ Удаление...' : '🗑️ Удалить'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </li>
+                )}
+              </li>
             )
           })}
         </ul>
@@ -537,4 +628,3 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     </div>
   )
 }
-

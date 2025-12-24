@@ -9,6 +9,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.factories.use_case_factory import UseCaseFactory
+from src.application.use_cases.holiday.get_all_holidays import GetAllHolidaysUseCase
 from src.domain.exceptions.not_found import BirthdayNotFoundError
 from src.infrastructure.config.rate_limits import (
     ACCESS_CHECK_LIMIT,
@@ -589,22 +590,29 @@ async def delete_birthday_user(
 async def list_holidays_user(
     request: Request,
     user: dict = Depends(verify_telegram_auth),  # Только Telegram auth, без panel access
-    factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
+    session: AsyncSession = Depends(get_db_session),
+    factory: UseCaseFactory = Depends(get_use_case_factory),
 ):
-    """Список всех праздников (для Mini App)."""
-    use_cases = factory.create_holiday_use_cases()
-    use_case = use_cases["get_all"]
+    """Список всех управляемых праздников (только из БД, для Mini App)."""
+    # Для управления используем только БД репозиторий, чтобы исключить JSON-праздники
+    from src.infrastructure.database.repositories.holiday_repository_impl import HolidayRepositoryImpl
+    db_repo = HolidayRepositoryImpl(session)
+    use_case = GetAllHolidaysUseCase(db_repo)
     holidays = await use_case.execute()
+    
+    # Фильтруем только праздники с валидным ID (из БД)
+    managed_holidays = [h for h in holidays if h.id is not None and h.id > 0]
+    
     return [
         {
-            "id": h.id if h.id is not None else 0,  # Используем 0 если id=None
+            "id": h.id,
             "name": h.name,
             "day": h.date.day,
             "month": h.date.month,
             "description": h.description,
             "date": h.date.isoformat(),  # Для обратной совместимости
         }
-        for h in holidays
+        for h in managed_holidays
     ]
 
 
