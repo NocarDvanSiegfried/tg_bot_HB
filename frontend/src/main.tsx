@@ -2,8 +2,12 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'
+import { initTheme } from './utils/theme'
 import './styles/tokens.css'
 import './index.css'
+
+// Инициализация темы при загрузке
+initTheme()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>

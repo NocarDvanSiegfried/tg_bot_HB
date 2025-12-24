@@ -15,9 +15,10 @@
 }
 
 .panel-description {
-  color: #666;
+  color: var(--color-text-secondary, #666);
   font-size: 14px;
   margin-bottom: 20px;
+  transition: var(--transition-theme);
 }
 
 .panel-buttons {
@@ -29,16 +30,17 @@
 .panel-button {
   padding: 15px;
   font-size: 16px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid var(--color-border, #ddd);
+  background: var(--color-bg-primary, white);
+  color: var(--color-text-primary);
   cursor: pointer;
   border-radius: 8px;
   text-align: left;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: var(--transition-theme);
 }
 
 .panel-button:hover {
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-tertiary, #f0f0f0);
   transform: translateY(-1px);
 }
 
@@ -63,15 +65,17 @@
 .panel-main button {
   padding: 15px;
   font-size: 16px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid var(--color-border, #ddd);
+  background: var(--color-bg-primary, white);
+  color: var(--color-text-primary);
   cursor: pointer;
   border-radius: 8px;
   text-align: left;
+  transition: var(--transition-theme);
 }
 
 .panel-main button:hover {
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-tertiary, #f0f0f0);
 }
 
 .panel-section {
@@ -92,8 +96,18 @@
 .panel-form input,
 .panel-form textarea {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border, #ddd);
   border-radius: var(--border-radius-sm);
+  background: var(--color-bg-primary, white);
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
+}
+
+.panel-form input:focus,
+.panel-form textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
 .panel-form button {
@@ -117,11 +131,13 @@
 .panel-list-item {
   padding: 15px;
   margin-bottom: 10px;
-  background: #f9f9f9;
+  background: var(--color-bg-secondary, #f9f9f9);
   border-radius: 4px;
+  border: 1px solid var(--color-border-light, transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: var(--transition-theme);
 }
 
 .panel-list-item button {
@@ -149,7 +165,8 @@
   font-size: 24px;
   font-weight: 600;
   margin: 0 0 var(--spacing-xl) 0;
-  color: #333;
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .diagnostic-info {
@@ -174,11 +191,14 @@
 .birthday-filter-select {
   flex: 1;
   padding: var(--spacing-md);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border, #ddd);
   border-radius: var(--border-radius-sm);
   font-size: 14px;
   height: 44px; /* Одинаковая высота */
   box-sizing: border-box;
+  background: var(--color-bg-primary, white);
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .birthday-search-input:focus,
@@ -221,7 +241,7 @@
 }
 
 .birthday-add-button:disabled {
-  background-color: #ccc;
+  background-color: var(--color-border, #ccc);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -233,12 +253,13 @@
   align-items: center;
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--color-bg-primary, white);
+  border: 1px solid var(--color-border, #e0e0e0);
   border-radius: var(--border-radius-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.3s ease-in;
   gap: var(--spacing-lg);
+  transition: var(--transition-theme);
 }
 
 .birthday-card-content {
@@ -249,8 +270,9 @@
 .birthday-card-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: var(--spacing-xs);
+  transition: var(--transition-theme);
 }
 
 .birthday-card-company-position {
@@ -327,7 +349,7 @@
 }
 
 .birthday-action-button:disabled {
-  background-color: #ccc;
+  background-color: var(--color-border, #ccc);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -336,38 +358,75 @@
 @media (max-width: 768px) {
   .birthday-controls-panel {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
 
   .birthday-card {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
   }
 
   .birthday-card-actions {
     flex-direction: row;
     justify-content: stretch;
+    gap: var(--spacing-md);
   }
 
   .birthday-action-button {
     flex: 1;
     min-width: auto;
   }
+
+  /* Увеличить отступы для мобильных в тёмной теме */
+  .calendar-container {
+    padding: var(--spacing-lg);
+  }
+
+  .date-view {
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+  }
+
+  .birthday-management {
+    padding: var(--spacing-lg);
+  }
+
+  /* Меньше визуального шума на мобильных */
+  .calendar-day {
+    border-width: 1px;
+    min-height: 45px;
+    padding: var(--spacing-sm);
+  }
+
+  .calendar-day-header {
+    padding: var(--spacing-sm);
+  }
+
+  /* Мягкие границы для мобильных */
+  .birthday-card,
+  .holiday-card {
+    border-width: 1px;
+    box-shadow: none;
+  }
 }
 
 .back-button {
   margin-bottom: var(--spacing-xl);
   padding: 10px;
-  background-color: #6c757d;
+  background-color: var(--color-secondary, #6c757d);
   color: white;
   border: none;
   border-radius: var(--border-radius-sm);
   cursor: pointer;
+  transition: var(--transition-theme);
 }
 
 .back-button:hover {
-  background-color: #5a6268;
+  background-color: var(--color-text-muted, #5a6268);
+  opacity: 0.9;
 }
 
 /* Анимация появления */
@@ -388,8 +447,10 @@
   text-align: center;
   color: var(--color-text-muted, var(--color-secondary, #666));
   font-style: italic;
-  background: #f9f9f9;
+  background: var(--color-bg-secondary, #f9f9f9);
   border-radius: var(--border-radius-md);
   margin: var(--spacing-md) 0;
+  border: 1px solid var(--color-border-light, transparent);
+  transition: var(--transition-theme);
 }
 

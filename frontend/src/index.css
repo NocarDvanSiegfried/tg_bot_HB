@@ -10,11 +10,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-primary, #ffffff);
+  color: var(--color-text-primary, #333333);
+  transition: var(--transition-theme);
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  background-color: var(--color-bg-primary, #ffffff);
+  transition: var(--transition-theme);
 }
 
 .app {
@@ -49,8 +54,9 @@ body {
 
 .app-loading p {
   font-size: 16px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
   margin-top: 10px;
+  transition: var(--transition-theme);
 }
 
 .app-error-message {
@@ -59,13 +65,14 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 193, 7, 0.95);
-  color: #856404;
+  color: var(--color-text-primary, #856404);
   padding: 15px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 90%;
   z-index: 1000;
   text-align: center;
+  transition: var(--transition-theme);
 }
 
 .app-error-message p {

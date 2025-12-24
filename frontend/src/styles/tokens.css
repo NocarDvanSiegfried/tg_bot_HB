@@ -6,7 +6,7 @@
  */
 
 :root {
-  /* Цвета */
+  /* Светлая тема - Цвета */
   --color-primary: #007bff;
   --color-primary-dark: #0056b3;
   --color-success: #28a745;
@@ -16,6 +16,19 @@
   --color-warning: #ffc107;
   --color-secondary: #666;
   --color-text-muted: #666;
+  
+  /* Светлая тема - Фоны */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9f9f9;
+  --color-bg-tertiary: #f0f0f0;
+  
+  /* Светлая тема - Текст */
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  
+  /* Светлая тема - Границы */
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
   
   /* Spacing tokens */
   --spacing-xs: 4px;
@@ -29,5 +42,64 @@
   --size-calendar-max-width: 600px;
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
+  
+  /* Transitions */
+  --transition-theme: all 0.3s ease;
+}
+
+/* Тёмная тема - через data-theme атрибут */
+[data-theme="dark"] {
+  /* Тёмная тема - Акценты (адаптированные для тёмного фона) */
+  --color-primary: #4a9eff;
+  --color-primary-dark: #357abd;
+  --color-success: #4caf50;
+  --color-success-hover: #45a049;
+  --color-danger: #f44336;
+  --color-danger-hover: #e53935;
+  --color-warning: #ffb74d;
+  --color-secondary: rgba(255, 255, 255, 0.6);
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+  
+  /* Тёмная тема - Фоны */
+  --color-bg-primary: #1a1a1a;
+  --color-bg-secondary: #242424;
+  --color-bg-tertiary: #2d2d2d;
+  
+  /* Тёмная тема - Текст */
+  --color-text-primary: rgba(255, 255, 255, 0.9);
+  --color-text-secondary: rgba(255, 255, 255, 0.6);
+  
+  /* Тёмная тема - Границы */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-light: rgba(255, 255, 255, 0.05);
+}
+
+/* Тёмная тема - через системные настройки (fallback) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Тёмная тема - Акценты (адаптированные для тёмного фона) */
+    --color-primary: #4a9eff;
+    --color-primary-dark: #357abd;
+    --color-success: #4caf50;
+    --color-success-hover: #45a049;
+    --color-danger: #f44336;
+    --color-danger-hover: #e53935;
+    --color-warning: #ffb74d;
+    --color-secondary: rgba(255, 255, 255, 0.6);
+    --color-text-muted: rgba(255, 255, 255, 0.6);
+    
+    /* Тёмная тема - Фоны */
+    --color-bg-primary: #1a1a1a;
+    --color-bg-secondary: #242424;
+    --color-bg-tertiary: #2d2d2d;
+    
+    /* Тёмная тема - Текст */
+    --color-text-primary: rgba(255, 255, 255, 0.9);
+    --color-text-secondary: rgba(255, 255, 255, 0.6);
+    
+    /* Тёмная тема - Границы */
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-light: rgba(255, 255, 255, 0.05);
+  }
 }
 

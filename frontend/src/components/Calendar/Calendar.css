@@ -65,13 +65,15 @@
   text-align: center;
   font-weight: 600;
   padding: 10px;
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-tertiary, #f0f0f0);
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .calendar-day {
   padding: 10px;
-  border: 1px solid #e0e0e0;
-  background: white;
+  border: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-bg-primary, white);
   cursor: pointer;
   text-align: center;
   position: relative;
@@ -80,57 +82,58 @@
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  transition: all 0.2s ease;
+  transition: var(--transition-theme);
+  color: var(--color-text-primary);
 }
 
 .calendar-day:hover {
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-tertiary, #f0f0f0);
   border-color: var(--color-primary);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .calendar-day.selected {
-  background-color: rgba(0, 123, 255, 0.2);
+  background-color: rgba(0, 123, 255, 0.15);
   color: var(--color-primary);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   font-weight: 600;
 }
 
 .calendar-day.selected:hover {
-  background-color: var(--color-primary-dark);
-  transform: scale(1.05);
+  background-color: rgba(0, 123, 255, 0.2);
+  transform: scale(1.02);
 }
 
 .calendar-day.has-birthday {
   border-color: var(--color-warning);
-  background: linear-gradient(to bottom, #fff9e6 0%, #ffffff 100%);
+  background: var(--color-bg-primary, white);
 }
 
 .calendar-day.has-birthday:hover {
-  background: linear-gradient(to bottom, #fff3cd 0%, #fff9e6 100%);
-  border-color: #ff9800;
+  background-color: var(--color-bg-tertiary, #f0f0f0);
+  border-color: var(--color-warning);
 }
 
 .calendar-day.selected.has-birthday {
-  background: linear-gradient(to bottom, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-  border-color: #004085;
+  background-color: rgba(0, 123, 255, 0.15);
+  border-color: var(--color-primary);
 }
 
 .calendar-day.today {
   border-color: var(--color-success);
-  border-width: 3px;
+  border-width: 1px;
   font-weight: bold;
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
 .calendar-day.today:not(.selected) {
-  background: linear-gradient(to bottom, #d4edda 0%, #ffffff 100%);
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
-/* Удаляем старые стили для today.has-birthday */
-
 .calendar-day.today.selected {
-  border-color: var(--color-primary-dark);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4), 0 0 0 2px rgba(40, 167, 69, 0.3);
+  background-color: rgba(0, 123, 255, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: none;
 }
 
 .calendar-day .day-number {
@@ -138,18 +141,53 @@
   line-height: 1.2;
 }
 
+/* Индикаторы событий */
+.day-indicators {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.indicator-badge {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.indicator-badge.birthday {
+  opacity: 0.7;
+}
+
+.indicator-badge.holiday {
+  opacity: 0.7;
+}
+
+.indicator-badge.combined {
+  opacity: 0.8;
+}
+
+.calendar-day.selected .indicator-badge {
+  opacity: 0.9;
+}
+
 /* Старые индикаторы заменены на новые */
 
 .date-view {
   margin-top: var(--spacing-xl);
   padding: var(--spacing-xl);
-  background-color: #f9f9f9;
+  background-color: var(--color-bg-secondary, #f9f9f9);
   border-radius: var(--border-radius-md);
+  transition: var(--transition-theme);
 }
 
 .date-view h3 {
   margin-bottom: 15px;
   font-size: 18px;
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .date-section {
@@ -159,6 +197,8 @@
 .date-section h4 {
   margin-bottom: 10px;
   font-size: 16px;
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .date-section h4.holidays-header-clickable {
@@ -176,19 +216,82 @@
 .birthday-item,
 /* Карточки праздников */
 .holiday-card {
-  background: white;
+  background: var(--color-bg-primary, white);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border-light, transparent);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.3s ease-in;
+  transition: var(--transition-theme);
+}
+
+/* Карточки дней рождения в DateView */
+.birthday-card {
+  background: var(--color-bg-primary, white);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border-light, transparent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in;
+  transition: var(--transition-theme);
+}
+
+.birthday-card-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.birthday-card-header .birthday-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  transition: var(--transition-theme);
+}
+
+.birthday-card-body {
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
+}
+
+.birthday-card-body p {
+  margin: var(--spacing-xs) 0;
+  color: var(--color-text-primary);
+}
+
+.birthday-company-position {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.birthday-age {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.birthday-comment {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: 13px;
+}
+
+.birthday-responsible {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.birthday-responsible strong {
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .holiday-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0 0 var(--spacing-xs) 0;
+  transition: var(--transition-theme);
 }
 
 .holiday-description {
@@ -200,8 +303,10 @@
 .holiday-item {
   padding: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
-  background: white;
+  background: var(--color-bg-primary, white);
   border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-light, transparent);
+  transition: var(--transition-theme);
 }
 
 .birthday-item p,
@@ -229,10 +334,11 @@
 .error-message {
   padding: var(--spacing-xl);
   text-align: center;
-  background-color: #fff3cd;
+  background-color: rgba(255, 193, 7, 0.1);
   border: 1px solid var(--color-warning);
   border-radius: var(--border-radius-md);
-  color: #856404;
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
 }
 
 .error-message p {
