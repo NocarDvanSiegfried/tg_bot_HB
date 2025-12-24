@@ -144,6 +144,26 @@ class CardGeneratorImpl(CardGeneratorPort):
         
         return all_lines if all_lines else [text]
 
+    def _validate_anchor(self, anchor: str) -> str:
+        """Валидировать и нормализовать anchor параметр."""
+        # Проверяем тип
+        if not isinstance(anchor, str):
+            logger.warning(f"[CardGeneratorImpl] Invalid anchor type: {type(anchor)}, using 'mm'")
+            return "mm"
+        
+        # Проверяем длину
+        if len(anchor) != 2:
+            logger.warning(f"[CardGeneratorImpl] Invalid anchor length: {len(anchor)}, using 'mm'")
+            return "mm"
+        
+        # Проверяем допустимые значения (Pillow поддерживает: lt, lm, lb, mt, mm, mb, rt, rm, rb, la, ma, ra)
+        valid_anchors = ["lt", "lm", "lb", "mt", "mm", "mb", "rt", "rm", "rb", "la", "ma", "ra"]
+        if anchor not in valid_anchors:
+            logger.warning(f"[CardGeneratorImpl] Invalid anchor value: {anchor}, using 'mm'")
+            return "mm"
+        
+        return anchor
+
     def _draw_text_multiline(
         self,
         draw: ImageDraw.ImageDraw,
@@ -156,6 +176,9 @@ class CardGeneratorImpl(CardGeneratorPort):
         anchor: str = "mm",
     ) -> int:
         """Нарисовать многострочный текст с правильным переносом."""
+        # ВАЛИДАЦИЯ: anchor должен быть строго 2 символа
+        anchor = self._validate_anchor(anchor)
+        
         lines = self._wrap_text(text, font, max_width)
         x, y = position
         
@@ -166,12 +189,24 @@ class CardGeneratorImpl(CardGeneratorPort):
         except Exception:
             line_height = font.size if hasattr(font, 'size') else 20
         
-        # Рисуем текст построчно
-        # Для anchor="mm" используем горизонтальное центрирование, вертикальное - сверху вниз
-        text_anchor = "m" if "m" in anchor else anchor[0]  # Горизонтальное центрирование
+        # Для многострочного текста используем горизонтальное центрирование
+        # Вертикальное выравнивание - по базовой линии (ma = middle-ascent)
+        # Если ma не поддерживается, используем mm (middle-middle)
+        text_anchor = "ma"  # middle-ascent: горизонтально по центру, вертикально по базовой линии
+        # Проверяем валидность
+        text_anchor = self._validate_anchor(text_anchor)
         
+        # Рисуем текст построчно
         for line in lines:
-            draw.text((x, y), line, fill=fill, font=font, anchor=text_anchor)
+            try:
+                draw.text((x, y), line, fill=fill, font=font, anchor=text_anchor)
+            except ValueError as e:
+                if "anchor" in str(e).lower():
+                    logger.error(f"[CardGeneratorImpl] Anchor error: {e}, using fallback 'mm'")
+                    text_anchor = "mm"
+                    draw.text((x, y), line, fill=fill, font=font, anchor=text_anchor)
+                else:
+                    raise
             y += line_height + line_spacing
         
         return y
@@ -246,35 +281,53 @@ class CardGeneratorImpl(CardGeneratorPort):
         
         y_offset = padding_y
 
-        # Заголовок
-        draw.text(
-            (self.width // 2, y_offset),
-            "С Днем Рождения!",
-            fill=self.accent_color,
-            font=title_font,
-            anchor="mm",
-        )
+        # Заголовок (центрированный)
+        try:
+            draw.text(
+                (self.width // 2, y_offset),
+                "С Днем Рождения!",
+                fill=self.accent_color,
+                font=title_font,
+                anchor="mm",
+            )
+        except ValueError as e:
+            if "anchor" in str(e).lower():
+                logger.error(f"[CardGeneratorImpl] Anchor error in title: {e}")
+                raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
+            raise
         y_offset += 90
 
-        # ФИО
-        draw.text(
-            (self.width // 2, y_offset),
-            full_name,
-            fill=self.text_color,
-            font=name_font,
-            anchor="mm",
-        )
+        # ФИО (центрированный)
+        try:
+            draw.text(
+                (self.width // 2, y_offset),
+                full_name,
+                fill=self.text_color,
+                font=name_font,
+                anchor="mm",
+            )
+        except ValueError as e:
+            if "anchor" in str(e).lower():
+                logger.error(f"[CardGeneratorImpl] Anchor error in name: {e}")
+                raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
+            raise
         y_offset += 50
 
-        # Компания и должность
+        # Компания и должность (центрированный)
         company_position = f"{company}, {position}"
-        draw.text(
-            (self.width // 2, y_offset),
-            company_position,
-            fill=self.subtitle_color,
-            font=text_font,
-            anchor="mm",
-        )
+        try:
+            draw.text(
+                (self.width // 2, y_offset),
+                company_position,
+                fill=self.subtitle_color,
+                font=text_font,
+                anchor="mm",
+            )
+        except ValueError as e:
+            if "anchor" in str(e).lower():
+                logger.error(f"[CardGeneratorImpl] Anchor error in company/position: {e}")
+                raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
+            raise
         y_offset += 70
 
         # Поздравительный текст
@@ -299,16 +352,22 @@ class CardGeneratorImpl(CardGeneratorPort):
             anchor="mm",
         )
 
-        # Комментарий (если есть)
+        # Комментарий (если есть, центрированный)
         if comment:
             y_offset += 30
-            draw.text(
-                (self.width // 2, y_offset),
-                f"Комментарий: {comment}",
-                fill=self.subtitle_color,
-                font=small_font,
-                anchor="mm",
-            )
+            try:
+                draw.text(
+                    (self.width // 2, y_offset),
+                    f"Комментарий: {comment}",
+                    fill=self.subtitle_color,
+                    font=small_font,
+                    anchor="mm",
+                )
+            except ValueError as e:
+                if "anchor" in str(e).lower():
+                    logger.error(f"[CardGeneratorImpl] Anchor error in comment: {e}")
+                    raise InvalidGreetingTextError("Card rendering failed: invalid text layout configuration") from e
+                raise
 
         # QR-код (всегда в правом нижнем углу)
         if qr_url:
