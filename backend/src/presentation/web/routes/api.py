@@ -3,7 +3,7 @@ import logging
 from datetime import date
 
 from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query, Request, Response
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -70,7 +70,8 @@ class BirthdayUpdate(BaseModel):
 
 class HolidayCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="Название праздника")
-    holiday_date: date = Field(..., description="Дата праздника (день и месяц, год игнорируется)")
+    day: int = Field(..., ge=1, le=31, description="День месяца (1-31)")
+    month: int = Field(..., ge=1, le=12, description="Месяц (1-12)")
     description: str | None = Field(None, max_length=1000, description="Комментарий")
 
     @field_validator("name")
@@ -81,10 +82,21 @@ class HolidayCreate(BaseModel):
             raise ValueError("Field cannot be empty")
         return v.strip()
 
+    @model_validator(mode='after')
+    def validate_date_combination(self):
+        """Проверка корректности комбинации дня и месяца."""
+        from calendar import monthrange
+        
+        max_day = monthrange(date.today().year, self.month)[1]
+        if self.day > max_day:
+            raise ValueError(f"Day {self.day} is invalid for month {self.month}. Maximum day is {max_day}.")
+        return self
+
 
 class HolidayUpdate(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=255, description="Название праздника")
-    holiday_date: date | None = Field(None, description="Дата праздника")
+    day: int | None = Field(None, ge=1, le=31, description="День месяца (1-31)")
+    month: int | None = Field(None, ge=1, le=12, description="Месяц (1-12)")
     description: str | None = Field(None, max_length=1000, description="Комментарий")
 
     @field_validator("name")
@@ -94,6 +106,17 @@ class HolidayUpdate(BaseModel):
         if v is not None and (not v or not v.strip()):
             raise ValueError("Field cannot be empty if provided")
         return v.strip() if v else None
+
+    @model_validator(mode='after')
+    def validate_date_combination(self):
+        """Проверка корректности комбинации дня и месяца (если оба предоставлены)."""
+        if self.day is not None and self.month is not None:
+            from calendar import monthrange
+            
+            max_day = monthrange(date.today().year, self.month)[1]
+            if self.day > max_day:
+                raise ValueError(f"Day {self.day} is invalid for month {self.month}. Maximum day is {max_day}.")
+        return self
 
 
 class ResponsibleCreate(BaseModel):
@@ -597,12 +620,22 @@ async def create_holiday_user(
     use_cases = factory.create_holiday_use_cases()
     use_case = use_cases["create"]
 
-    # Нормализуем дату: используем только день и месяц, год устанавливаем в текущий
+    # Проверка корректности даты (день для выбранного месяца)
     from datetime import date as date_class
+    from calendar import monthrange
+    
+    max_day = monthrange(date_class.today().year, data.month)[1]
+    if data.day > max_day:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Day {data.day} is invalid for month {data.month}. Maximum day is {max_day}."
+        )
+
+    # Нормализуем дату: используем только день и месяц, год устанавливаем в текущий
     normalized_date = date_class(
         date_class.today().year,
-        data.holiday_date.month,
-        data.holiday_date.day,
+        data.month,
+        data.day,
     )
 
     holiday = await use_case.execute(
@@ -636,12 +669,22 @@ async def update_holiday_user(
 
     # Нормализуем дату если она предоставлена
     normalized_date = None
-    if data.holiday_date:
+    if data.day is not None and data.month is not None:
         from datetime import date as date_class
+        from calendar import monthrange
+        
+        # Проверка корректности даты
+        max_day = monthrange(date_class.today().year, data.month)[1]
+        if data.day > max_day:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Day {data.day} is invalid for month {data.month}. Maximum day is {max_day}."
+            )
+        
         normalized_date = date_class(
             date_class.today().year,
-            data.holiday_date.month,
-            data.holiday_date.day,
+            data.month,
+            data.day,
         )
 
     holiday = await use_case.execute(

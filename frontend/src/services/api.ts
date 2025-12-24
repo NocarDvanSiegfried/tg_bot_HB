@@ -264,7 +264,7 @@ export const api = {
     return data
   },
 
-  async createHoliday(data: Omit<Holiday, 'id'>): Promise<Holiday> {
+  async createHoliday(data: { name: string; day: number; month: number; description?: string }): Promise<Holiday> {
     const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.LIST), {
       method: 'POST',
       headers: getHeaders(),
@@ -279,7 +279,7 @@ export const api = {
     return result
   },
 
-  async updateHoliday(id: number, data: Partial<Holiday>): Promise<Holiday> {
+  async updateHoliday(id: number, data: Partial<{ name: string; day: number; month: number; description?: string }>): Promise<Holiday> {
     const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.HOLIDAYS.BY_ID(id)), {
       method: 'PUT',
       headers: getHeaders(),

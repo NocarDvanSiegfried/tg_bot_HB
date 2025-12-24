@@ -13,7 +13,7 @@ interface HolidayManagementProps {
 
 export default function HolidayManagement({ onBack }: HolidayManagementProps) {
   // Валидация для Holiday (специфичная логика)
-  const validateHoliday = (data: Partial<Holiday>): string[] => {
+  const validateHoliday = (data: any): string[] => {
     const errors: string[] = []
     
     if (!data.name?.trim()) {
@@ -24,14 +24,21 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       errors.push('Название праздника не может быть длиннее 255 символов')
     }
     
-    // Проверка даты с использованием утилиты
-    if (data.date) {
-      const dateValidation = validateDate(data.date)
-      if (!dateValidation.isValid) {
-        errors.push(...dateValidation.errors)
+    // Проверка дня и месяца
+    if (data.day === undefined || data.day === null || data.day < 1 || data.day > 31) {
+      errors.push('День должен быть от 1 до 31')
+    }
+    
+    if (data.month === undefined || data.month === null || data.month < 1 || data.month > 12) {
+      errors.push('Месяц должен быть от 1 до 12')
+    }
+    
+    // Проверка корректности даты (например, 31 февраля недопустимо)
+    if (data.day && data.month) {
+      const daysInMonth = new Date(2000, data.month, 0).getDate()
+      if (data.day > daysInMonth) {
+        errors.push(`День ${data.day} недопустим для месяца ${data.month}. Максимальный день: ${daysInMonth}`)
       }
-    } else {
-      errors.push('Дата праздника обязательна')
     }
     
     // Проверка длины комментария
@@ -42,36 +49,34 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
     return errors
   }
 
-  // Нормализация даты для редактирования (специфичная логика)
-  const normalizeHoliday = (holiday: Holiday): Partial<Holiday> => {
+  // Нормализация даты для редактирования (извлекаем день и месяц из date строки)
+  const normalizeHoliday = (holiday: Holiday): any => {
     try {
-      let normalizedDate = holiday.date
-      if (normalizedDate) {
-        // Если дата в формате ISO (с временем), извлечь только дату
-        if (normalizedDate.includes('T')) {
-          normalizedDate = normalizedDate.split('T')[0]
-        }
-        // Если дата в другом формате, попытаться преобразовать
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedDate)) {
-          logger.warn(`[HolidayManagement] Invalid date format: ${normalizedDate}, attempting to fix`)
-          try {
-            const date = new Date(normalizedDate)
-            if (!isNaN(date.getTime())) {
-              normalizedDate = date.toISOString().split('T')[0]
-            } else {
-              logger.error(`[HolidayManagement] Could not parse date: ${normalizedDate}`)
-              normalizedDate = '' // Fallback to empty string
-            }
-          } catch (e) {
-            logger.error(`[HolidayManagement] Error normalizing date: ${e}`)
-            normalizedDate = '' // Fallback to empty string
+      let day: number | undefined
+      let month: number | undefined
+      
+      if (holiday.date) {
+        // Парсим дату из ISO формата (YYYY-MM-DD)
+        const dateStr = holiday.date.includes('T') ? holiday.date.split('T')[0] : holiday.date
+        const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+        
+        if (dateMatch) {
+          month = parseInt(dateMatch[2], 10)
+          day = parseInt(dateMatch[3], 10)
+        } else {
+          // Попытка парсинга через Date
+          const date = new Date(holiday.date)
+          if (!isNaN(date.getTime())) {
+            month = date.getMonth() + 1
+            day = date.getDate()
           }
         }
       }
       
       return {
         name: holiday.name || '',
-        date: normalizedDate || '',
+        day: day || '',
+        month: month || '',
         description: holiday.description || '',
       }
     } catch (error) {
@@ -79,7 +84,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       // Возвращаем безопасные значения по умолчанию
       return {
         name: holiday.name || '',
-        date: holiday.date || '',
+        day: '',
+        month: '',
         description: holiday.description || '',
       }
     }
@@ -109,15 +115,24 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
   } = useCRUDManagement<Holiday>({
     loadData: api.getHolidays,
     createItem: async (data) => {
-      // Преобразуем Partial<Holiday> в Omit<Holiday, 'id'> для API
-      const holidayData: Omit<Holiday, 'id'> = {
+      // Отправляем day и month вместо date
+      const holidayData = {
         name: data.name!,
-        date: data.date!,
+        day: data.day as number,
+        month: data.month as number,
         description: data.description,
       }
       return api.createHoliday(holidayData)
     },
-    updateItem: api.updateHoliday,
+    updateItem: async (id: number, data: any) => {
+      // Преобразуем данные для обновления
+      const updateData: any = {}
+      if (data.name !== undefined) updateData.name = data.name
+      if (data.day !== undefined) updateData.day = data.day
+      if (data.month !== undefined) updateData.month = data.month
+      if (data.description !== undefined) updateData.description = data.description
+      return api.updateHoliday(id, updateData)
+    },
     deleteItem: api.deleteHoliday,
     validateItem: validateHoliday,
     normalizeItem: normalizeHoliday,
@@ -179,7 +194,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
           type="button"
           onClick={() => {
             if (showAddForm) {
-              setFormData({ name: '', date: '', description: '' })
+              setFormData({ name: '', day: '', month: '', description: '' })
               setError(null)
             }
             setShowAddForm(!showAddForm)
@@ -216,13 +231,34 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
             maxLength={255}
           />
           <div>
-            <input
-              type="date"
-              placeholder="Дата праздника"
-              value={(formData.date as string) || ''}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
+            <select
+              value={(formData.month as number) || ''}
+              onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) || '' })}
               required
               disabled={creating}
+              style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
+            >
+              <option value="">Выберите месяц</option>
+              {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                <option key={m} value={m}>
+                  {new Date(2000, m-1, 1).toLocaleString('ru', { month: 'long' })}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>День:</label>
+            <input
+              type="number"
+              min="1"
+              max="31"
+              placeholder="День месяца"
+              value={(formData.day as number) || ''}
+              onChange={(e) => setFormData({ ...formData, day: parseInt(e.target.value) || '' })}
+              required
+              disabled={creating}
+              style={{ width: '100%', padding: '8px' }}
             />
             <small style={{ 
               display: 'block', 
@@ -230,7 +266,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
               color: 'var(--color-text-muted, var(--color-secondary, #666))',
               fontSize: '0.875em'
             }}>
-              ℹ️ Год не важен, праздник будет ежегодным
+              ℹ️ Праздник будет ежегодным
             </small>
           </div>
           <textarea
@@ -305,13 +341,43 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                       maxLength={255}
                     />
                     <div>
-                      <input
-                        type="date"
-                        placeholder="Дата праздника"
-                        value={(editFormData.date as string) || ''}
-                        onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
+                      <select
+                        value={(editFormData.month as number) || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, month: parseInt(e.target.value) || '' })}
                         disabled={updating === holiday.id || showAddForm}
+                        style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
+                      >
+                        <option value="">Выберите месяц</option>
+                        {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                          <option key={m} value={m}>
+                            {new Date(2000, m-1, 1).toLocaleString('ru', { month: 'long' })}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>День:</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="31"
+                        placeholder="День месяца"
+                        value={(editFormData.day as number) || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, day: parseInt(e.target.value) || '' })}
+                        disabled={updating === holiday.id || showAddForm}
+                        style={{ width: '100%', padding: '8px' }}
                       />
+                      <small style={{ 
+                        display: 'block', 
+                        marginTop: '4px', 
+                        color: 'var(--color-text-muted, var(--color-secondary, #666))',
+                        fontSize: '0.875em'
+                      }}>
+                        ℹ️ Праздник будет ежегодным
+                      </small>
+                    </div>
                       <small style={{ 
                         display: 'block', 
                         marginTop: '4px', 

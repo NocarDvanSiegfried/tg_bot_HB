@@ -173,6 +173,11 @@ export default function Calendar() {
     return <BirthdayManagement onBack={handleBackFromManagement} />
   }
 
+  // Если открыто управление праздниками, показываем компонент управления праздниками
+  if (showHolidayManagement) {
+    return <HolidayManagement onBack={() => setShowHolidayManagement(false)} />
+  }
+
   // Если есть ошибка рендеринга, показываем сообщение
   if (renderError) {
     return (
@@ -272,14 +277,6 @@ export default function Calendar() {
             setSelectedDate(null) // Закрываем DateView при переходе
           }}
         />
-      )}
-
-      {showManagement && (
-        <BirthdayManagement onBack={() => setShowManagement(false)} />
-      )}
-
-      {showHolidayManagement && (
-        <HolidayManagement onBack={() => setShowHolidayManagement(false)} />
       )}
     </div>
   )
