@@ -1112,7 +1112,7 @@ async def search_people(
 async def generate_greeting(
     request: Request,
     data: GenerateGreetingRequest,
-    user: dict = Depends(require_panel_access),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth, без panel access
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Сгенерировать поздравление."""
@@ -1156,7 +1156,7 @@ async def generate_greeting(
 async def create_card(
     request: Request,
     data: CreateCardRequest,
-    user: dict = Depends(require_panel_access),
+    user: dict = Depends(verify_telegram_auth),  # Только Telegram auth, без panel access
     factory: UseCaseFactory = Depends(get_readonly_use_case_factory),
 ):
     """Создать открытку."""

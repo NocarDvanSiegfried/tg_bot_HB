@@ -114,7 +114,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     company: string
     position: string
   } | null>(null)
-  const [hasPanelAccess, setHasPanelAccess] = useState(false)
 
   // Использование общего хука для CRUD операций
   const {
@@ -196,29 +195,12 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
     }
   }, [editingId])
 
-  // Проверка доступа к панели
-  useEffect(() => {
-    const checkAccess = async () => {
-      try {
-        const result = await api.checkPanelAccess()
-        setHasPanelAccess(result.has_access)
-        if (import.meta.env.DEV) {
-          logger.info('[BirthdayManagement] Panel access check:', result.has_access)
-        }
-      } catch (error) {
-        logger.error('[BirthdayManagement] Failed to check panel access:', error)
-        setHasPanelAccess(false)
-      }
-    }
-    checkAccess()
-  }, [])
-
   // Обработчик генерации поздравления
   const handleGenerateGreeting = (id: number, name: string, company: string, position: string) => {
-    if (!hasPanelAccess) {
-      logger.warn('[BirthdayManagement] Attempt to generate greeting without panel access')
-      return
+    if (import.meta.env.DEV) {
+      logger.info('[BirthdayManagement] Opening greeting modal', { id, name })
     }
+    // Открываем модальное окно сразу, без проверок доступа
     setGreetingModal({ isOpen: true, birthdayId: id, name, company, position })
   }
 
@@ -541,23 +523,21 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                     )}
                   </div>
                   <div className="birthday-card-actions">
-                    {hasPanelAccess && (
-                      <button 
-                        className="birthday-action-button birthday-greeting-button"
-                        onClick={() => {
-                          if (!bd.id) {
-                            logger.error('[BirthdayManagement] Cannot generate greeting: birthday id is missing')
-                            setError('Ошибка: ID дня рождения не найден')
-                            return
-                          }
-                          handleGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)
-                        }}
-                        disabled={deleting === bd.id || updating === bd.id || showAddForm}
-                        title="Сгенерировать поздравление"
-                      >
-                        🤖 Поздравить
-                      </button>
-                    )}
+                    <button 
+                      className="birthday-action-button birthday-greeting-button"
+                      onClick={() => {
+                        if (!bd.id) {
+                          logger.error('[BirthdayManagement] Cannot generate greeting: birthday id is missing')
+                          setError('Ошибка: ID дня рождения не найден')
+                          return
+                        }
+                        handleGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)
+                      }}
+                      disabled={deleting === bd.id || updating === bd.id || showAddForm}
+                      title="Сгенерировать поздравление"
+                    >
+                      🤖 Поздравить
+                    </button>
                     <button 
                       className="birthday-action-button birthday-edit-button"
                       onClick={() => {

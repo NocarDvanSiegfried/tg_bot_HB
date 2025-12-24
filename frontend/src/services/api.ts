@@ -235,12 +235,6 @@ export const api = {
     return response.blob()
   },
 
-  async checkPanelAccess(): Promise<{ has_access: boolean }> {
-    const response = await fetchWithErrorHandling(buildApiUrl(API_ENDPOINTS.PANEL.CHECK_ACCESS), {
-      headers: getHeaders(),
-    })
-    return response.json()
-  },
 
   async getHolidays(): Promise<Holiday[]> {
     const cacheKey = CacheKeys.holidays

@@ -72,12 +72,5 @@ export const API_ENDPOINTS = {
     CREATE_CARD: '/api/panel/create-card',
   },
 
-  /**
-   * Endpoints для проверки доступа
-   */
-  PANEL: {
-    /** Проверить доступ к панели управления */
-    CHECK_ACCESS: '/api/panel/check-access',
-  },
 } as const
 

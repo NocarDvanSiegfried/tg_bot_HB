@@ -46,8 +46,6 @@ export default function Calendar() {
     company: string
     position: string
   } | null>(null)
-  const [hasPanelAccess, setHasPanelAccess] = useState(false)
-  const [checkingAccess, setCheckingAccess] = useState(true) // Флаг проверки доступа
 
   // Логирование для отладки
   useEffect(() => {
@@ -56,28 +54,6 @@ export default function Calendar() {
     }
   }, [])
 
-  // Проверка доступа к панели
-  useEffect(() => {
-    const checkAccess = async () => {
-      setCheckingAccess(true)
-      try {
-        const result = await api.checkPanelAccess()
-        setHasPanelAccess(result.has_access)
-        // Диагностика
-        console.log('[Calendar] Panel access check result:', result.has_access)
-        if (import.meta.env.DEV) {
-          logger.info('[Calendar] Panel access check:', result.has_access)
-        }
-      } catch (error) {
-        logger.error('[Calendar] Failed to check panel access:', error)
-        setHasPanelAccess(false)
-        console.error('[Calendar] Failed to check panel access:', error)
-      } finally {
-        setCheckingAccess(false)
-      }
-    }
-    checkAccess()
-  }, [])
 
   // Загрузка дней рождения за месяц
   useEffect(() => {
@@ -260,44 +236,16 @@ export default function Calendar() {
   }
 
   // Обработчик генерации поздравления (мемоизирован для стабильности ссылки)
-  const handleGenerateGreeting = useCallback(async (id: number, name: string, company: string, position: string) => {
+  const handleGenerateGreeting = useCallback((id: number, name: string, company: string, position: string) => {
     // Диагностика
-    console.log('[Calendar] handleGenerateGreeting called:', { id, name, hasPanelAccess, checkingAccess })
-    
-    // Если проверка ещё не завершена, ждём
-    if (checkingAccess) {
-      console.log('[Calendar] Still checking access, waiting...')
-      // Можно показать индикатор загрузки
-      return
+    if (import.meta.env.DEV) {
+      console.log('[Calendar] Opening greeting modal for:', { id, name, company, position })
+      logger.info('[Calendar] Opening greeting modal', { id, name })
     }
     
-    // Если доступа нет, проверяем ещё раз (на случай, если доступ появился)
-    if (!hasPanelAccess) {
-      console.log('[Calendar] No access, re-checking...')
-      try {
-        const result = await api.checkPanelAccess()
-        setHasPanelAccess(result.has_access)
-        console.log('[Calendar] Re-check result:', result.has_access)
-        
-        if (!result.has_access) {
-          logger.warn('[Calendar] Attempt to generate greeting without panel access')
-          console.warn('[Calendar] No panel access, cannot generate greeting')
-          // Можно показать сообщение пользователю
-          alert('У вас нет доступа к функции генерации поздравлений. Обратитесь к администратору.')
-          return
-        }
-      } catch (error) {
-        logger.error('[Calendar] Failed to re-check panel access:', error)
-        console.error('[Calendar] Failed to re-check panel access:', error)
-        alert('Ошибка при проверке доступа. Попробуйте позже.')
-        return
-      }
-    }
-    
-    // Если доступ есть, открываем модальное окно
-    console.log('[Calendar] Opening greeting modal')
+    // Открываем модальное окно сразу, без проверок доступа
     setGreetingModal({ isOpen: true, birthdayId: id, name, company, position })
-  }, [hasPanelAccess, checkingAccess]) // setGreetingModal стабильна, не нужна в зависимостях
+  }, []) // setGreetingModal стабильна, не нужна в зависимостях
 
   // Закрытие модального окна
   const handleCloseGreetingModal = () => {
