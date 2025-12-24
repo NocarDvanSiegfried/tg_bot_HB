@@ -191,21 +191,14 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
   }
 
   return (
-    <div className="panel-section">
+    <div className="birthday-management">
       <button className="back-button" onClick={onBack}>🔙 Назад</button>
-      <h3>Управление днями рождения</h3>
+      
+      <h2 className="birthday-management-title">Управление днями рождения</h2>
 
       {/* Диагностическая информация (только в dev режиме) */}
       {import.meta.env.DEV && (
-        <div style={{ 
-          padding: '10px', 
-          marginBottom: '10px', 
-          background: '#e3f2fd', 
-          color: '#1976d2', 
-          borderRadius: '4px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}>
+        <div className="diagnostic-info">
           <strong>🔍 Диагностика:</strong><br/>
           API URL: {diagnosticInfo.apiUrl}<br/>
           InitData: {diagnosticInfo.hasInitData ? `✅ (${diagnosticInfo.initDataLength} символов)` : '❌ отсутствует'}
@@ -213,36 +206,24 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
       )}
 
       {error && (
-        <div className="error-message" style={{ padding: '10px', marginBottom: '10px', background: '#fee', color: '#c00', borderRadius: '4px', whiteSpace: 'pre-line' }}>
+        <div className="error-message" style={{ whiteSpace: 'pre-line' }}>
           ⚠️ {error}
         </div>
       )}
 
-      {/* Поиск и фильтры */}
-      <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {/* Панель управления: поиск и фильтр в одной строке */}
+      <div className="birthday-controls-panel">
         <input
           type="text"
+          className="birthday-search-input"
           placeholder="🔍 Поиск по имени, компании, должности..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}
         />
         <select
+          className="birthday-filter-select"
           value={filterMonth}
           onChange={(e) => setFilterMonth(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
-          style={{
-            width: '100%',
-            padding: '10px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}
         >
           <option value="">Все месяцы</option>
           {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
@@ -251,36 +232,26 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
             </option>
           ))}
         </select>
-        {searchQuery || filterMonth !== '' ? (
-          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-            Найдено: {birthdays.length} из {allBirthdays.length}
-          </div>
-        ) : null}
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      {/* Счетчик результатов */}
+      {searchQuery || filterMonth !== '' ? (
+        <div className="birthday-results-count">
+          Найдено: {birthdays.length} из {allBirthdays.length}
+        </div>
+      ) : null}
+
+      {/* Кнопка добавления */}
+      <div className="birthday-add-button-container">
         <button
           type="button"
+          className="birthday-add-button"
           onClick={() => {
             if (showAddForm) {
-              setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '' })
+              setFormData({ full_name: '', company: '', position: '', birth_date: '', comment: '', responsible: '' })
               setError(null)
             }
             setShowAddForm(!showAddForm)
-          }}
-          style={{
-            padding: '12px 20px',
-            backgroundColor: creating || editingId !== null ? '#ccc' : 'var(--color-success)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: creating || editingId !== null ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            opacity: creating || editingId !== null ? 0.6 : 1
           }}
           disabled={creating || editingId !== null}
         >
@@ -353,7 +324,7 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
               logger.info(`[BirthdayManagement] Rendering birthday id=${bd.id}, editingId=${editingId}, isValidId=${isValidId}, isEditing=${isEditing}`)
             }
             return (
-            <li key={bd.id ?? `birthday-${index}`} className="panel-list-item">
+            <li key={bd.id ?? `birthday-${index}`} className="birthday-card">
               {isEditing ? (
                 <div style={{ width: '100%' }}>
                   {!editFormData.full_name && !editFormData.company && !editFormData.position ? (
@@ -457,13 +428,22 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                 </div>
               ) : (
                 <>
-                  <div>
-                    <strong>{bd.full_name}</strong> - {bd.company}, {bd.position}
-                    <br />
-                    {bd.birth_date} {bd.comment && `(${bd.comment})`}
+                  <div className="birthday-card-content">
+                    <div className="birthday-card-name">{bd.full_name}</div>
+                    <div className="birthday-card-company-position">{bd.company}, {bd.position}</div>
+                    <div className="birthday-card-date">{bd.birth_date}</div>
+                    {bd.comment && (
+                      <div className="birthday-card-comment">{bd.comment}</div>
+                    )}
+                    {bd.responsible && (
+                      <div className="birthday-card-responsible">
+                        👤 <strong>Ответственный:</strong> {bd.responsible}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div className="birthday-card-actions">
                     <button 
+                      className="birthday-action-button birthday-edit-button"
                       onClick={() => {
                         if (!bd.id) {
                           logger.error('[BirthdayManagement] Cannot edit: birthday id is missing', bd)
@@ -475,23 +455,11 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         logger.info(`[BirthdayManagement] After handleEdit call, editingId should be=${bd.id}`)
                       }}
                       disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? '#ccc' : 'var(--color-primary)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? 'not-allowed' : 'pointer',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        opacity: deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm ? 0.6 : 1
-                      }}
                     >
                       ✏️ Редактировать
                     </button>
                     <button 
+                      className="birthday-action-button birthday-delete-button"
                       onClick={() => {
                         if (!bd.id) {
                           logger.error('[BirthdayManagement] Cannot delete: birthday id is missing')
@@ -501,18 +469,6 @@ export default function BirthdayManagement({ onBack }: BirthdayManagementProps) 
                         handleDelete(bd.id)
                       }}
                       disabled={deleting === bd.id || updating === bd.id || editingId === bd.id || showAddForm}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: 'var(--color-danger)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
                     >
                       {deleting === bd.id ? '⏳ Удаление...' : '🗑️ Удалить'}
                     </button>

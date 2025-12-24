@@ -138,6 +138,224 @@
   background-color: var(--color-danger-hover);
 }
 
+/* Стили для экрана управления днями рождения */
+.birthday-management {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.birthday-management-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xl) 0;
+  color: #333;
+}
+
+.diagnostic-info {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+/* Панель управления: поиск и фильтр */
+.birthday-controls-panel {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  align-items: stretch;
+}
+
+.birthday-search-input,
+.birthday-filter-select {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-sm);
+  font-size: 14px;
+  height: 44px; /* Одинаковая высота */
+  box-sizing: border-box;
+}
+
+.birthday-search-input:focus,
+.birthday-filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.birthday-results-count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xs);
+}
+
+/* Кнопка добавления */
+.birthday-add-button-container {
+  margin-bottom: var(--spacing-lg);
+}
+
+.birthday-add-button {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: background-color 0.2s ease;
+}
+
+.birthday-add-button:hover:not(:disabled) {
+  background-color: var(--color-success-hover);
+}
+
+.birthday-add-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Карточка дня рождения */
+.birthday-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-in;
+  gap: var(--spacing-lg);
+}
+
+.birthday-card-content {
+  flex: 1;
+  min-width: 0; /* Позволяет контенту сжиматься */
+}
+
+.birthday-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: var(--spacing-xs);
+}
+
+.birthday-card-company-position {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.birthday-card-date {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.birthday-card-comment {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.birthday-card-responsible {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+.birthday-card-responsible strong {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.birthday-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  align-items: stretch;
+}
+
+.birthday-action-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: 140px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.birthday-edit-button {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.birthday-edit-button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.birthday-delete-button {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.birthday-delete-button:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+}
+
+.birthday-action-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .birthday-controls-panel {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .birthday-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .birthday-card-actions {
+    flex-direction: row;
+    justify-content: stretch;
+  }
+
+  .birthday-action-button {
+    flex: 1;
+    min-width: auto;
+  }
+}
+
 .back-button {
   margin-bottom: var(--spacing-xl);
   padding: 10px;
