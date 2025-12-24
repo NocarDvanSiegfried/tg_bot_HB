@@ -94,7 +94,9 @@ export async function handleHttpError(response: Response, url: string, method: s
     if (response.status === 401) {
       errorMessage = errorMessage || 'Ошибка авторизации. Пожалуйста, обновите страницу.'
     } else if (response.status === 403) {
-      errorMessage = errorMessage || 'Доступ запрещен. У вас нет прав для выполнения этого действия.'
+      // Для генерации поздравлений 403 не должен появляться (используется только Telegram auth)
+      // Если появился, значит проблема с авторизацией Telegram
+      errorMessage = errorMessage || 'Ошибка авторизации. Пожалуйста, обновите страницу и попробуйте снова.'
     } else if (response.status === 404) {
       errorMessage = errorMessage || 'Ресурс не найден. Возможно, он был удален.'
     } else if (response.status === 422) {

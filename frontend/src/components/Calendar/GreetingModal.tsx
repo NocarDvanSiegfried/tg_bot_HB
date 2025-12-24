@@ -77,7 +77,19 @@ export default function GreetingModal({
       setGreetingText(result.greeting)
     } catch (err) {
       logger.error('[GreetingModal] Failed to generate greeting:', err)
-      setError(err instanceof Error ? err.message : 'Не удалось сгенерировать поздравление')
+      const errorMessage = err instanceof Error ? err.message : 'Не удалось сгенерировать поздравление'
+      
+      // Улучшаем сообщения об ошибках для пользователя
+      let userFriendlyMessage = errorMessage
+      if (errorMessage.includes('403') || errorMessage.includes('доступ') || errorMessage.includes('Access denied')) {
+        userFriendlyMessage = 'Ошибка авторизации. Пожалуйста, обновите страницу и попробуйте снова.'
+      } else if (errorMessage.includes('401') || errorMessage.includes('авторизац')) {
+        userFriendlyMessage = 'Ошибка авторизации. Пожалуйста, обновите страницу.'
+      } else if (errorMessage.includes('Network') || errorMessage.includes('fetch')) {
+        userFriendlyMessage = 'Ошибка подключения. Проверьте интернет-соединение и попробуйте снова.'
+      }
+      
+      setError(userFriendlyMessage)
     } finally {
       setGenerating(false)
     }
@@ -110,7 +122,19 @@ export default function GreetingModal({
       }
     } catch (err) {
       logger.error('[GreetingModal] Failed to create card:', err)
-      setError(err instanceof Error ? err.message : 'Не удалось создать открытку')
+      const errorMessage = err instanceof Error ? err.message : 'Не удалось создать открытку'
+      
+      // Улучшаем сообщения об ошибках для пользователя
+      let userFriendlyMessage = errorMessage
+      if (errorMessage.includes('403') || errorMessage.includes('доступ') || errorMessage.includes('Access denied')) {
+        userFriendlyMessage = 'Ошибка авторизации. Пожалуйста, обновите страницу и попробуйте снова.'
+      } else if (errorMessage.includes('401') || errorMessage.includes('авторизац')) {
+        userFriendlyMessage = 'Ошибка авторизации. Пожалуйста, обновите страницу.'
+      } else if (errorMessage.includes('Network') || errorMessage.includes('fetch')) {
+        userFriendlyMessage = 'Ошибка подключения. Проверьте интернет-соединение и попробуйте снова.'
+      }
+      
+      setError(userFriendlyMessage)
     } finally {
       setCreatingCard(false)
     }
