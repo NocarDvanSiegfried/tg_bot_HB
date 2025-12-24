@@ -85,17 +85,55 @@ class CardGeneratorImpl(CardGeneratorPort):
         )
         y_offset += 80
 
-        # Поздравительный текст
-        text_lines = self._wrap_text(greeting_text, text_font, self.width - 200)
-        for line in text_lines:
-            draw.text(
-                (self.width // 2, y_offset),
-                line,
-                fill=self.text_color,
-                font=text_font,
-                anchor="mm",
-            )
-            y_offset += 35
+        # Определяем размер и позицию QR-кода заранее
+        qr_size = 150
+        qr_margin = 20
+        qr_x = self.width - qr_size - qr_margin
+        qr_y = self.height - qr_size - qr_margin
+        
+        # Поздравительный текст - структурируем на логические блоки
+        # Рассчитываем высоту текста для корректного размещения QR-кода
+        text_blocks = self._structure_text(greeting_text)
+        # Учитываем место для QR-кода при расчёте ширины текста
+        text_max_width = self.width - 200 - (qr_size + qr_margin if qr_url else 0)
+        text_height = self._calculate_text_height(text_blocks, text_font, text_max_width)
+        
+        # Проверяем, не перекрывает ли QR-код текст
+        # Если текст занимает слишком много места, уменьшаем QR-код или смещаем выше
+        if qr_url and text_height > qr_y - y_offset - 50:
+            # Текст может перекрыться с QR-кодом
+            available_height = qr_y - y_offset - 50
+            if text_height > available_height:
+                # Уменьшаем размер QR-кода
+                qr_size = 120
+                qr_x = self.width - qr_size - qr_margin
+                qr_y = self.height - qr_size - qr_margin
+                # Пересчитываем ширину текста с новым размером QR-кода
+                text_max_width = self.width - 200 - (qr_size + qr_margin)
+                text_height = self._calculate_text_height(text_blocks, text_font, text_max_width)
+                # Если всё ещё не помещается, смещаем QR-код выше
+                if text_height > qr_y - y_offset - 50:
+                    qr_y = y_offset + text_height + 50
+        
+        # Рисуем структурированный текст
+        line_spacing = 30  # Межстрочное расстояние
+        paragraph_spacing = 20  # Отступ между абзацами
+        
+        for block_idx, block in enumerate(text_blocks):
+            if block_idx > 0:
+                # Отступ между блоками
+                y_offset += paragraph_spacing
+            
+            block_lines = self._wrap_text(block, text_font, text_max_width)
+            for line in block_lines:
+                draw.text(
+                    (self.width // 2, y_offset),
+                    line,
+                    fill=self.text_color,
+                    font=text_font,
+                    anchor="mm",
+                )
+                y_offset += line_spacing
 
         # Комментарий
         if comment:
@@ -108,11 +146,9 @@ class CardGeneratorImpl(CardGeneratorPort):
                 anchor="mm",
             )
 
-        # QR-код
+        # QR-код (размещаем в правом нижнем углу с отступами)
         if qr_url:
-            qr_img = self._generate_qr_code(qr_url, size=150)
-            qr_x = self.width - 200
-            qr_y = self.height - 200
+            qr_img = self._generate_qr_code(qr_url, size=qr_size)
             img.paste(qr_img, (qr_x, qr_y))
 
         # Сохраняем в bytes
@@ -120,28 +156,91 @@ class CardGeneratorImpl(CardGeneratorPort):
         img.save(img_byte_arr, format="PNG")
         return img_byte_arr.getvalue()
 
+    def _structure_text(self, text: str) -> list[str]:
+        """Разбить текст на логические блоки (обращение, основной текст, пожелания)."""
+        import re
+        
+        # Нормализуем текст
+        text = text.strip()
+        
+        # Разбиваем по предложениям
+        sentences = re.split(r'([.!?]+)', text)
+        # Объединяем предложения с их знаками препинания
+        sentences = [sentences[i] + (sentences[i+1] if i+1 < len(sentences) else '') 
+                     for i in range(0, len(sentences), 2) if sentences[i].strip()]
+        
+        if not sentences:
+            return [text]
+        
+        # Определяем блоки:
+        # 1. Обращение (первые 1-2 предложения, обычно содержат имя или обращение)
+        # 2. Основной текст (остальные предложения)
+        blocks = []
+        current_block = []
+        
+        # Первое предложение обычно обращение
+        if sentences:
+            first_sentence = sentences[0].strip()
+            if first_sentence:
+                blocks.append(first_sentence)
+        
+        # Остальные предложения - основной текст
+        if len(sentences) > 1:
+            remaining_text = ' '.join(sentences[1:]).strip()
+            if remaining_text:
+                blocks.append(remaining_text)
+        
+        # Если блоков нет, возвращаем весь текст как один блок
+        if not blocks:
+            blocks = [text]
+        
+        return blocks
+
+    def _calculate_text_height(self, text_blocks: list[str], font, max_width: int) -> int:
+        """Рассчитать общую высоту текста с учётом переносов и отступов."""
+        line_spacing = 30
+        paragraph_spacing = 20
+        
+        total_height = 0
+        for block_idx, block in enumerate(text_blocks):
+            if block_idx > 0:
+                total_height += paragraph_spacing
+            
+            block_lines = self._wrap_text(block, font, max_width)
+            total_height += len(block_lines) * line_spacing
+        
+        return total_height
+
     def _wrap_text(self, text: str, font, max_width: int) -> list[str]:
-        """Перенос текста по словам."""
-        words = text.split()
-        lines = []
-        current_line = []
+        """Перенос текста по словам с сохранением логических абзацев."""
+        # Если текст содержит переносы строк, сохраняем их как отдельные абзацы
+        paragraphs = text.split('\n')
+        all_lines = []
+        
+        for paragraph in paragraphs:
+            paragraph = paragraph.strip()
+            if not paragraph:
+                continue
+            
+            words = paragraph.split()
+            current_line = []
 
-        for word in words:
-            test_line = " ".join(current_line + [word])
-            bbox = font.getbbox(test_line)
-            text_width = bbox[2] - bbox[0]
+            for word in words:
+                test_line = " ".join(current_line + [word])
+                bbox = font.getbbox(test_line)
+                text_width = bbox[2] - bbox[0]
 
-            if text_width <= max_width:
-                current_line.append(word)
-            else:
-                if current_line:
-                    lines.append(" ".join(current_line))
-                current_line = [word]
+                if text_width <= max_width:
+                    current_line.append(word)
+                else:
+                    if current_line:
+                        all_lines.append(" ".join(current_line))
+                    current_line = [word]
 
-        if current_line:
-            lines.append(" ".join(current_line))
-
-        return lines
+            if current_line:
+                all_lines.append(" ".join(current_line))
+        
+        return all_lines if all_lines else [text]
 
     def _generate_qr_code(self, url: str, size: int = 150) -> Image.Image:
         """Сгенерировать QR-код."""
