@@ -3,7 +3,6 @@ import { useCRUDManagement } from '../../hooks/useCRUDManagement'
 import { api } from '../../services/api'
 import { Holiday } from '../../types/holiday'
 import { logger } from '../../utils/logger'
-import { validateDate } from '../../utils/validation'
 import { API_BASE_URL } from '../../config/api'
 import './Panel.css'
 
@@ -24,20 +23,24 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       errors.push('Название праздника не может быть длиннее 255 символов')
     }
     
+    // Преобразуем day и month в числа для проверки (они могут быть строками)
+    const dayNum = typeof data.day === 'string' ? parseInt(data.day, 10) : data.day
+    const monthNum = typeof data.month === 'string' ? parseInt(data.month, 10) : data.month
+    
     // Проверка дня и месяца
-    if (data.day === undefined || data.day === null || data.day < 1 || data.day > 31) {
+    if (dayNum === undefined || dayNum === null || isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
       errors.push('День должен быть от 1 до 31')
     }
     
-    if (data.month === undefined || data.month === null || data.month < 1 || data.month > 12) {
+    if (monthNum === undefined || monthNum === null || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
       errors.push('Месяц должен быть от 1 до 12')
     }
     
     // Проверка корректности даты (например, 31 февраля недопустимо)
-    if (data.day && data.month) {
-      const daysInMonth = new Date(2000, data.month, 0).getDate()
-      if (data.day > daysInMonth) {
-        errors.push(`День ${data.day} недопустим для месяца ${data.month}. Максимальный день: ${daysInMonth}`)
+    if (dayNum && monthNum && !isNaN(dayNum) && !isNaN(monthNum)) {
+      const daysInMonth = new Date(2000, monthNum, 0).getDate()
+      if (dayNum > daysInMonth) {
+        errors.push(`День ${dayNum} недопустим для месяца ${monthNum}. Максимальный день: ${daysInMonth}`)
       }
     }
     
@@ -79,8 +82,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
       
       return {
         name: holiday.name || '',
-        day: day || '',
-        month: month || '',
+        day: day ? String(day) : '',
+        month: month ? String(month) : '',
         description: holiday.description || '',
       }
     } catch (error) {
@@ -119,21 +122,39 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
   } = useCRUDManagement<Holiday>({
     loadData: api.getHolidays,
     createItem: async (data) => {
-      // Отправляем day и month вместо date
+      // Преобразуем day и month в числа перед отправкой (они хранятся как строки)
+      const dayStr = data.day as string | number | undefined
+      const monthStr = data.month as string | number | undefined
+      
+      const dayNum = typeof dayStr === 'string' ? parseInt(dayStr, 10) : (typeof dayStr === 'number' ? dayStr : undefined)
+      const monthNum = typeof monthStr === 'string' ? parseInt(monthStr, 10) : (typeof monthStr === 'number' ? monthStr : undefined)
+      
+      if (dayNum === undefined || isNaN(dayNum) || monthNum === undefined || isNaN(monthNum)) {
+        throw new Error('День и месяц должны быть числами')
+      }
+      
       const holidayData = {
         name: data.name!,
-        day: data.day as number,
-        month: data.month as number,
+        day: dayNum,
+        month: monthNum,
         description: data.description,
       }
       return api.createHoliday(holidayData)
     },
     updateItem: async (id: number, data: any) => {
-      // Преобразуем данные для обновления
+      // Преобразуем данные для обновления, конвертируя строки в числа
       const updateData: any = {}
       if (data.name !== undefined) updateData.name = data.name
-      if (data.day !== undefined) updateData.day = data.day
-      if (data.month !== undefined) updateData.month = data.month
+      if (data.day !== undefined) {
+        const dayStr = data.day as string | number | undefined
+        const dayNum = typeof dayStr === 'string' ? parseInt(dayStr, 10) : (dayStr as number | undefined)
+        if (dayNum !== undefined && !isNaN(dayNum)) updateData.day = dayNum
+      }
+      if (data.month !== undefined) {
+        const monthStr = data.month as string | number | undefined
+        const monthNum = typeof monthStr === 'string' ? parseInt(monthStr, 10) : (monthStr as number | undefined)
+        if (monthNum !== undefined && !isNaN(monthNum)) updateData.month = monthNum
+      }
       if (data.description !== undefined) updateData.description = data.description
       return api.updateHoliday(id, updateData)
     },
@@ -198,7 +219,7 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
           type="button"
           onClick={() => {
             if (showAddForm) {
-              setFormData({ name: '', day: '', month: '', description: '' })
+              setFormData({ name: '', day: '' as any, month: '' as any, description: '' })
               setError(null)
             }
             setShowAddForm(!showAddForm)
@@ -237,8 +258,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
           <div>
             <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
             <select
-              value={(formData.month as number) || ''}
-              onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) || '' })}
+              value={(formData.month !== undefined && formData.month !== null) ? String(formData.month) : ''}
+              onChange={(e) => setFormData({ ...formData, month: (e.target.value || '') as any })}
               required
               disabled={creating}
               style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
@@ -258,8 +279,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
               min="1"
               max="31"
               placeholder="День месяца"
-              value={(formData.day as number) || ''}
-              onChange={(e) => setFormData({ ...formData, day: parseInt(e.target.value) || '' })}
+              value={String(formData.day || '')}
+              onChange={(e) => setFormData({ ...formData, day: (e.target.value || '') as any })}
               required
               disabled={creating}
               style={{ width: '100%', padding: '8px' }}
@@ -348,8 +369,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                     <div>
                       <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Месяц:</label>
                       <select
-                        value={(editFormData.month as number) || ''}
-                        onChange={(e) => setEditFormData({ ...editFormData, month: parseInt(e.target.value) || '' })}
+                        value={String(editFormData.month || '')}
+                        onChange={(e) => setEditFormData({ ...editFormData, month: (e.target.value || '') as any })}
                         disabled={updating === holiday.id || showAddForm}
                         style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
                       >
@@ -368,8 +389,8 @@ export default function HolidayManagement({ onBack }: HolidayManagementProps) {
                         min="1"
                         max="31"
                         placeholder="День месяца"
-                        value={(editFormData.day as number) || ''}
-                        onChange={(e) => setEditFormData({ ...editFormData, day: parseInt(e.target.value) || '' })}
+                        value={String(editFormData.day || '')}
+                        onChange={(e) => setEditFormData({ ...editFormData, day: (e.target.value || '') as any })}
                         disabled={updating === holiday.id || showAddForm}
                         style={{ width: '100%', padding: '8px' }}
                       />
