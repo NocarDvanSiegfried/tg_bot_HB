@@ -1,5 +1,5 @@
 // Оптимизированные импорты из date-fns для tree-shaking
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 import format from 'date-fns/format'
 import ru from 'date-fns/locale/ru'
 import { CalendarData } from '../../services/api'
@@ -16,6 +16,12 @@ interface DateViewProps {
 }
 
 function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreeting }: DateViewProps) {
+  // Диагностика: проверяем, передан ли обработчик
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('[DateView] onGenerateGreeting provided:', !!onGenerateGreeting)
+    }
+  }, [onGenerateGreeting])
   if (loading) {
     return <div className="date-view">Загрузка...</div>
   }
@@ -80,14 +86,25 @@ function DateView({ date, data, loading, error, onHolidaysClick, onGenerateGreet
             <div key={bd.id} className="birthday-card">
               <div className="birthday-card-header">
                 <strong className="birthday-name">{bd.full_name}</strong>
-                {onGenerateGreeting && (
+                {onGenerateGreeting ? (
                   <button 
                     className="greeting-button"
-                    onClick={() => onGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)}
+                    onClick={() => {
+                      console.log('[DateView] Greeting button clicked:', { 
+                        id: bd.id, 
+                        name: bd.full_name,
+                        company: bd.company,
+                        position: bd.position
+                      })
+                      onGenerateGreeting(bd.id, bd.full_name, bd.company, bd.position)
+                    }}
                     title="Сгенерировать поздравление"
                   >
                     🤖 Поздравить
                   </button>
+                ) : (
+                  // Диагностика в dev режиме
+                  import.meta.env.DEV && console.log('[DateView] onGenerateGreeting is not provided for:', bd.full_name)
                 )}
               </div>
               <div className="birthday-card-body">
